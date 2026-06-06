@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d12">
+<title>AI 每日精选 · 2026年6月7日</title>
+<style>
+  :root{
+    --bg:#0b0d12; --card:#151924; --card2:#1b2030; --line:#262c3b;
+    --txt:#e8ecf4; --sub:#9aa3b8; --accent:#5b8cff; --hot:#ff5a4d; --gold:#ffcf5c;
+    --green:#39d98a;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;
+    line-height:1.7;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:560px;margin:0 auto;padding:0 16px calc(40px + env(safe-area-inset-bottom));}
+  header{padding:28px 16px 18px;max-width:560px;margin:0 auto;}
+  .kicker{font-size:13px;color:var(--accent);letter-spacing:2px;font-weight:700;}
+  h1{font-size:26px;line-height:1.3;margin:8px 0 6px;font-weight:800;letter-spacing:-.3px;}
+  .date{font-size:14px;color:var(--sub);}
+  .intro{font-size:14px;color:var(--sub);margin-top:12px;padding-top:14px;border-top:1px solid var(--line);}
+  .section-label{display:flex;align-items:center;gap:8px;margin:30px 4px 14px;font-size:14px;
+    font-weight:700;color:var(--sub);letter-spacing:1px;text-transform:uppercase;}
+  .section-label .bar{flex:1;height:1px;background:var(--line);}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:18px 17px;margin-bottom:14px;}
+  .hotcard{background:linear-gradient(160deg,#241016,#1a1320);border:1px solid #4a2230;
+    box-shadow:0 0 0 1px rgba(255,90,77,.15),0 8px 30px rgba(255,90,77,.08);}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;
+    padding:4px 10px;border-radius:999px;letter-spacing:.5px;margin-bottom:10px;}
+  .badge.hot{background:rgba(255,90,77,.16);color:var(--hot);border:1px solid rgba(255,90,77,.4);}
+  .num{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;
+    padding:0 7px;border-radius:8px;background:var(--card2);color:var(--accent);font-weight:800;
+    font-size:14px;margin-right:9px;vertical-align:middle;}
+  .num.hotn{background:rgba(255,90,77,.18);color:var(--hot);}
+  h2{font-size:18.5px;line-height:1.45;margin:0 0 10px;font-weight:800;letter-spacing:-.2px;}
+  .card p{margin:0 0 11px;font-size:15.5px;color:#d6dbe8;}
+  .card p:last-child{margin-bottom:0;}
+  .why{background:var(--card2);border-radius:12px;padding:12px 13px;margin-top:11px;
+    font-size:14.5px;border-left:3px solid var(--accent);}
+  .why.hotwhy{border-left-color:var(--hot);}
+  .why b{color:var(--gold);}
+  .tag{font-size:12px;color:var(--sub);background:var(--card2);padding:3px 9px;border-radius:7px;
+    margin-right:6px;display:inline-block;margin-bottom:6px;}
+  em{color:var(--green);font-style:normal;font-weight:700;}
+  strong{color:#fff;}
+  .src{margin-top:9px;font-size:12.5px;}
+  .src a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);}
+  footer{margin-top:34px;padding:20px 4px 0;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--sub);line-height:1.8;}
+  footer a{color:var(--accent);text-decoration:none;}
+  .disc{font-size:11.5px;color:#6b7287;margin-top:14px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker">AI 每日精选</div>
+  <h1>今天的 AI，发生了什么大事</h1>
+  <div class="date">2026年6月7日 · 周日 · 用大白话讲清最值得关注的 10 条</div>
+  <div class="intro">先看全球头部 AI 公司动态，再扫一遍全网热点，按"最值得你关注"排序。开头两条是<strong>跨时代的爆点</strong>，其余 8 条快速过。</div>
+</header>
+
+<div class="wrap">
+
+  <div class="section-label">🔥 爆点 · 置顶<span class="bar"></span></div>
+
+  <!-- 爆点 1 -->
+  <div class="card hotcard">
+    <span class="badge hot">🔥 爆点 · 跨时代</span>
+    <h2><span class="num hotn">1</span>顶级 AI 正在变成"白菜价"：开源模型追平闭源，成本只要 1/10 甚至 1/30</h2>
+    <p>这一周中国的开放权重模型集体放大招：阿里 <strong>Qwen 3.7 Max</strong> 在智能体（agent）任务上追平甚至超过 Claude Opus 4.7，但输入价只要一半、输出价只要四分之一；<strong>DeepSeek V4</strong> 能以约 <em>$0.30/百万 token</em> 运行（西方同级要 $10+）；MiniMax M2.7 更低到 $0.30/$1.20；Moonshot 的 <strong>Kimi K2.6</strong> 还成了首个在 SWE-Bench Pro 编程榜上击败 GPT-5.4 的开放权重模型。</p>
+    <div class="why hotwhy"><b>为什么是爆点</b>（正是你说的"Gamma 4 标准"：又强又便宜）：以前"最强 AI"等于"最贵、还得联网调闭源 API"。现在普通团队花十分之一甚至三十分之一的钱，就能把接近顶级的能力跑在自己手里。这意味着顶级智能开始<strong>普及化、平民化</strong>——AI 的成本曲线正在被一脚踩塌，这是改写整个行业经济账的跨时代信号。</div>
+    <div class="src">来源：<a href="https://benchlm.ai/blog/posts/best-chinese-llm">BenchLM 中文模型榜</a> · <a href="https://www.buildfastwithai.com/blogs/ai-news-today-june-6-2026">Build Fast with AI（6/6）</a></div>
+  </div>
+
+  <!-- 爆点 2 -->
+  <div class="card hotcard">
+    <span class="badge hot">🔥 爆点 · 跨时代</span>
+    <h2><span class="num hotn">2</span>英伟达要"重新发明笔记本"：AI 直接跑在你电脑里，不用上云</h2>
+    <p>黄仁勋在台北 Computex 发布 <strong>RTX Spark 超级芯片</strong>，正式杀进消费级笔记本市场（直接对标 Intel、AMD）。它把 AI 智能体、内容创作、游戏整合到一块便携芯片上，能在<strong>本地</strong>直接跑大模型，不必事事联网。Adobe 已经在为它重写 Photoshop 和 Premiere，微软联手做系统。消息一出，AMD、Intel、高通股价应声下跌。</p>
+    <div class="why hotwhy"><b>为什么是爆点</b>：过去 AI 的算力都堆在云端数据中心，又贵又有延迟、还涉及隐私。把顶级算力塞进个人笔记本，意味着<strong>"个人本地 AI"时代真正开始</strong>——更快、更私密、不按 token 收费。英伟达押注：下一个算力瓶颈在"你手里的设备"，而不只是数据中心。秋季上市。</div>
+    <div class="src">来源：<a href="https://www.cnbc.com/2026/06/02/nvidias-new-pc-chips-are-ceos-bid-to-own-every-part-of-ai-stack.html">CNBC（6/2）</a></div>
+  </div>
+
+  <div class="section-label">📌 其余 8 条值得关注<span class="bar"></span></div>
+
+  <!-- 3 -->
+  <div class="card">
+    <h2><span class="num">3</span>ChatGPT 记忆大升级：它终于"自己记住你"了</h2>
+    <p>OpenAI 推出 <strong>Dreaming V3</strong> 记忆架构（6/4 起 Plus/Pro 美国用户先用）。以前要你手动说"记住这件事"，现在它会在对话结束后<strong>自动总结</strong>你的偏好、项目、临时安排——而且懂得"过期就忘"（比如你 7 月去过新加坡，回来后它就不再老推荐新加坡餐厅）。算力消耗砍掉约 5 倍，所以连免费用户也能用上。</p>
+    <div class="why"><b>看点</b>：这是"留住用户"的体验补丁，不是能力跃升——AI 助手最大的流失原因，就是老让你重复自己。隐私研究者已警告：96% 的记忆是系统"自作主张"建的，欧盟 8 月的透明度新规会盯上它。</div>
+    <div class="src">来源：<a href="https://openai.com/index/chatgpt-memory-dreaming/">OpenAI</a> · <a href="https://www.engadget.com/2187811/chatgpt-s-memory-is-getting-better-especially-if-you-re-on-the-free-tier/">Engadget</a></div>
+  </div>
+
+  <!-- 4 -->
+  <div class="card">
+    <h2><span class="num">4</span>Anthropic 估值 9650 亿美元，秘密递交 IPO</h2>
+    <p>6/1 向美国 SEC <strong>秘密提交 S-1</strong>，正式启动上市流程。最新数据吓人：营收年化（run-rate）从去年约 100 亿冲到 5 月的约 <em>470 亿美元</em>，一年涨约 5 倍；上市前刚完成 650 亿美元 H 轮，投后估值 9650 亿。分析师称"破万亿上市"是基准预期。</p>
+    <div class="why"><b>看点</b>：靠 Claude Code（AI 编程）撑起的营收狂奔，让编程类 AI 成了最被资本认可的方向。但它一个月要付 SpaceX <strong>12.5 亿美元</strong>租算力（一年 150 亿），这笔成本会是招股书里最敏感的一行。OpenAI 预计也将很快递交，两大巨头同年争抢同一批机构投资人。</div>
+    <div class="src">来源：<a href="https://www.anthropic.com/news/confidential-draft-s1-sec">Anthropic</a> · <a href="https://techcrunch.com/2026/06/01/anthropic-files-to-go-public/">TechCrunch</a></div>
+  </div>
+
+  <!-- 5 -->
+  <div class="card">
+    <h2><span class="num">5</span>微软一口气发 7 个自研模型，开始"去 OpenAI 化"</h2>
+    <p>在 Build 2026 大会上，微软发布 <strong>MAI 系列 7 个自研模型</strong>：推理旗舰 MAI-Thinking-1、编程模型 MAI-Code-1-Flash、图像模型 MAI-Image-2.5（Arena 图像榜超过 Gemini 3 Pro）、转录模型 MAI-Transcribe-1.5（43 种语言、比对手快 5 倍）、语音模型 MAI-Voice-2 等。全部<strong>自己训练，不靠 OpenAI</strong>。</p>
+    <div class="why"><b>看点</b>：时点很微妙——OpenAI 上市在即，微软要向公开市场证明：我的 AI 战略不再绑死在 OpenAI 的估值和模型质量上。这是纳德拉给自己上的"对冲险"，而且已经投入生产。</div>
+    <div class="src">来源：<a href="https://www.cnbc.com/2026/06/02/microsoft-unveils-new-ai-models-lessen-reliance-on-openai-lower-costs.html">CNBC（6/2）</a> · <a href="https://dev.to/vjswamy/microsoft-build-2026-introducing-the-mai-model-family-seven-new-ai-models-1dd8">Build 2026</a></div>
+  </div>
+
+  <!-- 6 -->
+  <div class="card">
+    <h2><span class="num">6</span>SpaceX 冲刺史上最大 IPO，6 月 12 日上市</h2>
+    <p>SpaceX（已合并 xAI）路演 6/4 启动，<strong>6/11 定价、6/12 在纳斯达克挂牌（代码 SPCX）</strong>，目标募资高达 750 亿美元、估值约 1.75 万亿。若成功，将超过 2019 年沙特阿美，成为有史以来最大 IPO。值得注意：30% 份额直接开放给散户（通过 Robinhood、富达、嘉信），是常规的 3 倍。</p>
+    <div class="why"><b>看点</b>：高盛预计 2026 年美股 IPO 募资可达约 1600 亿美元，是去年的 4 倍，几乎全靠 SpaceX、OpenAI、Anthropic 三家撑起。AI 与航天正一起进入"资本大兑现"时刻。</div>
+    <div class="src">来源：<a href="https://www.fastcompany.com/91553827/look-biggest-ai-players-barreling-towards-huge-wall-street-debuts">Fast Company</a> · <a href="https://www.buildfastwithai.com/blogs/ai-news-today-june-6-2026">Build Fast with AI（6/6）</a></div>
+  </div>
+
+  <!-- 7 -->
+  <div class="card">
+    <h2><span class="num">7</span>美国出 269 页 AI 大法案，想"冻结"各州 AI 立法 3 年</h2>
+    <p>两党议员 6/4 公布《伟大美国 AI 法案》讨论稿，最炸的一条：<strong>3 年内冻结各州关于前沿 AI 的立法</strong>（包括即将 6/30 生效的科罗拉多反歧视 AI 法）。同时要求年营收 5 亿美元以上的大公司公开"前沿 AI 治理框架"、上报重大安全事故、接受审计。</p>
+    <div class="why"><b>看点</b>：工会（AFL-CIO 等）直接喊"硬拒绝，这是送给 AI 行业的大礼包"；科技行业组织点赞。争议核心：在没有同等联邦保护的情况下先冻结州法，到底是"统一监管"还是"保护公司多过保护人"。它目前只是讨论稿，立法路还很长。</div>
+    <div class="src">来源：<a href="https://rollcall.com/2026/06/04/bipartisan-ai-draft-proposes-three-year-preemption-of-state-laws/">Roll Call</a> · <a href="https://fedscoop.com/bipartisan-great-american-ai-act-draft-proposes-new-federal-ai-governance-framework/">FedScoop</a></div>
+  </div>
+
+  <!-- 8 -->
+  <div class="card">
+    <h2><span class="num">8</span>AI 开始守护电网和水务：Anthropic、OpenAI 抢攻网络安全</h2>
+    <p>Anthropic 的 <strong>Project Glasswing</strong>（用 Claude Mythos 做网络安全）6/2 扩展到电网、水务、医疗、通信、硬件等关键基础设施，覆盖系统影响超 1 亿人；首月就在 1000+ 开源项目里查出 <em>2.3 万个漏洞</em>，独立抽检 90.6% 属实。同时 OpenAI 把 <strong>GPT-5.5-Cyber</strong> 开放给欧盟的安全团队和政府机构。</p>
+    <div class="why"><b>看点</b>：AI 正从"聊天框"走进国家命脉系统。两家用不同打法（Anthropic 专攻安全基建、OpenAI 主攻政府关系）争抢同一批政府预算。网络安全行业的玩法正被 AI 重写。</div>
+    <div class="src">来源：<a href="https://www.investing.com/analysis/anthropic-mythos-expansion-opens-a-new-ai-cybersecurity-market-200681377">Investing.com</a> · <a href="https://www.buildfastwithai.com/blogs/ai-news-today-june-6-2026">Build Fast with AI（6/6）</a></div>
+  </div>
+
+  <!-- 9 -->
+  <div class="card">
+    <h2><span class="num">9</span>下一波旗舰临近：GPT-5.6 与 Claude Sonnet 4.8 都在路上</h2>
+    <p>多个泄露信息指向 <strong>GPT-5.6</strong> 6 月发布，主打 agentic 任务更准、token 消耗再降 20–30%——目标是"用 GPT-4o 的价格享受 GPT-5.5 的推理"。同时开发者圈普遍预期 <strong>Claude Sonnet 4.8</strong> 中旬登场（线索来自一次意外泄露的源码映射，其中"opus-4-7"已被验证为真）。</p>
+    <div class="why"><b>看点</b>：两款都把矛头对准"又便宜又能干活"的生产级智能体市场，且都瞄准 6 月中旬。未来两周，做 AI 产品的成本账可能再次被改写。注意：Sonnet 4.8 仍属高可信传闻，官方未证实。</div>
+    <div class="src">来源：<a href="https://www.geeky-gadgets.com/gpt-5-6-leaks-microsoft-build-2026/">Geeky Gadgets</a> · <a href="https://www.buildfastwithai.com/blogs/ai-news-today-june-6-2026">Build Fast with AI（6/6）</a></div>
+  </div>
+
+  <!-- 10 -->
+  <div class="card">
+    <h2><span class="num">10</span>"算力即权力，电费即命门"：谷歌每月豪掷 9.2 亿租 GPU</h2>
+    <p>谷歌同意每月向 SpaceX 支付约 <strong>9.2 亿美元</strong>，租用 xAI 数据中心里约 11 万块英伟达 GPU（2026 年 10 月起到 2029 年 6 月），是史上最大云算力承诺之一。与此同时，亚利桑那州最大电力公司提议对数据中心<strong>单独加价 45% 电费</strong>，理由是 AI 该"为电网扩容付出公平份额"。</p>
+    <div class="why"><b>看点</b>：当模型能力趋同，竞争焦点已经转移——<strong>电和算力成了新的护城河</strong>。谁能锁定便宜、稳定的电力与 GPU，谁就赢。这也是为什么巨头们纷纷自建核电、绑定算力供应商。</div>
+    <div class="src">来源：<a href="https://www.cnbc.com/2026/06/05/google-to-pay-spacex-920-million-a-month-for-xai-compute-capacity.html">CNBC（6/5）</a> · <a href="https://www.wsj.com/articles/arizona-utility-ai-data-center-rate-increase">WSJ</a></div>
+  </div>
+
+  <footer>
+    <div>📅 报告由定时任务自动生成于 2026-06-07。新闻经多源交叉核对，模型版本号/价格等以官方为准；标注"泄露/传闻"的内容尚未获官方证实。</div>
+    <div class="disc">主要信源：Build Fast with AI 每日汇总、CNBC、TechCrunch、Anthropic / OpenAI 官方、BenchLM、Roll Call、WSJ 等（见每条卡片链接）。本页面向手机竖屏阅读。</div>
+  </footer>
+
+</div>
+</body>
+</html>
