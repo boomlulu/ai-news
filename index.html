@@ -2,160 +2,435 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b0d12">
-<title>AI 每日精选 · 2026年6月7日</title>
+<title>每日 AI 新闻 · 2026年6月7日</title>
 <style>
   :root{
-    --bg:#0b0d12; --card:#151924; --card2:#1b2030; --line:#262c3b;
-    --txt:#e8ecf4; --sub:#9aa3b8; --accent:#5b8cff; --hot:#ff5a4d; --gold:#ffcf5c;
-    --green:#39d98a;
+    --bg:#0b0d12; --bg2:#0e1118; --card:#151a25; --card2:#1a2030; --line:#252b3a;
+    --txt:#eaeef6; --sub:#9aa3b8; --dim:#6b7388;
+    --accent:#5b8cff; --hot:#ff5a4d; --gold:#ffce5c; --green:#39d98a; --purple:#b48bff; --teal:#3fd0c9;
+    --statusbar:46px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;
-    line-height:1.7;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:560px;margin:0 auto;padding:0 16px calc(40px + env(safe-area-inset-bottom));}
-  header{padding:28px 16px 18px;max-width:560px;margin:0 auto;}
-  .kicker{font-size:13px;color:var(--accent);letter-spacing:2px;font-weight:700;}
-  h1{font-size:26px;line-height:1.3;margin:8px 0 6px;font-weight:800;letter-spacing:-.3px;}
-  .date{font-size:14px;color:var(--sub);}
-  .intro{font-size:14px;color:var(--sub);margin-top:12px;padding-top:14px;border-top:1px solid var(--line);}
-  .section-label{display:flex;align-items:center;gap:8px;margin:30px 4px 14px;font-size:14px;
-    font-weight:700;color:var(--sub);letter-spacing:1px;text-transform:uppercase;}
-  .section-label .bar{flex:1;height:1px;background:var(--line);}
+    -webkit-font-smoothing:antialiased;line-height:1.6;}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;
-    padding:18px 17px;margin-bottom:14px;}
-  .hotcard{background:linear-gradient(160deg,#241016,#1a1320);border:1px solid #4a2230;
-    box-shadow:0 0 0 1px rgba(255,90,77,.15),0 8px 30px rgba(255,90,77,.08);}
-  .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;
-    padding:4px 10px;border-radius:999px;letter-spacing:.5px;margin-bottom:10px;}
-  .badge.hot{background:rgba(255,90,77,.16);color:var(--hot);border:1px solid rgba(255,90,77,.4);}
-  .num{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;
-    padding:0 7px;border-radius:8px;background:var(--card2);color:var(--accent);font-weight:800;
-    font-size:14px;margin-right:9px;vertical-align:middle;}
-  .num.hotn{background:rgba(255,90,77,.18);color:var(--hot);}
-  h2{font-size:18.5px;line-height:1.45;margin:0 0 10px;font-weight:800;letter-spacing:-.2px;}
-  .card p{margin:0 0 11px;font-size:15.5px;color:#d6dbe8;}
-  .card p:last-child{margin-bottom:0;}
-  .why{background:var(--card2);border-radius:12px;padding:12px 13px;margin-top:11px;
-    font-size:14.5px;border-left:3px solid var(--accent);}
-  .why.hotwhy{border-left-color:var(--hot);}
-  .why b{color:var(--gold);}
-  .tag{font-size:12px;color:var(--sub);background:var(--card2);padding:3px 9px;border-radius:7px;
-    margin-right:6px;display:inline-block;margin-bottom:6px;}
-  em{color:var(--green);font-style:normal;font-weight:700;}
-  strong{color:#fff;}
-  .src{margin-top:9px;font-size:12.5px;}
-  .src a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);}
-  footer{margin-top:34px;padding:20px 4px 0;border-top:1px solid var(--line);
-    font-size:12.5px;color:var(--sub);line-height:1.8;}
-  footer a{color:var(--accent);text-decoration:none;}
-  .disc{font-size:11.5px;color:#6b7287;margin-top:14px;}
+  /* ===== 顶部状态栏 ===== */
+  .statusbar{position:fixed;top:0;left:0;right:0;height:var(--statusbar);z-index:60;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 16px;padding-top:env(safe-area-inset-top);
+    background:rgba(11,13,18,.82);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);}
+  .sb-brand{font-size:14px;font-weight:800;letter-spacing:.5px;}
+  .sb-brand .dot{color:var(--accent);}
+  .sb-meta{font-size:11.5px;color:var(--sub);text-align:right;line-height:1.35;}
+
+  /* ===== 滚动容器：整屏纵向翻页 ===== */
+  #scroller{height:100dvh;overflow-y:scroll;scroll-snap-type:y mandatory;
+    scroll-behavior:smooth;-webkit-overflow-scrolling:touch;}
+  #scroller::-webkit-scrollbar{display:none;}
+  .page{height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;
+    padding-top:calc(var(--statusbar) + env(safe-area-inset-top));
+    display:flex;flex-direction:column;}
+
+  .inner{max-width:560px;width:100%;margin:0 auto;padding:0 20px;flex:1;
+    display:flex;flex-direction:column;min-height:0;}
+
+  /* ===== 封面页 ===== */
+  .cover{justify-content:center;}
+  .cover .kicker{font-size:12px;letter-spacing:3px;color:var(--accent);font-weight:800;}
+  .cover h1{font-size:32px;line-height:1.25;margin:14px 0 0;font-weight:800;letter-spacing:-.5px;}
+  .cover .lead{font-size:15px;color:var(--sub);margin:16px 0 26px;max-width:30em;}
+  .cover .stats{display:flex;gap:10px;flex-wrap:wrap;}
+  .stat{flex:1;min-width:90px;background:var(--card);border:1px solid var(--line);
+    border-radius:8px;padding:14px 12px;}
+  .stat .v{font-size:24px;font-weight:800;color:var(--txt);}
+  .stat .v.hot{color:var(--hot);}
+  .stat .k{font-size:11.5px;color:var(--dim);margin-top:3px;}
+  .cover .hint{margin-top:30px;font-size:12.5px;color:var(--dim);display:flex;align-items:center;gap:7px;}
+  .cover .hint .arr{animation:bob 1.6s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+  /* ===== 新闻页 ===== */
+  .news .nhead{padding-top:14px;}
+  .metarow{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+  .tag{font-size:11px;font-weight:800;padding:3px 9px;border-radius:6px;letter-spacing:.5px;}
+  .tag.cat-产品{background:rgba(91,140,255,.16);color:var(--accent);}
+  .tag.cat-研究{background:rgba(180,139,255,.16);color:var(--purple);}
+  .tag.cat-政策{background:rgba(255,206,92,.16);color:var(--gold);}
+  .tag.cat-商业{background:rgba(57,217,138,.16);color:var(--green);}
+  .tag.cat-开源{background:rgba(63,208,201,.16);color:var(--teal);}
+  .tag.cat-落地{background:rgba(255,206,92,.16);color:var(--gold);}
+  .tag.hot{background:rgba(255,90,77,.18);color:var(--hot);border:1px solid rgba(255,90,77,.4);
+    display:inline-flex;align-items:center;gap:4px;}
+  .seq{font-size:12px;color:var(--dim);font-weight:700;margin-left:auto;}
+  .impact{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--sub);}
+  .impact .dots{letter-spacing:1px;}
+  .impact .on{color:var(--gold);} .impact .off{color:#39415a;}
+  .impact .ho{color:var(--hot);}
+  .news h2{font-size:21px;line-height:1.38;margin:4px 0 0;font-weight:800;letter-spacing:-.3px;}
+  .news h2.hoth2{color:#fff;}
+
+  /* 横向面板 */
+  .panels{flex:1;display:flex;overflow-x:auto;overflow-y:hidden;
+    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+    margin:14px -20px 0;padding:0 20px;min-height:0;}
+  .panels::-webkit-scrollbar{display:none;}
+  .panel{min-width:100%;scroll-snap-align:start;padding-right:4px;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:14px;}
+  .panel::-webkit-scrollbar{display:none;}
+  .plabel{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--dim);
+    text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .plabel .bar{flex:1;height:1px;background:var(--line);}
+
+  .body{font-size:15px;color:#d7dce8;}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:13px 14px;margin-bottom:11px;}
+  .box.hl{border-left:3px solid var(--accent);background:var(--card2);}
+  .box.hl.hot{border-left-color:var(--hot);}
+  .box .h{font-size:12px;font-weight:800;color:var(--gold);margin-bottom:6px;letter-spacing:.5px;}
+  .box .h.blue{color:var(--accent);}
+  .box .h.green{color:var(--green);}
+  .ilist{margin:0;padding:0;list-style:none;}
+  .ilist li{position:relative;padding-left:18px;margin-bottom:9px;font-size:14px;color:#d2d8e6;}
+  .ilist li:last-child{margin-bottom:0;}
+  .ilist li::before{content:"";position:absolute;left:2px;top:8px;width:6px;height:6px;
+    border-radius:2px;background:var(--accent);}
+  .panel.pc .ilist li::before{background:var(--green);}
+  .kv{display:flex;gap:10px;margin-bottom:11px;font-size:13.5px;}
+  .kv .kk{flex:0 0 64px;color:var(--dim);font-weight:700;}
+  .kv .vv{color:#d7dce8;flex:1;}
+  .src a{color:var(--accent);text-decoration:none;}
+  .cred{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:5px;}
+  .cred.high{background:rgba(57,217,138,.15);color:var(--green);}
+  .cred.mid{background:rgba(255,206,92,.15);color:var(--gold);}
+  .pend{color:#c7a85a;}
+
+  .pdots{display:flex;gap:6px;justify-content:center;align-items:center;
+    padding:10px 0 4px;font-size:11px;color:var(--dim);}
+  .pdots .d{width:6px;height:6px;border-radius:50%;background:#39415a;transition:.2s;}
+  .pdots .d.act{background:var(--accent);width:18px;border-radius:3px;}
+
+  /* ===== 明日观察 ===== */
+  .watch{justify-content:center;}
+  .watch .kicker{font-size:12px;letter-spacing:3px;color:var(--accent);font-weight:800;}
+  .watch h1{font-size:26px;margin:12px 0 18px;font-weight:800;}
+  .witem{background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:15px 15px;margin-bottom:11px;display:flex;gap:12px;}
+  .wn{flex:0 0 26px;height:26px;border-radius:7px;background:var(--card2);color:var(--accent);
+    font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;}
+  .wt{font-size:15px;color:#e2e7f1;}
+  .watch .foot{margin-top:20px;font-size:11.5px;color:var(--dim);line-height:1.7;}
+  .watch .foot a{color:var(--accent);text-decoration:none;}
+
+  /* ===== 右侧纵向进度条 ===== */
+  .progress{position:fixed;right:8px;top:50%;transform:translateY(-50%);z-index:55;
+    display:flex;flex-direction:column;gap:7px;align-items:center;}
+  .progress .pd{width:6px;height:6px;border-radius:50%;background:#39415a;transition:.25s;}
+  .progress .pd.act{background:var(--accent);height:20px;border-radius:3px;}
+  .progress .pd.hot.act{background:var(--hot);}
+
+  /* ===== 左侧日期抽屉 ===== */
+  .drawer-handle{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:58;
+    width:24px;height:96px;background:var(--card);border:1px solid var(--line);border-left:none;
+    border-radius:0 10px 10px 0;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;color:var(--sub);}
+  .drawer-handle span{writing-mode:vertical-rl;font-size:11px;font-weight:700;letter-spacing:2px;}
+  .drawer{position:fixed;left:0;top:0;bottom:0;width:230px;z-index:59;
+    background:var(--bg2);border-right:1px solid var(--line);
+    transform:translateX(-101%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+    padding:calc(var(--statusbar) + env(safe-area-inset-top) + 16px) 16px 20px;
+    display:flex;flex-direction:column;overflow-y:auto;}
+  .drawer.open{transform:translateX(0);box-shadow:18px 0 50px rgba(0,0,0,.5);}
+  .drawer .dt{font-size:12px;letter-spacing:2px;color:var(--dim);font-weight:800;margin-bottom:14px;}
+  .drawer a.day{display:flex;justify-content:space-between;align-items:center;
+    text-decoration:none;color:var(--sub);background:var(--card);border:1px solid var(--line);
+    border-radius:8px;padding:12px 13px;margin-bottom:9px;font-size:14px;font-weight:600;}
+  .drawer a.day.cur{color:var(--txt);border-color:var(--accent);background:var(--card2);}
+  .drawer a.day .badge{font-size:11px;color:var(--dim);font-weight:500;}
+  .drawer a.day.cur .badge{color:var(--accent);}
+  .drawer .more{margin-top:auto;padding-top:14px;font-size:12.5px;}
+  .drawer .more a{color:var(--accent);text-decoration:none;}
+  .scrim{position:fixed;inset:0;z-index:57;background:rgba(0,0,0,.4);opacity:0;visibility:hidden;
+    transition:.28s;}
+  .scrim.show{opacity:1;visibility:visible;}
 </style>
 </head>
 <body>
-<header>
-  <div class="kicker">AI 每日精选</div>
-  <h1>今天的 AI，发生了什么大事</h1>
-  <div class="date">2026年6月7日 · 周日 · 用大白话讲清最值得关注的 10 条</div>
-  <div class="intro">先看全球头部 AI 公司动态，再扫一遍全网热点，按"最值得你关注"排序。开头两条是<strong>跨时代的爆点</strong>，其余 8 条快速过。</div>
-</header>
 
-<div class="wrap">
-
-  <div class="section-label">🔥 爆点 · 置顶<span class="bar"></span></div>
-
-  <!-- 爆点 1 -->
-  <div class="card hotcard">
-    <span class="badge hot">🔥 爆点 · 跨时代</span>
-    <h2><span class="num hotn">1</span>顶级 AI 正在变成"白菜价"：开源模型追平闭源，成本只要 1/10 甚至 1/30</h2>
-    <p>这一周中国的开放权重模型集体放大招：阿里 <strong>Qwen 3.7 Max</strong> 在智能体（agent）任务上追平甚至超过 Claude Opus 4.7，但输入价只要一半、输出价只要四分之一；<strong>DeepSeek V4</strong> 能以约 <em>$0.30/百万 token</em> 运行（西方同级要 $10+）；MiniMax M2.7 更低到 $0.30/$1.20；Moonshot 的 <strong>Kimi K2.6</strong> 还成了首个在 SWE-Bench Pro 编程榜上击败 GPT-5.4 的开放权重模型。</p>
-    <div class="why hotwhy"><b>为什么是爆点</b>（正是你说的"Gamma 4 标准"：又强又便宜）：以前"最强 AI"等于"最贵、还得联网调闭源 API"。现在普通团队花十分之一甚至三十分之一的钱，就能把接近顶级的能力跑在自己手里。这意味着顶级智能开始<strong>普及化、平民化</strong>——AI 的成本曲线正在被一脚踩塌，这是改写整个行业经济账的跨时代信号。</div>
-    <div class="src">来源：<a href="https://benchlm.ai/blog/posts/best-chinese-llm">BenchLM 中文模型榜</a> · <a href="https://www.buildfastwithai.com/blogs/ai-news-today-june-6-2026">Build Fast with AI（6/6）</a></div>
-  </div>
-
-  <!-- 爆点 2 -->
-  <div class="card hotcard">
-    <span class="badge hot">🔥 爆点 · 跨时代</span>
-    <h2><span class="num hotn">2</span>英伟达要"重新发明笔记本"：AI 直接跑在你电脑里，不用上云</h2>
-    <p>黄仁勋在台北 Computex 发布 <strong>RTX Spark 超级芯片</strong>，正式杀进消费级笔记本市场（直接对标 Intel、AMD）。它把 AI 智能体、内容创作、游戏整合到一块便携芯片上，能在<strong>本地</strong>直接跑大模型，不必事事联网。Adobe 已经在为它重写 Photoshop 和 Premiere，微软联手做系统。消息一出，AMD、Intel、高通股价应声下跌。</p>
-    <div class="why hotwhy"><b>为什么是爆点</b>：过去 AI 的算力都堆在云端数据中心，又贵又有延迟、还涉及隐私。把顶级算力塞进个人笔记本，意味着<strong>"个人本地 AI"时代真正开始</strong>——更快、更私密、不按 token 收费。英伟达押注：下一个算力瓶颈在"你手里的设备"，而不只是数据中心。秋季上市。</div>
-    <div class="src">来源：<a href="https://www.cnbc.com/2026/06/02/nvidias-new-pc-chips-are-ceos-bid-to-own-every-part-of-ai-stack.html">CNBC（6/2）</a></div>
-  </div>
-
-  <div class="section-label">📌 其余 8 条值得关注<span class="bar"></span></div>
-
-  <!-- 3 -->
-  <div class="card">
-    <h2><span class="num">3</span>ChatGPT 记忆大升级：它终于"自己记住你"了</h2>
-    <p>OpenAI 推出 <strong>Dreaming V3</strong> 记忆架构（6/4 起 Plus/Pro 美国用户先用）。以前要你手动说"记住这件事"，现在它会在对话结束后<strong>自动总结</strong>你的偏好、项目、临时安排——而且懂得"过期就忘"（比如你 7 月去过新加坡，回来后它就不再老推荐新加坡餐厅）。算力消耗砍掉约 5 倍，所以连免费用户也能用上。</p>
-    <div class="why"><b>看点</b>：这是"留住用户"的体验补丁，不是能力跃升——AI 助手最大的流失原因，就是老让你重复自己。隐私研究者已警告：96% 的记忆是系统"自作主张"建的，欧盟 8 月的透明度新规会盯上它。</div>
-    <div class="src">来源：<a href="https://openai.com/index/chatgpt-memory-dreaming/">OpenAI</a> · <a href="https://www.engadget.com/2187811/chatgpt-s-memory-is-getting-better-especially-if-you-re-on-the-free-tier/">Engadget</a></div>
-  </div>
-
-  <!-- 4 -->
-  <div class="card">
-    <h2><span class="num">4</span>Anthropic 估值 9650 亿美元，秘密递交 IPO</h2>
-    <p>6/1 向美国 SEC <strong>秘密提交 S-1</strong>，正式启动上市流程。最新数据吓人：营收年化（run-rate）从去年约 100 亿冲到 5 月的约 <em>470 亿美元</em>，一年涨约 5 倍；上市前刚完成 650 亿美元 H 轮，投后估值 9650 亿。分析师称"破万亿上市"是基准预期。</p>
-    <div class="why"><b>看点</b>：靠 Claude Code（AI 编程）撑起的营收狂奔，让编程类 AI 成了最被资本认可的方向。但它一个月要付 SpaceX <strong>12.5 亿美元</strong>租算力（一年 150 亿），这笔成本会是招股书里最敏感的一行。OpenAI 预计也将很快递交，两大巨头同年争抢同一批机构投资人。</div>
-    <div class="src">来源：<a href="https://www.anthropic.com/news/confidential-draft-s1-sec">Anthropic</a> · <a href="https://techcrunch.com/2026/06/01/anthropic-files-to-go-public/">TechCrunch</a></div>
-  </div>
-
-  <!-- 5 -->
-  <div class="card">
-    <h2><span class="num">5</span>微软一口气发 7 个自研模型，开始"去 OpenAI 化"</h2>
-    <p>在 Build 2026 大会上，微软发布 <strong>MAI 系列 7 个自研模型</strong>：推理旗舰 MAI-Thinking-1、编程模型 MAI-Code-1-Flash、图像模型 MAI-Image-2.5（Arena 图像榜超过 Gemini 3 Pro）、转录模型 MAI-Transcribe-1.5（43 种语言、比对手快 5 倍）、语音模型 MAI-Voice-2 等。全部<strong>自己训练，不靠 OpenAI</strong>。</p>
-    <div class="why"><b>看点</b>：时点很微妙——OpenAI 上市在即，微软要向公开市场证明：我的 AI 战略不再绑死在 OpenAI 的估值和模型质量上。这是纳德拉给自己上的"对冲险"，而且已经投入生产。</div>
-    <div class="src">来源：<a href="https://www.cnbc.com/2026/06/02/microsoft-unveils-new-ai-models-lessen-reliance-on-openai-lower-costs.html">CNBC（6/2）</a> · <a href="https://dev.to/vjswamy/microsoft-build-2026-introducing-the-mai-model-family-seven-new-ai-models-1dd8">Build 2026</a></div>
-  </div>
-
-  <!-- 6 -->
-  <div class="card">
-    <h2><span class="num">6</span>SpaceX 冲刺史上最大 IPO，6 月 12 日上市</h2>
-    <p>SpaceX（已合并 xAI）路演 6/4 启动，<strong>6/11 定价、6/12 在纳斯达克挂牌（代码 SPCX）</strong>，目标募资高达 750 亿美元、估值约 1.75 万亿。若成功，将超过 2019 年沙特阿美，成为有史以来最大 IPO。值得注意：30% 份额直接开放给散户（通过 Robinhood、富达、嘉信），是常规的 3 倍。</p>
-    <div class="why"><b>看点</b>：高盛预计 2026 年美股 IPO 募资可达约 1600 亿美元，是去年的 4 倍，几乎全靠 SpaceX、OpenAI、Anthropic 三家撑起。AI 与航天正一起进入"资本大兑现"时刻。</div>
-    <div class="src">来源：<a href="https://www.fastcompany.com/91553827/look-biggest-ai-players-barreling-towards-huge-wall-street-debuts">Fast Company</a> · <a href="https://www.buildfastwithai.com/blogs/ai-news-today-june-6-2026">Build Fast with AI（6/6）</a></div>
-  </div>
-
-  <!-- 7 -->
-  <div class="card">
-    <h2><span class="num">7</span>美国出 269 页 AI 大法案，想"冻结"各州 AI 立法 3 年</h2>
-    <p>两党议员 6/4 公布《伟大美国 AI 法案》讨论稿，最炸的一条：<strong>3 年内冻结各州关于前沿 AI 的立法</strong>（包括即将 6/30 生效的科罗拉多反歧视 AI 法）。同时要求年营收 5 亿美元以上的大公司公开"前沿 AI 治理框架"、上报重大安全事故、接受审计。</p>
-    <div class="why"><b>看点</b>：工会（AFL-CIO 等）直接喊"硬拒绝，这是送给 AI 行业的大礼包"；科技行业组织点赞。争议核心：在没有同等联邦保护的情况下先冻结州法，到底是"统一监管"还是"保护公司多过保护人"。它目前只是讨论稿，立法路还很长。</div>
-    <div class="src">来源：<a href="https://rollcall.com/2026/06/04/bipartisan-ai-draft-proposes-three-year-preemption-of-state-laws/">Roll Call</a> · <a href="https://fedscoop.com/bipartisan-great-american-ai-act-draft-proposes-new-federal-ai-governance-framework/">FedScoop</a></div>
-  </div>
-
-  <!-- 8 -->
-  <div class="card">
-    <h2><span class="num">8</span>AI 开始守护电网和水务：Anthropic、OpenAI 抢攻网络安全</h2>
-    <p>Anthropic 的 <strong>Project Glasswing</strong>（用 Claude Mythos 做网络安全）6/2 扩展到电网、水务、医疗、通信、硬件等关键基础设施，覆盖系统影响超 1 亿人；首月就在 1000+ 开源项目里查出 <em>2.3 万个漏洞</em>，独立抽检 90.6% 属实。同时 OpenAI 把 <strong>GPT-5.5-Cyber</strong> 开放给欧盟的安全团队和政府机构。</p>
-    <div class="why"><b>看点</b>：AI 正从"聊天框"走进国家命脉系统。两家用不同打法（Anthropic 专攻安全基建、OpenAI 主攻政府关系）争抢同一批政府预算。网络安全行业的玩法正被 AI 重写。</div>
-    <div class="src">来源：<a href="https://www.investing.com/analysis/anthropic-mythos-expansion-opens-a-new-ai-cybersecurity-market-200681377">Investing.com</a> · <a href="https://www.buildfastwithai.com/blogs/ai-news-today-june-6-2026">Build Fast with AI（6/6）</a></div>
-  </div>
-
-  <!-- 9 -->
-  <div class="card">
-    <h2><span class="num">9</span>下一波旗舰临近：GPT-5.6 与 Claude Sonnet 4.8 都在路上</h2>
-    <p>多个泄露信息指向 <strong>GPT-5.6</strong> 6 月发布，主打 agentic 任务更准、token 消耗再降 20–30%——目标是"用 GPT-4o 的价格享受 GPT-5.5 的推理"。同时开发者圈普遍预期 <strong>Claude Sonnet 4.8</strong> 中旬登场（线索来自一次意外泄露的源码映射，其中"opus-4-7"已被验证为真）。</p>
-    <div class="why"><b>看点</b>：两款都把矛头对准"又便宜又能干活"的生产级智能体市场，且都瞄准 6 月中旬。未来两周，做 AI 产品的成本账可能再次被改写。注意：Sonnet 4.8 仍属高可信传闻，官方未证实。</div>
-    <div class="src">来源：<a href="https://www.geeky-gadgets.com/gpt-5-6-leaks-microsoft-build-2026/">Geeky Gadgets</a> · <a href="https://www.buildfastwithai.com/blogs/ai-news-today-june-6-2026">Build Fast with AI（6/6）</a></div>
-  </div>
-
-  <!-- 10 -->
-  <div class="card">
-    <h2><span class="num">10</span>"算力即权力，电费即命门"：谷歌每月豪掷 9.2 亿租 GPU</h2>
-    <p>谷歌同意每月向 SpaceX 支付约 <strong>9.2 亿美元</strong>，租用 xAI 数据中心里约 11 万块英伟达 GPU（2026 年 10 月起到 2029 年 6 月），是史上最大云算力承诺之一。与此同时，亚利桑那州最大电力公司提议对数据中心<strong>单独加价 45% 电费</strong>，理由是 AI 该"为电网扩容付出公平份额"。</p>
-    <div class="why"><b>看点</b>：当模型能力趋同，竞争焦点已经转移——<strong>电和算力成了新的护城河</strong>。谁能锁定便宜、稳定的电力与 GPU，谁就赢。这也是为什么巨头们纷纷自建核电、绑定算力供应商。</div>
-    <div class="src">来源：<a href="https://www.cnbc.com/2026/06/05/google-to-pay-spacex-920-million-a-month-for-xai-compute-capacity.html">CNBC（6/5）</a> · <a href="https://www.wsj.com/articles/arizona-utility-ai-data-center-rate-increase">WSJ</a></div>
-  </div>
-
-  <footer>
-    <div>📅 报告由定时任务自动生成于 2026-06-07。新闻经多源交叉核对，模型版本号/价格等以官方为准；标注"泄露/传闻"的内容尚未获官方证实。</div>
-    <div class="disc">主要信源：Build Fast with AI 每日汇总、CNBC、TechCrunch、Anthropic / OpenAI 官方、BenchLM、Roll Call、WSJ 等（见每条卡片链接）。本页面向手机竖屏阅读。</div>
-  </footer>
-
+<!-- 顶部状态栏 -->
+<div class="statusbar">
+  <div class="sb-brand">每日 AI 新闻<span class="dot"> ·</span></div>
+  <div class="sb-meta" id="sbMeta">2026年6月7日 周日<br>生成于 自动定时任务</div>
 </div>
+
+<!-- 日期抽屉 -->
+<div class="drawer-handle" id="dHandle"><span>日期 ›</span></div>
+<div class="scrim" id="scrim"></div>
+<nav class="drawer" id="drawer">
+  <div class="dt">选择日期</div>
+  <a class="day cur" href="index.html">2026年6月7日 · 周日<span class="badge">今日 · 10条</span></a>
+  <div class="more"><a href="archive/index.html">查看全部历史归档 →</a></div>
+</nav>
+
+<!-- 右侧进度条 -->
+<div class="progress" id="progress"></div>
+
+<!-- 滚动主体 -->
+<div id="scroller">
+  <!-- 封面 -->
+  <section class="page cover" data-label="封面">
+    <div class="inner">
+      <div class="kicker">DAILY AI BRIEF</div>
+      <h1>今天的 AI，<br>用大白话讲给你听</h1>
+      <p class="lead">全球 Top AI 公司动态 + 全网热点，按"最值得你关注"排序。爆点新闻置顶——又强、又便宜、或真正跨时代的才算。</p>
+      <div class="stats">
+        <div class="stat"><div class="v hot">2</div><div class="k">今日爆点</div></div>
+        <div class="stat"><div class="v">10</div><div class="k">精选新闻</div></div>
+        <div class="stat"><div class="v">12+</div><div class="k">交叉来源</div></div>
+        <div class="stat"><div class="v">约5分钟</div><div class="k">预计阅读</div></div>
+      </div>
+      <div class="hint"><span class="arr">↓</span> 上滑开始阅读 · 每条新闻左右滑看更多</div>
+    </div>
+  </section>
+  <!-- 新闻页由 JS 渲染 -->
+  <div id="newsHost"></div>
+
+  <!-- 明日观察 -->
+  <section class="page watch" data-label="明日观察">
+    <div class="inner">
+      <div class="kicker">TOMORROW</div>
+      <h1>明日观察</h1>
+      <div class="witems" id="watchHost"></div>
+      <div class="foot">
+        新闻经多源交叉核对；模型版本号、估值、价格等以各公司官方为准。标注"泄露/传闻"的内容尚未获官方证实。<br>
+        <a href="archive/index.html">历史归档</a> · 报告由定时任务自动生成
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ===================== 新闻数据 ===================== */
+const NEWS = [
+  { hot:true, cat:"研究", impact:9.8,
+    title:"OpenAI 模型独立推翻 80 年数学猜想",
+    summary:"OpenAI 一个<b>通用</b>推理模型独立找到了数学家 Erdős 1946 年\"单位距离猜想\"的反例：用代数数论工具构造出一整族比方格排列更优的点阵，把上界从约 n 提升到约 <em>n^1.014</em>（普林斯顿 Will Sawin 后续精化）。人类研究这道题近 80 年，一直以为方格是最优解。",
+    why:"这是 AI <b>首次\"自主\"解决一个数学子领域的核心开放问题</b>，而不只是当算题助手。菲尔兹奖得主 Tim Gowers 称之为\"AI 数学的里程碑\"——意味着 AI 开始能在前沿科研里<b>原创</b>，而非复述已知知识。",
+    impacts:["科研范式可能改变：AI 从检索/计算工具，升级为能提出新结构的\"发现者\"。","跨学科迁移：它借用了看似无关的数论分支来解几何题。","正面回应了\"AI 只会复述已知\"的长期质疑。"],
+    action:"关注 OpenAI 是否把该能力产品化为科研助手；以及学术界对结果的同行复核进展。",
+    src:[["OpenAI 官方","https://openai.com/index/model-disproves-discrete-geometry-conjecture/"],["Scientific American","https://www.scientificamerican.com/article/ai-just-solved-an-80-year-old-erdos-problem-and-mathematicians-are-amazed/"]],
+    cred:["high","高 · OpenAI 官方公布 + 多家权威报道 + arXiv 论文"],
+    pending:"该能力能否复现到其它难题、是否依赖大量人工引导，仍待观察。" },
+
+  { hot:true, cat:"开源", impact:9.3,
+    title:"MiniMax M3 开源：逼近顶级闭源，成本仅 5%–10%",
+    summary:"国产 MiniMax 发布开放权重模型 <b>M3</b>：SWE-Bench Pro 拿到 <em>59.0%</em>，超过 GPT-5.5 与 Gemini 3.1 Pro 等闭源 API；支持 <b>100 万 token</b> 上下文 + 原生多模态\"电脑操作\"。靠 MSA 稀疏注意力，把长文本算力砍到上一代约 <em>1/20</em>。",
+    why:"完全符合\"又强又便宜\"的爆点标准（你说的 Gamma 4 标准）：先得很强，其次部署成本极低。普通团队也用得起接近顶级的能力，重塑整个成本结构。",
+    impacts:["推理成本骤降，中小团队可负担顶级能力。","长上下文 + 多模态 agent 的门槛大幅降低。","开放权重加速生态，但训练代码未开源——严格说是\"开放权重\"而非\"完全开源\"。"],
+    action:"评估用 M3 替换部分闭源调用以降本；实测其 agent / 电脑操作的真实稳定性。",
+    src:[["devFlokers 开源月报","https://www.devflokers.com/blog/open-source-ai-roundup-june-2026"],["llm-stats","https://llm-stats.com/llm-updates"]],
+    cred:["mid","中高 · 基准为官方发布，第三方复测进行中"],
+    pending:"真实业务下的稳定性、安全对齐、与基准成绩的差距，待第三方验证。" },
+
+  { hot:false, cat:"商业", impact:9.0,
+    title:"Anthropic 估值 9650 亿美元，反超 OpenAI 并申请 IPO",
+    summary:"Anthropic 完成 <b>650 亿美元</b> Series H，投后估值 <em>9650 亿美元</em>，首次超过 OpenAI 私募估值；6 月 2 日已秘密提交 IPO 草案（S-1）。Apollo、Blackstone 还安排了 360 亿美元私募信贷去买谷歌 TPU——史上最大芯片融资债。",
+    why:"主要靠 Claude Code（AI 编程 agent）一路冲到全球最值钱 AI 公司。说明<b>编程类 AI 正成为最被资本认可、最能赚钱的方向</b>。",
+    impacts:["编程 agent 的商业价值被市场给到最高定价。","AI 进入\"资本兑现期\"，巨头集体冲刺 IPO。","算力融资工具创新：用债务直接买芯片。"],
+    action:"关注 IPO 定价，以及招股书披露的真实收入与毛利率。",
+    src:[["NBC News","https://www.nbcnews.com/business/corporations/anthropic-files-ipo-openai-rcna347897"],["Axios","https://www.axios.com/2026/05/21/google-ai-anthropic-openai-war"]],
+    cred:["high","高 · 多家权威财经媒体报道"],
+    pending:"秘密递交后，正式上市时间与最终估值仍待定。" },
+
+  { hot:false, cat:"商业", impact:8.2,
+    title:"OpenAI 也在筹备 IPO，或年内启动",
+    summary:"OpenAI 同样在推进上市，私募估值此前已达 <b>7000 亿美元级</b>，联手顶级投行筹备，可能成为史上最大 AI IPO 之一。",
+    why:"两大巨头同年冲刺 IPO，标志生成式 AI 从\"烧钱扩张\"转向\"向公开市场兑现\"。",
+    impacts:["一级市场泡沫担忧与兑现需求并存。","公开财报将首次让外界看清头部 AI 的真实经济模型。","二级市场资金有望大规模进入 AI。"],
+    action:"对比 Anthropic 与 OpenAI 招股书里的毛利与增速，判断谁的模式更健康。",
+    src:[["NBC News","https://www.nbcnews.com/business/corporations/anthropic-files-ipo-openai-rcna347897"]],
+    cred:["mid","中高 · 进程属早期，时间表可能变动"],
+    pending:"具体时间、估值与是否年内完成，尚未官方确认。" },
+
+  { hot:false, cat:"产品", impact:8.0,
+    title:"微软 Build 2026 一口气发 7 个自研 MAI 模型",
+    summary:"微软发布 <b>MAI 家族 7 款自研模型</b>：推理模型 MAI-Thinking-1（350 亿活跃参数，盲测优于 Sonnet 4.6）、5B 的 MAI-Code-1-Flash（SWE-Bench Pro 51%，进 GitHub Copilot）、MAI-Image-2.5（已进 PowerPoint）、MAI-Voice-2、MAI-Transcribe-1.5 等，均<b>非蒸馏</b>自第三方模型。",
+    why:"微软正系统性<b>降低对 OpenAI 的依赖</b>，自建全栈模型能力。巨头从\"投资 OpenAI\"转向\"自研竞争\"。",
+    impacts:["OpenAI 与微软的关系变得微妙。","小而快的专用模型（如 5B 编程模型）成为趋势。","Office / Copilot 正全面换上自研模型。"],
+    action:"关注 Copilot 换用 MAI 后的实际体验与成本变化。",
+    src:[["Microsoft AI","https://microsoft.ai/news/microsoft-build-2026-mai-keynote-transcript/"],["CNBC","https://www.cnbc.com/2026/06/02/microsoft-unveils-new-ai-models-lessen-reliance-on-openai-lower-costs.html"]],
+    cred:["high","高 · 官方 Build 大会发布"],
+    pending:"自研模型在真实负载下与 OpenAI 模型的差距，待第三方评测。" },
+
+  { hot:false, cat:"开源", impact:7.8,
+    title:"英伟达开源 Nemotron 3 Ultra：550B MoE，美国最强开放模型",
+    summary:"6 月 4 日英伟达发布 <b>Nemotron 3 Ultra</b>，5500 亿参数混合专家（MoE）开放模型，主打 agent 推理；配套 Nano / Super 三档，采用混合潜在 MoE 架构，被称作\"美国最佳开放权重模型\"。",
+    why:"芯片巨头亲自下场做开放模型，既卖铲子又给生态打样，正面抗衡中国开源军团。",
+    impacts:["开放模型阵营的美国一侧得到补强。","推动多 agent 系统走向标准化。","与自家硬件深度绑定，形成软硬闭环。"],
+    action:"对比 Nemotron 3 Ultra 与 Qwen / DeepSeek 在 agent 任务上的性价比。",
+    src:[["NVIDIA Newsroom","https://nvidianews.nvidia.com/news/nvidia-debuts-nemotron-3-family-of-open-models"],["Artificial Analysis","https://artificialanalysis.ai/articles/nvidia-nemotron-3-ultra-launch-announced"]],
+    cred:["high","高 · 官方发布"],
+    pending:"许可证细节与第三方 agent 实测表现，待跟进。" },
+
+  { hot:false, cat:"产品", impact:7.5,
+    title:"英伟达 RTX Spark 超级芯片：AI 跑进你自己的电脑",
+    summary:"Computex 2026 上，黄仁勋宣布与微软联手\"重新定义 PC\"，推出面向消费端的 <b>RTX Spark 超级芯片</b>，让 agent 在<b>本地</b>运行，摆脱云端延迟和成本；微软让 Windows 能本地直接跑开放模型。",
+    why:"AI 工作负载的下一个瓶颈被押注在\"端侧\"。个人 AI、隐私 AI 时代正式起步。",
+    impacts:["本地 agent 兴起，隐私和速度都更好。","可能催化新一轮 PC 换机潮。","云端推理需求的结构将发生变化。"],
+    action:"关注端侧到底能跑多大模型，以及电池/发热的真实表现。",
+    src:[["buildfastwithai 综述","https://www.buildfastwithai.com/blogs/ai-news-today-june-6-2026"]],
+    cred:["mid","中高 · 大会公布，产品细节待上市"],
+    pending:"消费级落地时间、价格与实际本地性能，待产品验证。" },
+
+  { hot:false, cat:"研究", impact:7.0,
+    title:"三大旗舰同期刷新 + GPT-5.6 基准疑似泄露",
+    summary:"ChatGPT 把默认模型换成 <b>GPT-5.5 Instant</b>；谷歌主打低价 <b>Gemini 3.5 Flash</b>；Anthropic <b>Claude Opus 4.8</b> 领跑编程。同时本周流出疑似 GPT-5.6 内部基准，指向多步 agent 推理与 token 效率提升，6 月窗口发布。",
+    why:"头部模型迭代进入\"季度级\"节奏，竞争白热化，价格与效率成为新战场。",
+    impacts:["默认模型免费升级，普通用户直接受益。","低价 Flash 类模型主攻企业批量需求。","迭代过快，带来选型疲劳。"],
+    action:"重大业务先用小流量灰度新模型，再考虑全量切换。",
+    src:[["OpenAI 帮助中心","https://help.openai.com/en/articles/9624314-model-release-notes"],["CNBC","https://www.cnbc.com/2026/06/01/microsoft-and-google-take-on-anthropic-and-openai-in-ai-coding-models.html"]],
+    cred:["mid","中 · GPT-5.6 部分为泄露/传闻，未证实"],
+    pending:"GPT-5.6 的发布时间与真实指标，尚未官方确认。" },
+
+  { hot:false, cat:"开源", impact:6.8,
+    title:"中国开源模型集体登顶",
+    summary:"阿里 Qwen、DeepSeek、Moonshot 的 <b>Kimi K2.6</b>、智谱 GLM 等多款开放权重模型，在编程 / agent 基准上追平甚至超过闭源。Kimi K2.6 主打长上下文与多步编程规划。",
+    why:"\"只有闭源才最强\"的格局正被改写，开源（尤其中国队）成本优势明显。",
+    impacts:["全球开发者获得高性价比、可自部署的选项。","闭源厂商的定价持续承压。","地缘 / 合规因素，带来部署选择的分化。"],
+    action:"数据敏感场景，可优先评估可自部署的开放权重模型。",
+    src:[["devFlokers","https://www.devflokers.com/blog/open-source-ai-roundup-june-2026"],["BentoML","https://www.bentoml.com/blog/navigating-the-world-of-open-source-large-language-models"]],
+    cred:["mid","中高 · 多榜单与第三方评测交叉"],
+    pending:"各模型的商用许可条款与安全性，需逐一核对。" },
+
+  { hot:false, cat:"落地", impact:6.5,
+    title:"机器人与无人车加速落地：马德里 Robotaxi、Atlas、MolmoAct 2",
+    summary:"Uber 联合 WeRide、AVOMO 在马德里推出<b>欧洲首个商业化 Robotaxi</b>；波士顿动力 Atlas 展示新的敏捷动作；Ai2 开源机器人控制模型 <b>MolmoAct 2</b>，下载量已超 40 万次。",
+    why:"大模型正从\"聊天框\"走进真实物理世界，具身智能的商业化版图扩大到欧洲。",
+    impacts:["自动驾驶商业化从中美扩散到欧洲。","开放具身模型降低机器人开发门槛。","人形机器人能力持续逼近实用。"],
+    action:"关注 Robotaxi 在欧洲的监管与安全数据披露。",
+    src:[["buildfastwithai","https://www.buildfastwithai.com/blogs/ai-news-today-june-6-2026"]],
+    cred:["mid","中高 · 公司公告 + 行业综述"],
+    pending:"商业化规模、盈利能力与安全记录，待长期数据。" },
+];
+
+const WATCH = [
+  "GPT-5.6 是否正式发布，以及它的真实指标能否兑现泄露的预期。",
+  "Anthropic / OpenAI 的 IPO 招股书一旦公开，将首次揭示头部 AI 的收入与毛利。",
+  "MiniMax M3、Nemotron 3 等开放权重模型，第三方复测结果与生态采用速度。",
+];
+
+/* ===================== 渲染 ===================== */
+function impactDots(v, hot){
+  const full = Math.round(v/2);
+  let s='';
+  for(let i=0;i<5;i++){
+    s += (i<full) ? `<span class="${hot?'ho':'on'}">●</span>` : `<span class="off">●</span>`;
+  }
+  return `<span class="impact"><span>影响指数</span><span class="dots">${s}</span><b style="color:${hot?'var(--hot)':'var(--gold)'}">${v.toFixed(1)}</b></span>`;
+}
+
+function renderNews(){
+  const host = document.getElementById('newsHost');
+  NEWS.forEach((n,idx)=>{
+    const seq = idx+1;
+    const catTag = n.hot
+      ? `<span class="tag hot">🔥 爆点</span><span class="tag cat-${n.cat}">${n.cat}</span>`
+      : `<span class="tag cat-${n.cat}">${n.cat}</span>`;
+    const impacts = n.impacts.map(x=>`<li>${x}</li>`).join('');
+    const srcs = n.src.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${s[0]}</a>`).join(' · ');
+    const sec = document.createElement('section');
+    sec.className = 'page news';
+    sec.dataset.hot = n.hot ? '1':'0';
+    sec.dataset.label = '新闻'+seq;
+    sec.innerHTML = `
+      <div class="inner">
+        <div class="nhead">
+          <div class="metarow">
+            ${catTag}
+            <span class="seq">No.${String(seq).padStart(2,'0')} / 10</span>
+          </div>
+          <div class="metarow">${impactDots(n.impact, n.hot)}</div>
+          <h2 class="${n.hot?'hoth2':''}">${n.title}</h2>
+        </div>
+        <div class="panels">
+          <div class="panel pa">
+            <div class="plabel">核心摘要<span class="bar"></span>1/3</div>
+            <p class="body">${n.summary}</p>
+            <div class="box hl ${n.hot?'hot':''}"><div class="h">为什么重要</div><div class="body">${n.why}</div></div>
+          </div>
+          <div class="panel pb">
+            <div class="plabel">影响判断<span class="bar"></span>2/3</div>
+            <div class="box"><div class="h blue">具体影响</div><ul class="ilist">${impacts}</ul></div>
+            <div class="box hl"><div class="h green">建议动作</div><div class="body">${n.action}</div></div>
+          </div>
+          <div class="panel pc">
+            <div class="plabel">来源与跟进<span class="bar"></span>3/3</div>
+            <div class="kv"><div class="kk">主要来源</div><div class="vv src">${srcs}</div></div>
+            <div class="kv"><div class="kk">可信度</div><div class="vv"><span class="cred ${n.cred[0]}">${n.cred[1]}</span></div></div>
+            <div class="kv"><div class="kk">待验证</div><div class="vv pend">${n.pending}</div></div>
+          </div>
+        </div>
+        <div class="pdots"><span>←</span><span class="d act"></span><span class="d"></span><span class="d"></span><span>左右滑动</span></div>
+      </div>`;
+    host.appendChild(sec);
+
+    const panels = sec.querySelector('.panels');
+    const dots = sec.querySelectorAll('.pdots .d');
+    panels.addEventListener('scroll',()=>{
+      const i = Math.round(panels.scrollLeft / panels.clientWidth);
+      dots.forEach((d,di)=>d.classList.toggle('act', di===i));
+    },{passive:true});
+  });
+}
+
+function renderWatch(){
+  document.getElementById('watchHost').innerHTML =
+    WATCH.map((w,i)=>`<div class="witem"><div class="wn">${i+1}</div><div class="wt">${w}</div></div>`).join('');
+}
+
+function buildProgress(){
+  const pages = document.querySelectorAll('.page');
+  const prog = document.getElementById('progress');
+  pages.forEach((p,i)=>{
+    const d = document.createElement('div');
+    d.className = 'pd' + (i===0?' act':'') + (p.dataset.hot==='1'?' hot':'');
+    prog.appendChild(d);
+  });
+  const dots = prog.querySelectorAll('.pd');
+  const scroller = document.getElementById('scroller');
+  scroller.addEventListener('scroll',()=>{
+    const i = Math.round(scroller.scrollTop / scroller.clientHeight);
+    dots.forEach((d,di)=>d.classList.toggle('act', di===i));
+  },{passive:true});
+}
+
+function setupDrawer(){
+  const drawer = document.getElementById('drawer');
+  const scrim = document.getElementById('scrim');
+  const handle = document.getElementById('dHandle');
+  const open = ()=>{drawer.classList.add('open');scrim.classList.add('show');};
+  const close = ()=>{drawer.classList.remove('open');scrim.classList.remove('show');};
+  handle.addEventListener('click', ()=> drawer.classList.contains('open')?close():open());
+  handle.addEventListener('mouseenter', open);
+  scrim.addEventListener('click', close);
+  let sx=null;
+  window.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
+  window.addEventListener('touchend',e=>{
+    if(sx===null) return;
+    const dx = e.changedTouches[0].clientX - sx;
+    if(sx<28 && dx>40) open();
+    if(drawer.classList.contains('open') && dx<-40) close();
+    sx=null;
+  },{passive:true});
+}
+
+renderNews();
+renderWatch();
+buildProgress();
+setupDrawer();
+</script>
 </body>
 </html>
