@@ -648,6 +648,8 @@
       text-transform: uppercase;
     }
 
+    .verified.unverified{border-color:var(--gold);color:var(--gold);}
+
     .dots {
       display: flex;
       align-items: center;
@@ -799,9 +801,9 @@
     <aside class="date-drawer" aria-label="日期切换抽屉">
       <button class="date-handle" type="button" aria-label="展开日期列表">日期</button>
       <nav class="date-menu" aria-label="按日期切换新闻">
-        <a href="archive/index.html" aria-label="查看更早 新闻">更早</a>
+        <a href="archive/index.html" aria-label="查看 历史归档 新闻">更早</a>
         <a href="archive/2026-06-07.html" aria-label="查看 2026年6月7日 新闻">06·07</a>
-        <a class="active" href="index.html" aria-current="page" aria-label="当前 2026年6月8日 新闻">06·08</a>
+        <a class="active" href="index.html" aria-current="page" aria-label="当前 2026年6月8日（active） 新闻">06·08</a>
         <a href="#" aria-label="查看 预告 新闻">预告</a>
       </nav>
     </aside>
@@ -811,11 +813,6 @@
       <a href="#story-1" aria-label="新闻 1">01</a>
       <a href="#story-2" aria-label="新闻 2">02</a>
       <a href="#story-3" aria-label="新闻 3">03</a>
-      <a href="#story-4" aria-label="新闻 4">04</a>
-      <a href="#story-5" aria-label="新闻 5">05</a>
-      <a href="#story-6" aria-label="新闻 6">06</a>
-      <a href="#story-7" aria-label="新闻 7">07</a>
-      <a href="#story-8" aria-label="新闻 8">08</a>
       <a href="#tomorrow" aria-label="明日观察">明</a>
     </nav>
 
@@ -830,18 +827,18 @@
             <small>Daily Artificial Intelligence Newspaper</small>
             <h1>AI 日报</h1>
           </div>
-          <p class="front-lead">苹果把 Siri 交给 Gemini，Anthropic 喊「刹车」，美国国会动手立法——AI 的产品、安全与监管同日交汇。</p>
+          <p class="front-lead">WWDC 开幕日：据报道苹果把 Siri 交给谷歌 Gemini；Anthropic、OpenAI 同步刷新旗舰与记忆。</p>
           <div class="headline-stack" aria-label="今日头条">
-            <a href="#story-1"><b>01</b><span>苹果 WWDC 发布 Gemini 版 Siri 与 iOS 27</span></a>
-            <a href="#story-2"><b>02</b><span>Anthropic 呼吁全球暂停：警告 AI 或将失控</span></a>
-            <a href="#story-3"><b>03</b><span>国会草案拟冻结各州 AI 立法三年</span></a>
+            <a href="#story-1"><b>01</b><span>据报道苹果 Siri 改用谷歌 Gemini</span></a>
+            <a href="#story-2"><b>02</b><span>Claude Opus 4.8 发布，默认百万上下文</span></a>
+            <a href="#story-3"><b>03</b><span>ChatGPT 记忆系统 V3 升级，容量翻倍</span></a>
           </div>
           <div class="daily-stats" aria-label="今日统计">
-            <div class="stat"><strong>8</strong><span>重点条目</span></div>
-            <div class="stat"><strong>18</strong><span>信息来源</span></div>
-            <div class="stat"><strong>约7分钟</strong><span>阅读时间</span></div>
+            <div class="stat"><strong>3</strong><span>重点条目</span></div>
+            <div class="stat"><strong>6</strong><span>信息来源</span></div>
+            <div class="stat"><strong>约3分钟</strong><span>阅读时间</span></div>
           </div>
-          <div class="ticker"><b>快讯</b><span>WWDC 推 Gemini 版 Siri · Anthropic 呼吁全球暂停 · 国会拟冻结州级 AI 立法 · ChatGPT 月活破 10 亿</span></div>
+          <div class="ticker"><b>快讯</b><span>苹果据报改用 Gemini 重写 Siri · Claude Opus 4.8 默认百万上下文 · ChatGPT 记忆 V3 容量翻倍</span></div>
           <div class="hint"><span>上下翻页 · 左右横滑</span><span class="gesture"><i></i><i></i><i></i></span></div>
         </div>
       </section>
@@ -849,28 +846,28 @@
       <section class="slide" id="story-1">
         <article class="slide-inner">
           <div class="news-head">
-            <div class="eyebrow"><span class="tag product">产品</span><span>Page 01 · Impact 9.5</span></div>
-            <h2 class="news-title">苹果 WWDC 发布 Gemini 版 Siri 与 iOS 27</h2>
-            <div class="byline"><span>来源：Apple · Reuters · Bloomberg</span><span>2026年6月8日</span><span>可信度：中高</span></div>
+            <div class="eyebrow"><span class="tag product">产品</span><span>Page 01 · Impact 9.2</span></div>
+            <h2 class="news-title">据报道：苹果 WWDC 重写 Siri，改用谷歌 Gemini 大模型</h2>
+            <div class="byline"><span>来源：MacRumors · 彭博社（据报道）</span><span>2026-06-08</span><span>可信度：中高</span></div>
           </div>
           <div class="h-scroll" aria-label="新闻 1 横向详情">
             <section class="panel">
               <div>
-                <div class="visual" data-label="MODEL LAUNCH"></div>
+                <div class="visual" data-label="PRODUCT DESK"></div>
                 <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
-                <p class="big">苹果在 WWDC 主题演讲推出重建版 Siri，云端能力由谷歌定制的约 <b>1.2 万亿</b>参数 Gemini 模型驱动，年付谷歌约 10 亿美元。</p>
-                <p class="text">同时发布 iOS 27 等系列系统，新增系统级「Search or Ask」手势，可把提问分流给 Siri、ChatGPT 或 Gemini；Gemini Siri 据称跑在谷歌云的英伟达 B200 芯片上。</p>
+                <p class="big">据多家媒体报道，苹果将在今天（6/8）开幕的 WWDC 上发布<b>重写版 Siri</b>，云端能力改由<b>谷歌定制版 Gemini</b>（约 <b>1.2 万亿参数</b>）驱动，年付谷歌约 <b>10 亿美元</b>。</p>
+                <p class="text">据报道还将推出 Extensions 机制，让用户自选 ChatGPT / Gemini / Claude 驱动 Apple Intelligence；Siri 变独立 App，带系统级"问一问"手势与聊天界面。一切以 keynote 正式公布为准。</p>
               </div>
-              <div class="score-stamp">IMPACT 9.5</div>
+              <div class="score-stamp">IMPACT 9.2</div>
             </section>
             <section class="panel">
               <div>
                 <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
-                <p class="big">苹果把最核心的语音入口交给对手谷歌，等于承认自研大模型暂时落后，也把 Gemini 推向约 14 亿台 iPhone。</p>
+                <p class="big">若属实，意味着苹果<b>承认自研 AI 暂时落后</b>，把手机最核心的入口交给对手谷歌——AI 竞争格局的标志性转折。</p>
                 <ul class="impact-list">
-                  <li>谷歌 Gemini 借苹果分发触达十亿级用户，搜索与助手格局生变</li>
-                  <li>苹果「AI 落后」叙事被坐实，但换来即战力</li>
-                  <li>端云混合：隐私走本地小模型，复杂任务上云</li>
+                  <li>谷歌 Gemini 借苹果拿到数亿台设备的超级入口。</li>
+                  <li>用户可在系统级自由切换 ChatGPT/Gemini/Claude，模型变"可插拔"。</li>
+                  <li>苹果自研大模型路线受质疑，端云协同策略生变。</li>
                 </ul>
               </div>
             </section>
@@ -878,12 +875,12 @@
               <div>
                 <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
                 <div class="source-box">
-                  <div class="source-row"><span>主要来源</span><span>Apple · Reuters · Bloomberg</span></div>
+                  <div class="source-row"><span>主要来源</span><span>MacRumors · 彭博社（据报道）</span></div>
                   <div class="source-row"><span>可信度</span><span>中高</span></div>
-                  <div class="source-row"><span>待验证</span><span>1.2 万亿参数、10 亿美元年费、B200 部署均为发布前报道，须以苹果正式公告为准</span></div>
-                  <div class="source-row"><span>建议动作</span><span>关注 keynote 实测与 Siri 开放时间表</span></div>
+                  <div class="source-row"><span>待验证</span><span>合作条款、参数与发布范围以今天 WWDC keynote（北京时间 6/9 凌晨）官方公布为准；当前为发布前报道。</span></div>
+                  <div class="source-row"><span>建议动作</span><span>看今晚 keynote 是否正式确认；关注 Extensions 是否真支持 Claude。</span></div>
                 </div>
-                <div class="verified">多源·待复测</div>
+                <div class="verified unverified">据报道·待证实</div>
               </div>
             </section>
           </div>
@@ -894,28 +891,28 @@
       <section class="slide" id="story-2">
         <article class="slide-inner">
           <div class="news-head">
-            <div class="eyebrow"><span class="tag policy">政策</span><span>Page 02 · Impact 9.0</span></div>
-            <h2 class="news-title">Anthropic 呼吁全球暂停：警告 AI 或将失控</h2>
-            <div class="byline"><span>来源：Anthropic · Al Jazeera · Scientific American</span><span>2026年6月4日</span><span>可信度：高</span></div>
+            <div class="eyebrow"><span class="tag research">研究</span><span>Page 02 · Impact 8.3</span></div>
+            <h2 class="news-title">Anthropic 发布 Claude Opus 4.8，默认 100 万 token 上下文</h2>
+            <div class="byline"><span>来源：Anthropic 官方 · Releasebot</span><span>2026-06-08</span><span>可信度：高</span></div>
           </div>
           <div class="h-scroll" aria-label="新闻 2 横向详情">
             <section class="panel">
               <div>
-                <div class="visual policy" data-label="POLICY FILE"></div>
+                <div class="visual research" data-label="MODEL LAUNCH"></div>
                 <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
-                <p class="big">Anthropic 发文呼吁顶级 AI 公司协调「暂停」前沿研发，警告模型正逼近能<b>自我改进</b>、脱离人类监督的临界点。</p>
-                <p class="text">联合创始人 Jack Clark 等称，算力足够时 AI 可能设计并造出自己的「继任者」（递归自我改进）；暂停期用于让对齐研究与社会制度跟上。</p>
+                <p class="big">Anthropic 发布最新旗舰 <b>Claude Opus 4.8</b>，编程、agent、推理较 Opus 4.7 全面增强，复杂编程任务<b>默认 100 万 token 上下文</b>。</p>
+                <p class="text">受管 Agent 可在你自己的沙箱内运行、接私有 MCP 服务器；旧版 Opus 4.1 定于 8/5 在 API 退役。</p>
               </div>
-              <div class="score-stamp">IMPACT 9.0</div>
+              <div class="score-stamp">IMPACT 8.3</div>
             </section>
             <section class="panel">
               <div>
                 <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
-                <p class="big">头部实验室罕见公开喊「刹车」，把「失控风险」从学术讨论推到产业议程中央。</p>
+                <p class="big">编程/agent 是当前最被验证的 AI 商业方向，旗舰每次提速都直接抬高开发者生产力上限。</p>
                 <ul class="impact-list">
-                  <li>加剧「加速 vs 暂停」路线之争，OpenAI 当日反对，主张由民主政府定规则</li>
-                  <li>或影响监管基调与企业风控优先级</li>
-                  <li>「递归自我改进」成为新的风险关键词</li>
+                  <li>超长默认上下文降低大型代码库 agent 的工程门槛。</li>
+                  <li>受管 Agent + 私有 MCP 让企业更敢把 agent 接进内网。</li>
+                  <li>旗舰迭代加快，挤压闭源竞品的差异化空间。</li>
                 </ul>
               </div>
             </section>
@@ -923,10 +920,10 @@
               <div>
                 <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
                 <div class="source-box">
-                  <div class="source-row"><span>主要来源</span><span>Anthropic · Al Jazeera · Scientific American</span></div>
+                  <div class="source-row"><span>主要来源</span><span>Anthropic 官方 · Releasebot</span></div>
                   <div class="source-row"><span>可信度</span><span>高</span></div>
-                  <div class="source-row"><span>待验证</span><span>「暂停」无统一定义与执行机制，是否有其他实验室响应待观察</span></div>
-                  <div class="source-row"><span>建议动作</span><span>跟踪 OpenAI、谷歌等回应与监管动向</span></div>
+                  <div class="source-row"><span>待验证</span><span>真实任务上相对 GPT-5.5 / Gemini 的优势，待第三方独立评测。</span></div>
+                  <div class="source-row"><span>建议动作</span><span>编程/agent 团队可小流量实测 Opus 4.8 的长上下文稳定性与成本。</span></div>
                 </div>
                 <div class="verified">官方·多源核实</div>
               </div>
@@ -939,163 +936,28 @@
       <section class="slide" id="story-3">
         <article class="slide-inner">
           <div class="news-head">
-            <div class="eyebrow"><span class="tag policy">政策</span><span>Page 03 · Impact 8.7</span></div>
-            <h2 class="news-title">美国国会草案拟冻结各州 AI 立法三年</h2>
-            <div class="byline"><span>来源：Roll Call · Broadband Breakfast · TechTimes</span><span>2026年6月4日</span><span>可信度：高</span></div>
+            <div class="eyebrow"><span class="tag product">产品</span><span>Page 03 · Impact 7.8</span></div>
+            <h2 class="news-title">ChatGPT 上线 "Dreaming" V3 记忆系统，容量翻倍</h2>
+            <div class="byline"><span>来源：OpenAI 官方 · Releasebot</span><span>2026-06-04</span><span>可信度：高</span></div>
           </div>
           <div class="h-scroll" aria-label="新闻 3 横向详情">
             <section class="panel">
               <div>
-                <div class="visual policy" data-label="POLICY FILE"></div>
-                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
-                <p class="big">两党议员推出 269 页讨论稿《2026 大美国人工智能法案》，拟在三年内<b>优先适用联邦法</b>，冻结各州对 AI「如何开发」的立法。</p>
-                <p class="text">由 Obernolte（共和党）与 Trahan（民主党）牵头；各州仍可管 AI「如何使用」，但不能再规定模型怎么造；对年营收超 5 亿美元的「前沿大开发者」设硬性要求。</p>
-              </div>
-              <div class="score-stamp">IMPACT 8.7</div>
-            </section>
-            <section class="panel">
-              <div>
-                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
-                <p class="big">这是美国迄今最全面的联邦 AI 立法尝试，直接触及「联邦 vs 各州」管辖权这一核心矛盾。</p>
-                <ul class="impact-list">
-                  <li>若通过，加州等州法或被部分架空</li>
-                  <li>工会、消费者组织当天几乎一致反对</li>
-                  <li>以「讨论稿」形式释出，意在征求意见而非立即表决</li>
-                </ul>
-              </div>
-            </section>
-            <section class="panel">
-              <div>
-                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
-                <div class="source-box">
-                  <div class="source-row"><span>主要来源</span><span>Roll Call · Broadband Breakfast · TechTimes</span></div>
-                  <div class="source-row"><span>可信度</span><span>高</span></div>
-                  <div class="source-row"><span>待验证</span><span>尚是讨论稿，条款与三年日落期可能大改，能否进入正式表决未定</span></div>
-                  <div class="source-row"><span>建议动作</span><span>关注听证及各州、行业反馈</span></div>
-                </div>
-                <div class="verified">官方·多源核实</div>
-              </div>
-            </section>
-          </div>
-          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
-        </article>
-      </section>
-
-      <section class="slide" id="story-4">
-        <article class="slide-inner">
-          <div class="news-head">
-            <div class="eyebrow"><span class="tag product">商业</span><span>Page 04 · Impact 8.5</span></div>
-            <h2 class="news-title">ChatGPT 月活破 10 亿，史上最快</h2>
-            <div class="byline"><span>来源：Sensor Tower · Reuters · The Next Web</span><span>2026年6月2日</span><span>可信度：中高</span></div>
-          </div>
-          <div class="h-scroll" aria-label="新闻 4 横向详情">
-            <section class="panel">
-              <div>
                 <div class="visual" data-label="PRODUCT DESK"></div>
                 <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
-                <p class="big">第三方机构 Sensor Tower 估算，ChatGPT App 在 5 月跨过<b>10 亿</b>月活，约用 3 年，是史上最快达成该里程碑的应用。</p>
-                <p class="text">速度超过谷歌地图、TikTok、Instagram、YouTube；但该数字为估算、仅统计 App 月活，且多数为免费用户。</p>
-              </div>
-              <div class="score-stamp">IMPACT 8.5</div>
-            </section>
-            <section class="panel">
-              <div>
-                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
-                <p class="big">10 亿月活把 ChatGPT 坐实为消费级 AI 的「默认入口」，为其 IPO 叙事添砝码。</p>
-                <ul class="impact-list">
-                  <li>巩固 OpenAI 在消费端的网络效应与数据飞轮</li>
-                  <li>Claude 同期约 5600 万月活，但同比增速约 640% 远超 ChatGPT</li>
-                  <li>变现重心仍待从免费转向付费</li>
-                </ul>
-              </div>
-            </section>
-            <section class="panel">
-              <div>
-                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
-                <div class="source-box">
-                  <div class="source-row"><span>主要来源</span><span>Sensor Tower · Reuters · The Next Web</span></div>
-                  <div class="source-row"><span>可信度</span><span>中高</span></div>
-                  <div class="source-row"><span>待验证</span><span>非 OpenAI 官方审计数据，口径为 App 月活而非全平台总用户</span></div>
-                  <div class="source-row"><span>建议动作</span><span>等 OpenAI 官方口径与付费转化披露</span></div>
-                </div>
-                <div class="verified">多源·待复测</div>
-              </div>
-            </section>
-          </div>
-          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
-        </article>
-      </section>
-
-      <section class="slide" id="story-5">
-        <article class="slide-inner">
-          <div class="news-head">
-            <div class="eyebrow"><span class="tag policy">政策</span><span>Page 05 · Impact 8.0</span></div>
-            <h2 class="news-title">OpenAI 向欧盟开放 GPT-5.5-Cyber 网安模型</h2>
-            <div class="byline"><span>来源：OpenAI · CNBC · eWeek</span><span>2026年6月5日</span><span>可信度：中高</span></div>
-          </div>
-          <div class="h-scroll" aria-label="新闻 5 横向详情">
-            <section class="panel">
-              <div>
-                <div class="visual policy" data-label="POLICY FILE"></div>
-                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
-                <p class="big">OpenAI 依据新版「欧盟网络行动计划」，向欧盟受核验的防御方、政府与机构限量开放网络安全调优模型 <b>GPT-5.5-Cyber</b>。</p>
-                <p class="text">该模型并非更强，而是对漏洞挖掘、恶意软件分析、逆向等授权安全工作更「宽松」；6 月 1 日起用最宽松网安模型须开启抗钓鱼强认证。数日前 Anthropic 已让 Claude Mythos 接入欧盟网安机构 ENISA。</p>
-              </div>
-              <div class="score-stamp">IMPACT 8.0</div>
-            </section>
-            <section class="panel">
-              <div>
-                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
-                <p class="big">前沿模型按地域与资质「分级开放」，正把 AI 能力变成地缘与安全博弈的筹码。</p>
-                <ul class="impact-list">
-                  <li>欧盟首次拿到美企前沿网安能力</li>
-                  <li>OpenAI 走「开放」、Anthropic 走「克制」，路线分化</li>
-                  <li>强认证门槛成为模型滥用的防线</li>
-                </ul>
-              </div>
-            </section>
-            <section class="panel">
-              <div>
-                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
-                <div class="source-box">
-                  <div class="source-row"><span>主要来源</span><span>OpenAI · CNBC · eWeek</span></div>
-                  <div class="source-row"><span>可信度</span><span>中高</span></div>
-                  <div class="source-row"><span>待验证</span><span>限量预览的具体名单与能力边界未完全公开</span></div>
-                  <div class="source-row"><span>建议动作</span><span>关注欧盟机构落地与滥用防护效果</span></div>
-                </div>
-                <div class="verified">多源·待复测</div>
-              </div>
-            </section>
-          </div>
-          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
-        </article>
-      </section>
-
-      <section class="slide" id="story-6">
-        <article class="slide-inner">
-          <div class="news-head">
-            <div class="eyebrow"><span class="tag policy">政策</span><span>Page 06 · Impact 7.8</span></div>
-            <h2 class="news-title">四大 AI CEO 联名促国会强制筛查合成 DNA</h2>
-            <div class="byline"><span>来源：Yellow.com · Reuters · 多家媒体</span><span>2026年6月5日</span><span>可信度：中高</span></div>
-          </div>
-          <div class="h-scroll" aria-label="新闻 6 横向详情">
-            <section class="panel">
-              <div>
-                <div class="visual policy" data-label="POLICY FILE"></div>
-                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
-                <p class="big">OpenAI、Anthropic、谷歌、微软四家 CEO 联名致信美国国会，呼吁对<b>合成 DNA</b>供应商强制实施筛查。</p>
-                <p class="text">信中警告 AI 正削弱滥用生物材料所需的技术门槛——合成 DNA/RNA 已可在线下单，而 AI 降低了所需的专业知识门槛。</p>
+                <p class="big">OpenAI 自 2024 年以来最大的记忆升级——<b>Dreaming V3</b> 架构 6/4 起向美国 Plus / Pro 用户推送。</p>
+                <p class="text">主打解决记忆"过时/出错/难扩展"，做到自动更新、个性化更准、Plus/Pro <b>记忆容量翻倍</b>。</p>
               </div>
               <div class="score-stamp">IMPACT 7.8</div>
             </section>
             <section class="panel">
               <div>
                 <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
-                <p class="big">头部公司主动把「AI×生物安全」风险摆上立法桌，罕见地为自家技术呼吁外部管制。</p>
+                <p class="big">记忆是把 ChatGPT 从"问答工具"变成"长期助理"的关键一步，直接影响数亿人日常使用的黏性与体验。</p>
                 <ul class="impact-list">
-                  <li>或推动合成生物订单的强制核验立法</li>
-                  <li>与 OpenAI 生物防御计划形成呼应</li>
-                  <li>为「AI 两用风险」治理提供模板</li>
+                  <li>上下文更新更及时，长期个性化体验提升。</li>
+                  <li>黏性增强，进一步巩固 ChatGPT 的消费级入口地位。</li>
+                  <li>长期记忆带来的隐私与数据边界更受关注。</li>
                 </ul>
               </div>
             </section>
@@ -1103,102 +965,12 @@
               <div>
                 <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
                 <div class="source-box">
-                  <div class="source-row"><span>主要来源</span><span>Yellow.com · Reuters · 多家媒体</span></div>
-                  <div class="source-row"><span>可信度</span><span>中高</span></div>
-                  <div class="source-row"><span>待验证</span><span>信件签署名单与具体措辞、国会是否跟进尚待核实</span></div>
-                  <div class="source-row"><span>建议动作</span><span>关注国会回应与行业自律细则</span></div>
-                </div>
-                <div class="verified">多源·待复测</div>
-              </div>
-            </section>
-          </div>
-          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
-        </article>
-      </section>
-
-      <section class="slide" id="story-7">
-        <article class="slide-inner">
-          <div class="news-head">
-            <div class="eyebrow"><span class="tag research">研究</span><span>Page 07 · Impact 7.6</span></div>
-            <h2 class="news-title">OpenAI 推 Rosalind 生物防御计划与升级生科模型</h2>
-            <div class="byline"><span>来源：OpenAI · Axios · The Defense Post</span><span>2026年6月3日</span><span>可信度：高</span></div>
-          </div>
-          <div class="h-scroll" aria-label="新闻 7 横向详情">
-            <section class="panel">
-              <div>
-                <div class="visual research" data-label="RESEARCH NOTE"></div>
-                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
-                <p class="big">OpenAI 推出 <b>Rosalind 生物防御计划</b>，向受信开发者开放面向生命科学的 GPT-Rosalind 模型，并于 6 月 3 日发布能力升级。</p>
-                <p class="text">升级版结合 GPT-5.5 的智能体编程与工具调用，在药物发现、医药化学、基因组学上更强，且少用约 31% token；合作方含约翰霍普金斯 APL、CEPI 等。</p>
-              </div>
-              <div class="score-stamp">IMPACT 7.6</div>
-            </section>
-            <section class="panel">
-              <div>
-                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
-                <p class="big">把前沿模型正向用于流行病预警与公共卫生，是 AI「防御性」应用的标志性落地。</p>
-                <ul class="impact-list">
-                  <li>生科科研提效，疫情早检与防备能力增强</li>
-                  <li>与「暂停 / 生物安全」议题相互呼应</li>
-                  <li>受信开放模式或成两用模型范式</li>
-                </ul>
-              </div>
-            </section>
-            <section class="panel">
-              <div>
-                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
-                <div class="source-box">
-                  <div class="source-row"><span>主要来源</span><span>OpenAI · Axios · The Defense Post</span></div>
+                  <div class="source-row"><span>主要来源</span><span>OpenAI 官方 · Releasebot</span></div>
                   <div class="source-row"><span>可信度</span><span>高</span></div>
-                  <div class="source-row"><span>待验证</span><span>受信开发者范围与实际科研成效有待验证</span></div>
-                  <div class="source-row"><span>建议动作</span><span>关注合作机构产出与开放门槛</span></div>
+                  <div class="source-row"><span>待验证</span><span>全量推送时间表、非美国地区与免费用户的覆盖待官方说明。</span></div>
+                  <div class="source-row"><span>建议动作</span><span>重度用户留意记忆开关与隐私设置；企业关注数据留存边界。</span></div>
                 </div>
                 <div class="verified">官方·多源核实</div>
-              </div>
-            </section>
-          </div>
-          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
-        </article>
-      </section>
-
-      <section class="slide" id="story-8">
-        <article class="slide-inner">
-          <div class="news-head">
-            <div class="eyebrow"><span class="tag product">产品</span><span>Page 08 · Impact 7.4</span></div>
-            <h2 class="news-title">Meta 发布 Muse Spark 旗舰模型，年资本开支翻倍</h2>
-            <div class="byline"><span>来源：Meta · CNBC · 多家媒体</span><span>2026年6月上旬</span><span>可信度：中</span></div>
-          </div>
-          <div class="h-scroll" aria-label="新闻 8 横向详情">
-            <section class="panel">
-              <div>
-                <div class="visual" data-label="MODEL LAUNCH"></div>
-                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
-                <p class="big">Meta 在 Alexandr Wang 新组建的 Superintelligence Labs 下推出首款旗舰大模型 <b>Muse Spark</b>，主打更低算力下的多模态与智能体表现。</p>
-                <p class="text">同时宣布 2026 年 AI 资本开支 1150–1350 亿美元，接近去年两倍，意在追赶 OpenAI 与谷歌。</p>
-              </div>
-              <div class="score-stamp">IMPACT 7.4</div>
-            </section>
-            <section class="panel">
-              <div>
-                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
-                <p class="big">Meta 用「重金 + 新团队」全力补课，前沿竞赛进入烧钱军备阶段。</p>
-                <ul class="impact-list">
-                  <li>开放 / 半开放阵营再添重量级玩家</li>
-                  <li>千亿级 capex 抬高行业入场门槛</li>
-                  <li>Wang 主导的技术路线初见产品</li>
-                </ul>
-              </div>
-            </section>
-            <section class="panel">
-              <div>
-                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
-                <div class="source-box">
-                  <div class="source-row"><span>主要来源</span><span>Meta · CNBC · 多家媒体</span></div>
-                  <div class="source-row"><span>可信度</span><span>中</span></div>
-                  <div class="source-row"><span>待验证</span><span>Muse Spark 确切发布日期、基准与开放程度，capex 区间均待官方确认</span></div>
-                  <div class="source-row"><span>建议动作</span><span>等 Meta 官方模型卡与基准数据</span></div>
-                </div>
-                <div class="verified">传闻·待证实</div>
               </div>
             </section>
           </div>
@@ -1214,11 +986,11 @@
           </div>
           <h2 class="news-title">明日观察</h2>
           <div class="wrap">
-            <div class="mini-card"><strong>WWDC 实测</strong><span>Gemini 版 Siri 的真实体验、隐私边界与开放时间表。</span></div>
-            <div class="mini-card"><strong>暂停之争</strong><span>是否有其他实验室响应 Anthropic，OpenAI、谷歌如何接招。</span></div>
-            <div class="mini-card"><strong>立法走向</strong><span>《大美国 AI 法案》听证进展与各州反弹力度。</span></div>
+            <div class="mini-card"><strong>WWDC 落地</strong><span>keynote 是否正式确认 Siri-Gemini 条款，以及 Claude 是否进入 Extensions。</span></div>
+            <div class="mini-card"><strong>六月模型潮</strong><span>谷歌 Gemini 3.5 Pro、Anthropic Claude Mythos 1、xAI Grok 5 是否本月落地。</span></div>
+            <div class="mini-card"><strong>AI 上市竞赛</strong><span>Anthropic（$965B 估值）秘密 IPO 后 OpenAI 是否跟进；GPT-5.5-Cyber 对欧盟开放进展。</span></div>
           </div>
-          <div class="ticker"><b>Next brief</b><span>明日聚焦 WWDC 落地细节、暂停争论后续与国会 AI 立法进程。</span></div>
+          <div class="ticker"><b>Next brief</b><span>06-09 继续追踪 WWDC 落地与六月模型潮。</span></div>
           <div class="hint"><span>模板字段：日期 / 新闻 / 摘要 / 影响 / 来源</span><span class="gesture"><i></i><i></i><i></i></span></div>
         </div>
       </section>

@@ -648,6 +648,8 @@
       text-transform: uppercase;
     }
 
+    .verified.unverified{border-color:var(--gold);color:var(--gold);}
+
     .dots {
       display: flex;
       align-items: center;
@@ -878,7 +880,7 @@
                   <div class="source-row"><span>待验证</span><span>{{STORY_1_TO_VERIFY}}</span></div>
                   <div class="source-row"><span>建议动作</span><span>{{STORY_1_ACTION}}</span></div>
                 </div>
-                <div class="verified">{{STORY_1_SOURCE_BADGE}}</div>
+                <div class="verified {{STORY_1_BADGE_CLASS}}">{{STORY_1_SOURCE_BADGE}}</div>
               </div>
             </section>
           </div>
@@ -923,7 +925,7 @@
                   <div class="source-row"><span>待验证</span><span>{{STORY_2_TO_VERIFY}}</span></div>
                   <div class="source-row"><span>建议动作</span><span>{{STORY_2_ACTION}}</span></div>
                 </div>
-                <div class="verified">{{STORY_2_SOURCE_BADGE}}</div>
+                <div class="verified {{STORY_2_BADGE_CLASS}}">{{STORY_2_SOURCE_BADGE}}</div>
               </div>
             </section>
           </div>
@@ -968,7 +970,7 @@
                   <div class="source-row"><span>待验证</span><span>{{STORY_3_TO_VERIFY}}</span></div>
                   <div class="source-row"><span>建议动作</span><span>{{STORY_3_ACTION}}</span></div>
                 </div>
-                <div class="verified">{{STORY_3_SOURCE_BADGE}}</div>
+                <div class="verified {{STORY_3_BADGE_CLASS}}">{{STORY_3_SOURCE_BADGE}}</div>
               </div>
             </section>
           </div>
