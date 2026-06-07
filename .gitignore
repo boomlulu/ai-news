@@ -2,3 +2,17 @@
 HANDOFF.md
 # macOS
 .DS_Store
+
+# TTS layer (heavy/generated artifacts)
+tts/.venv/
+tts/vendor/
+tts/models/
+tts/assets/_ref.aiff
+tts/**/__pycache__/
+__pycache__/
+# large/scratch TTS audio (keep small mp3 samples + script only)
+tts/samples/*.wav
+tts/samples/voicetest/
+tts/samples/_excerpt.txt
+tts/samples/*-macsay.mp3
+tts/install.log
