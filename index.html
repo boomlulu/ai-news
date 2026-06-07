@@ -1,563 +1,1354 @@
-<!DOCTYPE html>
+<!--
+每日 AI 新闻「新闻刊物风格」HTML 填充模板
+
+使用规则：
+1. 不要改 CSS、JS、class 名称、布局结构和交互方式。
+2. 只替换 {{...}} 占位符。
+3. 保留移动端单屏阅读：上下翻页，新闻内左右横滑。
+4. 保留左侧日期抽屉和右侧页码进度。
+5. 如果增加新闻页，复制一个 story section，并同步增加右侧 progress 链接。
+-->
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#0b0d12">
-<title>每日 AI 新闻 · 2026年6月7日</title>
-<style>
-  :root{
-    /* iOS 26 液态玻璃 · 深色 */
-    --bg0:#05070d; --bg1:#0a0e18; --bg2:#0e1320;
-    --glass:rgba(255,255,255,.07);
-    --glass-strong:rgba(255,255,255,.10);
-    --hair:rgba(255,255,255,.12);
-    --hair-soft:rgba(255,255,255,.07);
-    --txt:#f4f6fb; --sub:rgba(235,240,250,.66); --dim:rgba(235,240,250,.40);
-    --blue:#0a84ff; --hot:#ff453a; --orange:#ff9f0a; --gold:#ffd60a;
-    --green:#30d158; --purple:#bf5af2; --teal:#40c8e0; --pink:#ff375f;
-    --r-lg:28px; --r-md:20px; --r-sm:14px;
-    --bar:54px;
-    --shadow:0 18px 50px rgba(0,0,0,.55);
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{margin:0;padding:0;height:100%;overflow:hidden;background:var(--bg0);color:var(--txt);
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",sans-serif;
-    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.55;}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>每日 AI 新闻 ｜ 2026-06-07</title>
+  <style>
+    :root {
+      --paper: #fbf8ef;
+      --paper-deep: #efe7d8;
+      --ink: #111111;
+      --muted: #69645b;
+      --line: rgba(17, 17, 17, .16);
+      --line-strong: rgba(17, 17, 17, .36);
+      --card: rgba(255, 252, 244, .92);
+      --red: #b52823;
+      --green: #0f6046;
+      --blue: #1c6175;
+      --gold: #a36a08;
+      --shadow: 0 18px 44px rgba(38, 31, 20, .15);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
 
-  /* 环境光底：克制，仅为让玻璃有可折射的层次，不做装饰球 */
-  body::before{content:"";position:fixed;inset:0;z-index:-2;
-    background:
-      radial-gradient(130% 95% at 50% -16%, #1b2740 0%, #101727 38%, var(--bg1) 66%, var(--bg0) 100%);}
-  body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background:
-      radial-gradient(82% 56% at 84% 6%, rgba(10,132,255,.12), transparent 62%),
-      radial-gradient(78% 60% at 8% 88%, rgba(191,90,242,.10), transparent 64%),
-      radial-gradient(120% 70% at 50% 50%, transparent 60%, rgba(0,0,0,.30) 100%);}
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-  /* ===== 顶部状态栏（玻璃） ===== */
-  .statusbar{position:fixed;top:0;left:0;right:0;z-index:60;
-    height:calc(var(--bar) + env(safe-area-inset-top));
-    padding:env(safe-area-inset-top) 20px 0;
-    display:flex;align-items:center;justify-content:space-between;
-    background:rgba(8,11,18,.55);backdrop-filter:blur(28px) saturate(180%);
-    -webkit-backdrop-filter:blur(28px) saturate(180%);
-    border-bottom:.5px solid var(--hair-soft);}
-  .sb-brand{font-size:15px;font-weight:700;letter-spacing:.2px;display:flex;align-items:center;gap:7px;}
-  .sb-brand .glyph{width:22px;height:22px;border-radius:7px;
-    background:linear-gradient(160deg,var(--blue),var(--purple));
-    box-shadow:0 4px 12px rgba(10,132,255,.4);}
-  .sb-meta{font-size:11px;color:var(--sub);text-align:right;line-height:1.35;font-weight:500;}
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(17, 17, 17, .035) 1px, transparent 1px) 0 0 / 18px 18px,
+        linear-gradient(180deg, #fffaf0 0%, var(--paper) 52%, var(--paper-deep) 100%);
+      font-family: ui-serif, Georgia, "Times New Roman", "Songti SC", "STSong", serif;
+      line-height: 1.42;
+    }
 
-  /* ===== 纵向翻页 ===== */
-  #scroller{height:100dvh;overflow-y:scroll;scroll-snap-type:y mandatory;
-    scroll-behavior:smooth;-webkit-overflow-scrolling:touch;}
-  #scroller::-webkit-scrollbar{display:none;}
-  .page{height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;
-    display:flex;flex-direction:column;overflow:hidden;
-    padding-top:calc(var(--bar) + env(safe-area-inset-top));
-    padding-bottom:env(safe-area-inset-bottom);}
-  .pad{padding-left:20px;padding-right:20px;}
+    button {
+      font: inherit;
+    }
 
-  /* ===== 液态玻璃通用配方 ===== */
-  /* fill：上亮下暗分层；blur+saturate 做磨砂折射；inset 高光 + 外阴影立体 */
-  .glass{position:relative;isolation:isolate;
-    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.035));
-    backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 10px 30px rgba(0,0,0,.45);
-    border:none;}
-  /* 边缘光：遮罩描边法，上亮下暗 1px 边 */
-  .glass::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
-    background:linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,.06) 40%, rgba(255,255,255,.12));
-    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor; mask-composite:exclude;
-    pointer-events:none; z-index:1;}
+    .app {
+      position: relative;
+      height: 100dvh;
+      min-height: 100vh;
+      overflow: hidden;
+    }
 
-  /* ===== 封面 ===== */
-  .cover{justify-content:flex-start;padding-top:calc(var(--bar) + env(safe-area-inset-top) + clamp(48px,11vh,120px));}
-  .cover .kicker{font-size:12px;letter-spacing:4px;color:var(--blue);font-weight:700;}
-  .cover h1{font-size:38px;line-height:1.12;margin:14px 0 0;font-weight:800;letter-spacing:-1px;
-    background:linear-gradient(180deg,#fff,rgba(255,255,255,.72));
-    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
-  .cover .lead{font-size:15.5px;color:var(--sub);margin:18px 0 auto;max-width:30em;font-weight:450;}
-  .cover .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 auto;}
-  .stat{position:relative;isolation:isolate;border-radius:var(--r-md);
-    padding:16px 16px;
-    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.035));
-    backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 10px 30px rgba(0,0,0,.45);}
-  .stat::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
-    background:linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,.06) 40%, rgba(255,255,255,.12));
-    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; z-index:1;}
-  .stat .v{font-size:27px;font-weight:800;letter-spacing:-.5px;}
-  .stat .v.hot{color:var(--hot);}
-  .stat .v.blue{color:var(--blue);}
-  .stat .k{font-size:12px;color:var(--dim);margin-top:2px;font-weight:500;}
-  .cover .hint{margin-top:30px;font-size:13px;color:var(--dim);display:flex;align-items:center;gap:8px;font-weight:500;}
-  .cover .hint .arr{display:inline-flex;animation:bob 1.6s ease-in-out infinite;}
-  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+    .topbar {
+      position: fixed;
+      z-index: 20;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: calc(10px + var(--safe-top)) 15px 12px;
+      background: linear-gradient(180deg, rgba(251, 248, 239, .96), rgba(251, 248, 239, 0));
+      pointer-events: none;
+    }
 
-  /* ===== 新闻页 ===== */
-  .news .nhead{padding:6px 20px 0;}
-  .metarow{display:flex;align-items:center;gap:8px;margin-bottom:11px;flex-wrap:wrap;}
-  .tag{font-size:11px;font-weight:700;padding:5px 11px;border-radius:999px;letter-spacing:.3px;
-    border:.5px solid var(--hair);
-    backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 2px 8px rgba(0,0,0,.35);}
-  .tag.cat-产品{background:rgba(10,132,255,.16);color:#6db4ff;border-color:rgba(10,132,255,.3);}
-  .tag.cat-研究{background:rgba(191,90,242,.16);color:#d99bff;border-color:rgba(191,90,242,.3);}
-  .tag.cat-政策{background:rgba(255,214,10,.15);color:var(--gold);border-color:rgba(255,214,10,.3);}
-  .tag.cat-商业{background:rgba(48,209,88,.15);color:#5fe085;border-color:rgba(48,209,88,.3);}
-  .tag.cat-开源{background:rgba(64,200,224,.15);color:#6fdcef;border-color:rgba(64,200,224,.3);}
-  .tag.hot{background:rgba(255,69,58,.18);color:#ff7a70;border-color:rgba(255,69,58,.45);
-    display:inline-flex;align-items:center;gap:4px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 4px 14px rgba(255,69,58,.30);}
-  .seq{font-size:12px;color:var(--dim);font-weight:700;margin-left:auto;letter-spacing:.5px;
-    font-variant-numeric:tabular-nums;}
-  .impact{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--sub);font-weight:500;}
-  .impact .dots{display:inline-flex;gap:3px;}
-  .impact .dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.16);}
-  .impact .dots i.on{background:var(--gold);} .impact .dots i.ho{background:var(--hot);}
-  .impact b{font-variant-numeric:tabular-nums;}
-  .news h2{font-size:25px;line-height:1.28;margin:6px 0 0;font-weight:800;letter-spacing:-.6px;}
-  /* 爆点标题（render: h2.hoth2）：左侧热色光条 + 渐变高光，强调置顶爆点 */
-  .news h2.hoth2{padding-left:13px;position:relative;
-    background:linear-gradient(180deg,#fff,rgba(255,255,255,.78));
-    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
-  .news h2.hoth2::before{content:"";position:absolute;left:0;top:.18em;bottom:.18em;width:4px;
-    border-radius:2px;background:linear-gradient(180deg,var(--hot),var(--orange));
-    box-shadow:0 0 12px rgba(255,69,58,.55);-webkit-text-fill-color:initial;}
+    .mast-mini {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
 
-  /* 横向面板：满宽吸附，内部各自滚动，杜绝裁剪/溢出 */
-  .panels{flex:1;min-height:0;display:flex;overflow-x:auto;overflow-y:hidden;
-    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;}
-  .panels::-webkit-scrollbar{display:none;}
-  .panel{flex:0 0 100%;width:100%;scroll-snap-align:start;scroll-snap-stop:always;
-    overflow-y:auto;-webkit-overflow-scrolling:touch;
-    padding:14px 20px 8px;}
-  .panel::-webkit-scrollbar{display:none;}
-  .plabel{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--dim);
-    text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
-  .plabel .bar{flex:1;height:.5px;background:var(--hair);}
+    .mark {
+      display: grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+      font-size: 11px;
+      font-weight: 900;
+    }
 
-  .body{font-size:15px;color:rgba(235,240,250,.82);font-weight:450;}
-  .body b{color:var(--txt);font-weight:700;}
-  .body em{font-style:normal;color:var(--blue);font-weight:700;font-variant-numeric:tabular-nums;}
-  .card{position:relative;isolation:isolate;border-radius:var(--r-md);
-    padding:15px 16px;margin-top:12px;
-    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.035));
-    backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 10px 30px rgba(0,0,0,.45);}
-  .card::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
-    background:linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,.06) 40%, rgba(255,255,255,.12));
-    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; z-index:1;}
-  /* accent：用 inset 左色条，避免与 ::after 描边冲突 */
-  .card.accent{box-shadow:inset 3px 0 0 var(--blue), inset 0 1px 0 rgba(255,255,255,.18), 0 10px 30px rgba(0,0,0,.45);}
-  .card.accent.hot{box-shadow:inset 3px 0 0 var(--hot), inset 0 1px 0 rgba(255,255,255,.18), 0 12px 32px rgba(255,69,58,.18);}
-  .card .h{font-size:12px;font-weight:800;margin-bottom:7px;letter-spacing:.4px;}
-  .h.gold{color:var(--gold);} .h.blue{color:#6db4ff;} .h.green{color:#5fe085;}
-  .ilist{margin:0;padding:0;list-style:none;}
-  .ilist li{position:relative;padding-left:18px;margin-bottom:10px;font-size:14.5px;color:rgba(235,240,250,.80);}
-  .ilist li:last-child{margin-bottom:0;}
-  .ilist li::before{content:"";position:absolute;left:2px;top:8px;width:6px;height:6px;
-    border-radius:50%;background:var(--blue);}
-  .panel.pc .ilist li::before{background:var(--green);}
-  .kv{display:flex;gap:12px;margin-bottom:13px;font-size:14px;}
-  .kv .kk{flex:0 0 60px;color:var(--dim);font-weight:600;}
-  .kv .vv{color:rgba(235,240,250,.82);flex:1;}
-  .src a{color:#6db4ff;text-decoration:none;font-weight:500;}
-  .cred{display:inline-block;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;
-    backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.20), 0 2px 8px rgba(0,0,0,.30);}
-  .cred.high{background:rgba(48,209,88,.15);color:#5fe085;}
-  .cred.mid{background:rgba(255,214,10,.14);color:var(--gold);}
-  .pend{color:#e0bd66;}
+    .top-rule {
+      height: 1px;
+      background: var(--line-strong);
+    }
 
-  /* 面板指示器（render 产出: <span>←</span> <span class="d act"></span>… <span>左右滑动</span>） */
-  .pdots{display:flex;gap:8px;justify-content:center;align-items:center;
-    padding:10px 0 calc(6px + env(safe-area-inset-bottom));}
-  /* 首尾文字 span（← 与 "左右滑动"）：小号暗色提示 */
-  .pdots>span:not(.d){font-size:11px;color:var(--dim);font-weight:500;letter-spacing:.5px;line-height:1;}
-  /* 圆点 .d */
-  .pdots .d{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.20);transition:.25s;flex:0 0 auto;}
-  .pdots .d.act{background:var(--txt);width:20px;border-radius:3px;}
+    .date {
+      color: var(--muted);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
 
-  /* ===== 明日观察 ===== */
-  .watch{justify-content:center;}
-  .watch .kicker{font-size:12px;letter-spacing:4px;color:var(--blue);font-weight:700;}
-  .watch h1{font-size:30px;margin:14px 0 20px;font-weight:800;letter-spacing:-.8px;}
-  .witem{position:relative;isolation:isolate;border-radius:var(--r-md);
-    padding:16px;margin-bottom:12px;display:flex;gap:13px;align-items:flex-start;
-    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.035));
-    backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 10px 30px rgba(0,0,0,.45);}
-  .witem::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
-    background:linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,.06) 40%, rgba(255,255,255,.12));
-    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; z-index:1;}
-  .wn{flex:0 0 30px;height:30px;border-radius:10px;color:#fff;font-weight:800;font-size:14px;
-    display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(160deg,var(--blue),var(--purple));}
-  .wt{font-size:15px;color:rgba(235,240,250,.85);}
-  .watch .foot{margin-top:22px;font-size:12px;color:var(--dim);line-height:1.7;}
-  .watch .foot a{color:#6db4ff;text-decoration:none;}
+    .rail {
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+      overscroll-behavior-y: contain;
+    }
 
-  /* ===== 右侧纵向进度条 ===== */
-  .progress{position:fixed;right:9px;top:50%;transform:translateY(-50%);z-index:55;
-    display:flex;flex-direction:column;gap:7px;align-items:center;}
-  .progress .pd{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.20);transition:.28s;}
-  .progress .pd.act{background:var(--txt);height:20px;border-radius:3px;}
-  .progress .pd.hot.act{background:var(--hot);}
+    .rail::-webkit-scrollbar,
+    .h-scroll::-webkit-scrollbar {
+      display: none;
+    }
 
-  /* ===== 左侧日期抽屉 ===== */
-  .drawer-handle{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:58;
-    width:26px;height:100px;display:flex;align-items:center;justify-content:center;cursor:pointer;
-    background:linear-gradient(90deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
-    border:.5px solid var(--hair);border-left:none;
-    border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--sub);
-    backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 4px 0 16px rgba(0,0,0,.4);}
-  .drawer-handle span{writing-mode:vertical-rl;font-size:11px;font-weight:700;letter-spacing:2px;}
-  .drawer{position:fixed;left:0;top:0;bottom:0;width:248px;z-index:59;
-    background:rgba(12,16,26,.78);backdrop-filter:blur(34px) saturate(180%);
-    -webkit-backdrop-filter:blur(34px) saturate(180%);
-    border-right:.5px solid var(--hair);
-    transform:translateX(-101%);transition:transform .34s cubic-bezier(.32,.72,0,1);
-    padding:calc(var(--bar) + env(safe-area-inset-top) + 16px) 16px calc(20px + env(safe-area-inset-bottom));
-    display:flex;flex-direction:column;overflow-y:auto;}
-  .drawer.open{transform:translateX(0);box-shadow:var(--shadow);}
-  .drawer .dt{font-size:12px;letter-spacing:2px;color:var(--dim);font-weight:700;margin-bottom:14px;}
-  .drawer a.day{display:flex;justify-content:space-between;align-items:center;text-decoration:none;
-    color:var(--sub);border:.5px solid var(--hair-soft);
-    background:linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
-    border-radius:var(--r-sm);padding:13px 14px;margin-bottom:9px;font-size:14px;font-weight:600;
-    backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.14);}
-  .drawer a.day.cur{color:var(--txt);border-color:rgba(10,132,255,.5);
-    background:linear-gradient(180deg, rgba(10,132,255,.20), rgba(10,132,255,.08));
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), inset 3px 0 0 var(--blue);}
-  .drawer a.day .badge{font-size:11px;color:var(--dim);font-weight:500;}
-  .drawer a.day.cur .badge{color:#6db4ff;}
-  .drawer .more{margin-top:auto;padding-top:14px;font-size:12.5px;}
-  .drawer .more a{color:#6db4ff;text-decoration:none;}
-  .scrim{position:fixed;inset:0;z-index:57;background:rgba(0,0,0,.45);opacity:0;visibility:hidden;
-    transition:.3s;backdrop-filter:blur(2px);}
-  .scrim.show{opacity:1;visibility:visible;}
+    .date-drawer {
+      position: fixed;
+      z-index: 30;
+      left: 0;
+      top: 50%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transform: translateY(-50%);
+    }
 
-  /* ===== BRIDGE: 适配 b5ea890 render JS 的实际 DOM 类名 ===== */
-  /* b5 render 用 .inner 包裹每页内容；玻璃 CSS 缺 .inner，补回让其接管 flex 分配（修封面空洞 = 方案 b） */
-  .inner{max-width:560px;width:100%;margin:0 auto;padding:0 20px;flex:1;
-    display:flex;flex-direction:column;min-height:0;}
-  /* 封面 .inner 接管纵向分配：上对齐留白 + lead/stats 用 auto 把重心压实 */
-  .cover .inner{justify-content:flex-start;}
-  .cover{justify-content:flex-start;}
+    .date-handle {
+      display: grid;
+      width: 25px;
+      height: 92px;
+      place-items: center;
+      border: 1px solid var(--line-strong);
+      border-left: 0;
+      border-radius: 0 8px 8px 0;
+      background: rgba(251, 248, 239, .9);
+      color: var(--ink);
+      box-shadow: 0 10px 24px rgba(38, 31, 20, .12);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 10px;
+      font-weight: 900;
+      writing-mode: vertical-rl;
+      cursor: pointer;
+    }
 
-  /* 影响指数小圆点：render 产出 <span class="on/ho/off">●</span>（彩色文字点），非空 <i> */
-  .impact .dots{letter-spacing:1px;display:inline-flex;gap:2px;}
-  .impact .on{color:var(--gold);}
-  .impact .ho{color:var(--hot);}
-  .impact .off{color:rgba(255,255,255,.16);}
+    .date-menu {
+      display: grid;
+      gap: 7px;
+      width: 58px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-14px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
 
-  /* 落地分类：render 第10条 cat=落地，玻璃 CSS 漏了 */
-  .tag.cat-落地{background:rgba(255,214,10,.15);color:var(--gold);border-color:rgba(255,214,10,.3);}
+    .date-drawer:hover .date-menu,
+    .date-drawer:focus-within .date-menu,
+    .date-drawer.open .date-menu {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
 
-  /* 卡片：render 用 .box / .box.hl / .box.hl.hot，玻璃 CSS 只写了 .card —— 把玻璃配方桥接到 .box */
-  .box{position:relative;isolation:isolate;border-radius:var(--r-md);
-    padding:15px 16px;margin-bottom:12px;
-    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.035));
-    backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 10px 30px rgba(0,0,0,.45);}
-  .box::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
-    background:linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,.06) 40%, rgba(255,255,255,.12));
-    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; z-index:1;}
-  /* hl：左色条强调，与 ::after 描边不冲突（用 inset 阴影画色条） */
-  .box.hl{box-shadow:inset 3px 0 0 var(--blue), inset 0 1px 0 rgba(255,255,255,.18), 0 10px 30px rgba(0,0,0,.45);}
-  .box.hl.hot{box-shadow:inset 3px 0 0 var(--hot), inset 0 1px 0 rgba(255,255,255,.18), 0 12px 32px rgba(255,69,58,.18);}
-  .box .h{font-size:12px;font-weight:800;color:var(--gold);margin-bottom:7px;letter-spacing:.4px;}
-  .box .h.blue{color:#6db4ff;}
-  .box .h.green{color:#5fe085;}
+    .date-menu::before {
+      content: "往期";
+      padding: 6px 0;
+      border-bottom: 2px solid var(--ink);
+      color: var(--red);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 11px;
+      font-weight: 950;
+      text-align: center;
+    }
 
-  /* render 摘要正文用 <p class="body">，已有 .body 规则；段落去默认 margin 防溢出 */
-  .panel .body{margin:0;}
-  .box .body{margin:0;}
-</style>
+    .date-menu a {
+      display: grid;
+      min-height: 48px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: rgba(255, 252, 244, .9);
+      color: var(--muted);
+      box-shadow: 0 10px 22px rgba(38, 31, 20, .08);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .date-menu a.active {
+      border-color: var(--red);
+      background: var(--red);
+      color: white;
+    }
+
+    .progress {
+      position: fixed;
+      z-index: 25;
+      right: 9px;
+      top: 50%;
+      display: grid;
+      gap: 7px;
+      transform: translateY(-50%);
+    }
+
+    .progress a {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: rgba(255, 252, 244, .74);
+      color: rgba(17, 17, 17, .44);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 10px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .progress a:first-child {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .slide {
+      display: flex;
+      min-height: 100dvh;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      padding: calc(64px + var(--safe-top)) 42px calc(20px + var(--safe-bottom)) 34px;
+    }
+
+    .slide-inner {
+      display: flex;
+      width: min(100%, 520px);
+      min-height: calc(100dvh - 84px - var(--safe-top) - var(--safe-bottom));
+      margin: 0 auto;
+      flex-direction: column;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    .front {
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .edition {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 10px;
+      border-bottom: 3px double var(--ink);
+      color: var(--muted);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .masthead {
+      display: grid;
+      gap: 8px;
+    }
+
+    .masthead small {
+      color: var(--red);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 9ch;
+      font-size: clamp(48px, 14vw, 76px);
+      line-height: .86;
+      text-transform: uppercase;
+    }
+
+    .front-lead {
+      padding-top: 13px;
+      border-top: 1px solid var(--line-strong);
+      color: #2d2b27;
+      font-size: clamp(18px, 5vw, 24px);
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .headline-stack {
+      display: grid;
+      gap: 9px;
+      border-top: 2px solid var(--ink);
+      border-bottom: 2px solid var(--ink);
+      padding: 11px 0;
+    }
+
+    .headline-stack a {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .headline-stack b {
+      color: var(--red);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 12px;
+      font-weight: 950;
+      line-height: 1.1;
+    }
+
+    .headline-stack span {
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .daily-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .stat {
+      min-height: 80px;
+      padding: 10px;
+      border: 1px solid var(--line-strong);
+      background: rgba(255, 252, 244, .78);
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--red);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .ticker {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+      padding: 9px 0;
+      border-top: 1px solid var(--line-strong);
+      border-bottom: 1px solid var(--line-strong);
+      color: #2f2d29;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .ticker b {
+      color: var(--red);
+    }
+
+    .hint {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      color: var(--muted);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .gesture {
+      display: inline-flex;
+      gap: 5px;
+    }
+
+    .gesture i {
+      display: block;
+      width: 20px;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(17, 17, 17, .26);
+    }
+
+    .news-head {
+      display: grid;
+      gap: 9px;
+      margin-bottom: 12px;
+      padding-bottom: 11px;
+      border-bottom: 3px double var(--ink);
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .tag {
+      padding: 4px 8px;
+      border-radius: 999px;
+      color: white;
+      background: var(--green);
+      font-size: 11px;
+      font-weight: 950;
+    }
+
+    .tag.product { background: var(--blue); }
+    .tag.research { background: var(--gold); }
+    .tag.policy { background: var(--red); }
+
+    .news-title {
+      font-size: clamp(30px, 9vw, 46px);
+      line-height: .98;
+    }
+
+    .byline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      color: var(--muted);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .byline span {
+      padding-right: 7px;
+      border-right: 1px solid var(--line-strong);
+    }
+
+    .byline span:last-child {
+      border-right: 0;
+    }
+
+    .h-scroll {
+      display: grid;
+      grid-auto-columns: 100%;
+      grid-auto-flow: column;
+      gap: 12px;
+      min-height: 0;
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+    }
+
+    .panel {
+      display: flex;
+      min-height: 0;
+      flex-direction: column;
+      justify-content: space-between;
+      scroll-snap-align: center;
+      padding: 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .visual {
+      position: relative;
+      min-height: 112px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background:
+        linear-gradient(90deg, rgba(17, 17, 17, .12) 1px, transparent 1px) 0 0 / 18px 18px,
+        linear-gradient(0deg, rgba(17, 17, 17, .1) 1px, transparent 1px) 0 0 / 18px 18px,
+        rgba(181, 40, 35, .08);
+    }
+
+    .visual::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 13px;
+      top: 12px;
+      color: var(--red);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: .08em;
+    }
+
+    .visual::after {
+      content: "";
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      width: 76px;
+      height: 76px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      opacity: .76;
+    }
+
+    .visual.research {
+      background:
+        repeating-linear-gradient(0deg, rgba(17, 17, 17, .1) 0 1px, transparent 1px 12px),
+        rgba(163, 106, 8, .12);
+    }
+
+    .visual.policy {
+      background:
+        linear-gradient(135deg, rgba(181, 40, 35, .16), transparent 46%),
+        repeating-linear-gradient(90deg, rgba(17, 17, 17, .1) 0 1px, transparent 1px 14px),
+        rgba(255, 252, 244, .86);
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 13px;
+      color: var(--muted);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 12px;
+      font-weight: 950;
+      text-transform: uppercase;
+    }
+
+    .index {
+      color: rgba(17, 17, 17, .42);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .big {
+      color: var(--ink);
+      font-size: clamp(21px, 6vw, 28px);
+      font-weight: 900;
+      line-height: 1.16;
+    }
+
+    .text {
+      margin-top: 12px;
+      color: #393631;
+      font-size: 16px;
+    }
+
+    .score-stamp {
+      align-self: flex-start;
+      margin-top: 16px;
+      padding: 8px 11px;
+      border: 2px solid var(--red);
+      border-radius: 6px;
+      color: var(--red);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 13px;
+      font-weight: 950;
+      transform: rotate(-2deg);
+    }
+
+    .impact-list {
+      display: grid;
+      gap: 10px;
+      margin: 17px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .impact-list li {
+      padding: 11px 12px;
+      border-left: 4px solid var(--red);
+      background: rgba(255, 252, 244, .72);
+      color: #34312d;
+      font-size: 15px;
+    }
+
+    .source-box {
+      display: grid;
+      gap: 0;
+      margin-top: 16px;
+      border-top: 2px solid var(--ink);
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .source-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+      color: #2f2d29;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .source-row:last-child {
+      border-bottom: 0;
+    }
+
+    .source-row span:last-child {
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .verified {
+      width: fit-content;
+      margin-top: 15px;
+      padding: 6px 9px;
+      border: 1px solid var(--green);
+      color: var(--green);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 11px;
+      font-weight: 950;
+      text-transform: uppercase;
+    }
+
+    .dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding-top: 12px;
+    }
+
+    .dots i {
+      display: block;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(17, 17, 17, .24);
+    }
+
+    .dots i:first-child {
+      width: 18px;
+      background: var(--red);
+    }
+
+    .watch {
+      justify-content: center;
+      gap: 18px;
+    }
+
+    .wrap {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .mini-card {
+      padding: 14px;
+      border: 1px solid var(--line-strong);
+      background: rgba(255, 252, 244, .76);
+    }
+
+    .mini-card strong {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--red);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .mini-card span {
+      color: #393631;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    @media (min-width: 760px) {
+      .slide {
+        padding-left: 64px;
+        padding-right: 54px;
+      }
+
+      .slide-inner {
+        width: min(100%, 680px);
+      }
+
+      h1 {
+        max-width: 10ch;
+      }
+
+      .panel {
+        padding: 24px;
+      }
+    }
+
+    @media (max-height: 690px) {
+      .slide {
+        padding-top: calc(56px + var(--safe-top));
+        padding-bottom: calc(14px + var(--safe-bottom));
+      }
+
+      .slide-inner {
+        min-height: calc(100dvh - 70px - var(--safe-top) - var(--safe-bottom));
+      }
+
+      h1 {
+        font-size: clamp(39px, 12vw, 58px);
+      }
+
+      .front {
+        gap: 12px;
+      }
+
+      .front-lead,
+      .text {
+        font-size: 15px;
+      }
+
+      .visual {
+        min-height: 82px;
+        margin-bottom: 12px;
+      }
+
+      .panel {
+        padding: 14px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .slide {
+        padding-left: 30px;
+        padding-right: 38px;
+      }
+
+      .progress a {
+        width: 24px;
+        height: 24px;
+      }
+
+      .date-menu {
+        width: 52px;
+      }
+    }
+
+    @media (hover: none) {
+      .date-drawer::before {
+        content: "";
+        position: absolute;
+        top: -120px;
+        bottom: -120px;
+        left: 0;
+        width: 78px;
+      }
+
+      .date-drawer:active .date-menu,
+      .date-drawer.open .date-menu {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0);
+      }
+    }
+  </style>
 </head>
 <body>
+  <main class="app">
+    <header class="topbar" aria-label="简报信息">
+      <div class="mast-mini"><span class="mark">AI</span><span>每日 AI 新闻</span></div>
+      <div class="top-rule"></div>
+      <div class="date">2026年6月7日 周日 · 自动定时任务</div>
+    </header>
 
-<!-- 顶部状态栏 -->
-<div class="statusbar">
-  <div class="sb-brand">每日 AI 新闻<span class="dot"> ·</span></div>
-  <div class="sb-meta" id="sbMeta">2026年6月7日 周日<br>生成于 自动定时任务</div>
-</div>
+    <aside class="date-drawer" aria-label="日期切换抽屉">
+      <button class="date-handle" type="button" aria-label="展开日期列表">日期</button>
+      <nav class="date-menu" aria-label="按日期切换新闻">
+        <a href="archive/index.html" aria-label="查看 2026年6月7日 新闻">更早</a>
+        <a href="archive/index.html" aria-label="查看 2026年6月7日 新闻">往期</a>
+        <a class="active" href="index.html" aria-current="page" aria-label="当前 2026年6月7日 新闻">06·07</a>
+        <a href="#" aria-label="查看 预告 新闻">预告</a>
+      </nav>
+    </aside>
 
-<!-- 日期抽屉 -->
-<div class="drawer-handle" id="dHandle"><span>日期 ›</span></div>
-<div class="scrim" id="scrim"></div>
-<nav class="drawer" id="drawer">
-  <div class="dt">选择日期</div>
-  <a class="day cur" href="index.html">2026年6月7日 · 周日<span class="badge">今日 · 10条</span></a>
-  <div class="more"><a href="archive/index.html">查看全部历史归档 →</a></div>
-</nav>
+    <nav class="progress" aria-label="页面进度">
+      <a href="#cover" aria-label="封面">00</a>
+      <a href="#story-1" aria-label="新闻 1">01</a>
+      <a href="#story-2" aria-label="新闻 2">02</a>
+      <a href="#story-3" aria-label="新闻 3">03</a>
+      <a href="#story-4" aria-label="新闻 4">04</a>
+      <a href="#story-5" aria-label="新闻 5">05</a>
+      <a href="#story-6" aria-label="新闻 6">06</a>
+      <a href="#story-7" aria-label="新闻 7">07</a>
+      <a href="#story-8" aria-label="新闻 8">08</a>
+      <a href="#story-9" aria-label="新闻 9">09</a>
+      <a href="#story-10" aria-label="新闻 10">10</a>
+      <a href="#tomorrow" aria-label="明日观察">明</a>
+    </nav>
 
-<!-- 右侧进度条 -->
-<div class="progress" id="progress"></div>
-
-<!-- 滚动主体 -->
-<div id="scroller">
-  <!-- 封面 -->
-  <section class="page cover" data-label="封面">
-    <div class="inner">
-      <div class="kicker">DAILY AI BRIEF</div>
-      <h1>今天的 AI，<br>用大白话讲给你听</h1>
-      <p class="lead">全球 Top AI 公司动态 + 全网热点，按"最值得你关注"排序。爆点新闻置顶——又强、又便宜、或真正跨时代的才算。</p>
-      <div class="stats">
-        <div class="stat"><div class="v hot">2</div><div class="k">今日爆点</div></div>
-        <div class="stat"><div class="v">10</div><div class="k">精选新闻</div></div>
-        <div class="stat"><div class="v">12+</div><div class="k">交叉来源</div></div>
-        <div class="stat"><div class="v">约5分钟</div><div class="k">预计阅读</div></div>
-      </div>
-      <div class="hint"><span class="arr">↓</span> 上滑开始阅读 · 每条新闻左右滑看更多</div>
-    </div>
-  </section>
-  <!-- 新闻页由 JS 渲染 -->
-  <div id="newsHost"></div>
-
-  <!-- 明日观察 -->
-  <section class="page watch" data-label="明日观察">
-    <div class="inner">
-      <div class="kicker">TOMORROW</div>
-      <h1>明日观察</h1>
-      <div class="witems" id="watchHost"></div>
-      <div class="foot">
-        新闻经多源交叉核对；模型版本号、估值、价格等以各公司官方为准。标注"泄露/传闻"的内容尚未获官方证实。<br>
-        <a href="archive/index.html">历史归档</a> · 报告由定时任务自动生成
-      </div>
-    </div>
-  </section>
-</div>
-
-<script>
-/* ===================== 新闻数据 ===================== */
-const NEWS = [
-  { hot:true, cat:"研究", impact:9.8,
-    title:"OpenAI 模型独立推翻 80 年数学猜想",
-    summary:"OpenAI 一个<b>通用</b>推理模型独立找到了数学家 Erdős 1946 年\"单位距离猜想\"的反例：用代数数论工具构造出一整族比方格排列更优的点阵，把上界从约 n 提升到约 <em>n^1.014</em>（普林斯顿 Will Sawin 后续精化）。人类研究这道题近 80 年，一直以为方格是最优解。",
-    why:"这是 AI <b>首次\"自主\"解决一个数学子领域的核心开放问题</b>，而不只是当算题助手。菲尔兹奖得主 Tim Gowers 称之为\"AI 数学的里程碑\"——意味着 AI 开始能在前沿科研里<b>原创</b>，而非复述已知知识。",
-    impacts:["科研范式可能改变：AI 从检索/计算工具，升级为能提出新结构的\"发现者\"。","跨学科迁移：它借用了看似无关的数论分支来解几何题。","正面回应了\"AI 只会复述已知\"的长期质疑。"],
-    action:"关注 OpenAI 是否把该能力产品化为科研助手；以及学术界对结果的同行复核进展。",
-    src:[["OpenAI 官方","https://openai.com/index/model-disproves-discrete-geometry-conjecture/"],["Scientific American","https://www.scientificamerican.com/article/ai-just-solved-an-80-year-old-erdos-problem-and-mathematicians-are-amazed/"]],
-    cred:["high","高 · OpenAI 官方公布 + 多家权威报道 + arXiv 论文"],
-    pending:"该能力能否复现到其它难题、是否依赖大量人工引导，仍待观察。" },
-
-  { hot:true, cat:"开源", impact:9.3,
-    title:"MiniMax M3 开源：逼近顶级闭源，成本仅 5%–10%",
-    summary:"国产 MiniMax 发布开放权重模型 <b>M3</b>：SWE-Bench Pro 拿到 <em>59.0%</em>，超过 GPT-5.5 与 Gemini 3.1 Pro 等闭源 API；支持 <b>100 万 token</b> 上下文 + 原生多模态\"电脑操作\"。靠 MSA 稀疏注意力，把长文本算力砍到上一代约 <em>1/20</em>。",
-    why:"完全符合\"又强又便宜\"的爆点标准（你说的 Gamma 4 标准）：先得很强，其次部署成本极低。普通团队也用得起接近顶级的能力，重塑整个成本结构。",
-    impacts:["推理成本骤降，中小团队可负担顶级能力。","长上下文 + 多模态 agent 的门槛大幅降低。","开放权重加速生态，但训练代码未开源——严格说是\"开放权重\"而非\"完全开源\"。"],
-    action:"评估用 M3 替换部分闭源调用以降本；实测其 agent / 电脑操作的真实稳定性。",
-    src:[["devFlokers 开源月报","https://www.devflokers.com/blog/open-source-ai-roundup-june-2026"],["llm-stats","https://llm-stats.com/llm-updates"]],
-    cred:["mid","中高 · 基准为官方发布，第三方复测进行中"],
-    pending:"真实业务下的稳定性、安全对齐、与基准成绩的差距，待第三方验证。" },
-
-  { hot:false, cat:"商业", impact:9.0,
-    title:"Anthropic 估值 9650 亿美元，反超 OpenAI 并申请 IPO",
-    summary:"Anthropic 完成 <b>650 亿美元</b> Series H，投后估值 <em>9650 亿美元</em>，首次超过 OpenAI 私募估值；6 月 2 日已秘密提交 IPO 草案（S-1）。Apollo、Blackstone 还安排了 360 亿美元私募信贷去买谷歌 TPU——史上最大芯片融资债。",
-    why:"主要靠 Claude Code（AI 编程 agent）一路冲到全球最值钱 AI 公司。说明<b>编程类 AI 正成为最被资本认可、最能赚钱的方向</b>。",
-    impacts:["编程 agent 的商业价值被市场给到最高定价。","AI 进入\"资本兑现期\"，巨头集体冲刺 IPO。","算力融资工具创新：用债务直接买芯片。"],
-    action:"关注 IPO 定价，以及招股书披露的真实收入与毛利率。",
-    src:[["NBC News","https://www.nbcnews.com/business/corporations/anthropic-files-ipo-openai-rcna347897"],["Axios","https://www.axios.com/2026/05/21/google-ai-anthropic-openai-war"]],
-    cred:["high","高 · 多家权威财经媒体报道"],
-    pending:"秘密递交后，正式上市时间与最终估值仍待定。" },
-
-  { hot:false, cat:"商业", impact:8.2,
-    title:"OpenAI 也在筹备 IPO，或年内启动",
-    summary:"OpenAI 同样在推进上市，私募估值此前已达 <b>7000 亿美元级</b>，联手顶级投行筹备，可能成为史上最大 AI IPO 之一。",
-    why:"两大巨头同年冲刺 IPO，标志生成式 AI 从\"烧钱扩张\"转向\"向公开市场兑现\"。",
-    impacts:["一级市场泡沫担忧与兑现需求并存。","公开财报将首次让外界看清头部 AI 的真实经济模型。","二级市场资金有望大规模进入 AI。"],
-    action:"对比 Anthropic 与 OpenAI 招股书里的毛利与增速，判断谁的模式更健康。",
-    src:[["NBC News","https://www.nbcnews.com/business/corporations/anthropic-files-ipo-openai-rcna347897"]],
-    cred:["mid","中高 · 进程属早期，时间表可能变动"],
-    pending:"具体时间、估值与是否年内完成，尚未官方确认。" },
-
-  { hot:false, cat:"产品", impact:8.0,
-    title:"微软 Build 2026 一口气发 7 个自研 MAI 模型",
-    summary:"微软发布 <b>MAI 家族 7 款自研模型</b>：推理模型 MAI-Thinking-1（350 亿活跃参数，盲测优于 Sonnet 4.6）、5B 的 MAI-Code-1-Flash（SWE-Bench Pro 51%，进 GitHub Copilot）、MAI-Image-2.5（已进 PowerPoint）、MAI-Voice-2、MAI-Transcribe-1.5 等，均<b>非蒸馏</b>自第三方模型。",
-    why:"微软正系统性<b>降低对 OpenAI 的依赖</b>，自建全栈模型能力。巨头从\"投资 OpenAI\"转向\"自研竞争\"。",
-    impacts:["OpenAI 与微软的关系变得微妙。","小而快的专用模型（如 5B 编程模型）成为趋势。","Office / Copilot 正全面换上自研模型。"],
-    action:"关注 Copilot 换用 MAI 后的实际体验与成本变化。",
-    src:[["Microsoft AI","https://microsoft.ai/news/microsoft-build-2026-mai-keynote-transcript/"],["CNBC","https://www.cnbc.com/2026/06/02/microsoft-unveils-new-ai-models-lessen-reliance-on-openai-lower-costs.html"]],
-    cred:["high","高 · 官方 Build 大会发布"],
-    pending:"自研模型在真实负载下与 OpenAI 模型的差距，待第三方评测。" },
-
-  { hot:false, cat:"开源", impact:7.8,
-    title:"英伟达开源 Nemotron 3 Ultra：550B MoE，美国最强开放模型",
-    summary:"6 月 4 日英伟达发布 <b>Nemotron 3 Ultra</b>，5500 亿参数混合专家（MoE）开放模型，主打 agent 推理；配套 Nano / Super 三档，采用混合潜在 MoE 架构，被称作\"美国最佳开放权重模型\"。",
-    why:"芯片巨头亲自下场做开放模型，既卖铲子又给生态打样，正面抗衡中国开源军团。",
-    impacts:["开放模型阵营的美国一侧得到补强。","推动多 agent 系统走向标准化。","与自家硬件深度绑定，形成软硬闭环。"],
-    action:"对比 Nemotron 3 Ultra 与 Qwen / DeepSeek 在 agent 任务上的性价比。",
-    src:[["NVIDIA Newsroom","https://nvidianews.nvidia.com/news/nvidia-debuts-nemotron-3-family-of-open-models"],["Artificial Analysis","https://artificialanalysis.ai/articles/nvidia-nemotron-3-ultra-launch-announced"]],
-    cred:["high","高 · 官方发布"],
-    pending:"许可证细节与第三方 agent 实测表现，待跟进。" },
-
-  { hot:false, cat:"产品", impact:7.5,
-    title:"英伟达 RTX Spark 超级芯片：AI 跑进你自己的电脑",
-    summary:"Computex 2026 上，黄仁勋宣布与微软联手\"重新定义 PC\"，推出面向消费端的 <b>RTX Spark 超级芯片</b>，让 agent 在<b>本地</b>运行，摆脱云端延迟和成本；微软让 Windows 能本地直接跑开放模型。",
-    why:"AI 工作负载的下一个瓶颈被押注在\"端侧\"。个人 AI、隐私 AI 时代正式起步。",
-    impacts:["本地 agent 兴起，隐私和速度都更好。","可能催化新一轮 PC 换机潮。","云端推理需求的结构将发生变化。"],
-    action:"关注端侧到底能跑多大模型，以及电池/发热的真实表现。",
-    src:[["buildfastwithai 综述","https://www.buildfastwithai.com/blogs/ai-news-today-june-6-2026"]],
-    cred:["mid","中高 · 大会公布，产品细节待上市"],
-    pending:"消费级落地时间、价格与实际本地性能，待产品验证。" },
-
-  { hot:false, cat:"研究", impact:7.0,
-    title:"三大旗舰同期刷新 + GPT-5.6 基准疑似泄露",
-    summary:"ChatGPT 把默认模型换成 <b>GPT-5.5 Instant</b>；谷歌主打低价 <b>Gemini 3.5 Flash</b>；Anthropic <b>Claude Opus 4.8</b> 领跑编程。同时本周流出疑似 GPT-5.6 内部基准，指向多步 agent 推理与 token 效率提升，6 月窗口发布。",
-    why:"头部模型迭代进入\"季度级\"节奏，竞争白热化，价格与效率成为新战场。",
-    impacts:["默认模型免费升级，普通用户直接受益。","低价 Flash 类模型主攻企业批量需求。","迭代过快，带来选型疲劳。"],
-    action:"重大业务先用小流量灰度新模型，再考虑全量切换。",
-    src:[["OpenAI 帮助中心","https://help.openai.com/en/articles/9624314-model-release-notes"],["CNBC","https://www.cnbc.com/2026/06/01/microsoft-and-google-take-on-anthropic-and-openai-in-ai-coding-models.html"]],
-    cred:["mid","中 · GPT-5.6 部分为泄露/传闻，未证实"],
-    pending:"GPT-5.6 的发布时间与真实指标，尚未官方确认。" },
-
-  { hot:false, cat:"开源", impact:6.8,
-    title:"中国开源模型集体登顶",
-    summary:"阿里 Qwen、DeepSeek、Moonshot 的 <b>Kimi K2.6</b>、智谱 GLM 等多款开放权重模型，在编程 / agent 基准上追平甚至超过闭源。Kimi K2.6 主打长上下文与多步编程规划。",
-    why:"\"只有闭源才最强\"的格局正被改写，开源（尤其中国队）成本优势明显。",
-    impacts:["全球开发者获得高性价比、可自部署的选项。","闭源厂商的定价持续承压。","地缘 / 合规因素，带来部署选择的分化。"],
-    action:"数据敏感场景，可优先评估可自部署的开放权重模型。",
-    src:[["devFlokers","https://www.devflokers.com/blog/open-source-ai-roundup-june-2026"],["BentoML","https://www.bentoml.com/blog/navigating-the-world-of-open-source-large-language-models"]],
-    cred:["mid","中高 · 多榜单与第三方评测交叉"],
-    pending:"各模型的商用许可条款与安全性，需逐一核对。" },
-
-  { hot:false, cat:"落地", impact:6.5,
-    title:"机器人与无人车加速落地：马德里 Robotaxi、Atlas、MolmoAct 2",
-    summary:"Uber 联合 WeRide、AVOMO 在马德里推出<b>欧洲首个商业化 Robotaxi</b>；波士顿动力 Atlas 展示新的敏捷动作；Ai2 开源机器人控制模型 <b>MolmoAct 2</b>，下载量已超 40 万次。",
-    why:"大模型正从\"聊天框\"走进真实物理世界，具身智能的商业化版图扩大到欧洲。",
-    impacts:["自动驾驶商业化从中美扩散到欧洲。","开放具身模型降低机器人开发门槛。","人形机器人能力持续逼近实用。"],
-    action:"关注 Robotaxi 在欧洲的监管与安全数据披露。",
-    src:[["buildfastwithai","https://www.buildfastwithai.com/blogs/ai-news-today-june-6-2026"]],
-    cred:["mid","中高 · 公司公告 + 行业综述"],
-    pending:"商业化规模、盈利能力与安全记录，待长期数据。" },
-];
-
-const WATCH = [
-  "GPT-5.6 是否正式发布，以及它的真实指标能否兑现泄露的预期。",
-  "Anthropic / OpenAI 的 IPO 招股书一旦公开，将首次揭示头部 AI 的收入与毛利。",
-  "MiniMax M3、Nemotron 3 等开放权重模型，第三方复测结果与生态采用速度。",
-];
-
-/* ===================== 渲染 ===================== */
-function impactDots(v, hot){
-  const full = Math.round(v/2);
-  let s='';
-  for(let i=0;i<5;i++){
-    s += (i<full) ? `<span class="${hot?'ho':'on'}">●</span>` : `<span class="off">●</span>`;
-  }
-  return `<span class="impact"><span>影响指数</span><span class="dots">${s}</span><b style="color:${hot?'var(--hot)':'var(--gold)'}">${v.toFixed(1)}</b></span>`;
-}
-
-function renderNews(){
-  const host = document.getElementById('newsHost');
-  NEWS.forEach((n,idx)=>{
-    const seq = idx+1;
-    const catTag = n.hot
-      ? `<span class="tag hot">🔥 爆点</span><span class="tag cat-${n.cat}">${n.cat}</span>`
-      : `<span class="tag cat-${n.cat}">${n.cat}</span>`;
-    const impacts = n.impacts.map(x=>`<li>${x}</li>`).join('');
-    const srcs = n.src.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${s[0]}</a>`).join(' · ');
-    const sec = document.createElement('section');
-    sec.className = 'page news';
-    sec.dataset.hot = n.hot ? '1':'0';
-    sec.dataset.label = '新闻'+seq;
-    sec.innerHTML = `
-      <div class="inner">
-        <div class="nhead">
-          <div class="metarow">
-            ${catTag}
-            <span class="seq">No.${String(seq).padStart(2,'0')} / 10</span>
+    <div class="rail" aria-label="每日 AI 新闻竖向阅读流">
+      <section class="slide" id="cover">
+        <div class="slide-inner front">
+          <div class="edition">
+            <span>NO. 20260607</span>
+            <span>AI 日报</span>
           </div>
-          <div class="metarow">${impactDots(n.impact, n.hot)}</div>
-          <h2 class="${n.hot?'hoth2':''}">${n.title}</h2>
+          <div class="masthead">
+            <small>Daily Artificial Intelligence Newspaper</small>
+            <h1>AI 日报</h1>
+          </div>
+          <p class="front-lead">AI 首次独立攻破 80 年数学猜想，开源模型逼近顶级闭源，两大巨头同年冲刺 IPO。</p>
+          <div class="headline-stack" aria-label="今日头条">
+            <a href="#story-1"><b>01</b><span>OpenAI 模型独立推翻 80 年数学猜想</span></a>
+            <a href="#story-2"><b>02</b><span>MiniMax M3 开源：逼近顶级闭源，成本仅 5%–10%</span></a>
+            <a href="#story-3"><b>03</b><span>Anthropic 估值 9650 亿美元，反超 OpenAI 并申请 IPO</span></a>
+          </div>
+          <div class="daily-stats" aria-label="今日统计">
+            <div class="stat"><strong>10</strong><span>重点条目</span></div>
+            <div class="stat"><strong>13</strong><span>信息来源</span></div>
+            <div class="stat"><strong>约8分钟</strong><span>阅读时间</span></div>
+          </div>
+          <div class="ticker"><b>快讯</b><span>AI 独立推翻 Erdős 猜想 · MiniMax M3 开源逼近闭源 · Anthropic 估值反超 OpenAI · 微软一口气发 7 个自研 MAI 模型</span></div>
+          <div class="hint"><span>上下翻页 · 左右横滑</span><span class="gesture"><i></i><i></i><i></i></span></div>
         </div>
-        <div class="panels">
-          <div class="panel pa">
-            <div class="plabel">核心摘要<span class="bar"></span>1/3</div>
-            <p class="body">${n.summary}</p>
-            <div class="box hl ${n.hot?'hot':''}"><div class="h">为什么重要</div><div class="body">${n.why}</div></div>
+      </section>
+
+      <section class="slide" id="story-1">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag research">研究</span><span>Page 01 · Impact 9.8</span></div>
+            <h2 class="news-title">OpenAI 模型独立推翻 80 年数学猜想</h2>
+            <div class="byline"><span>来源：OpenAI 官方 · Scientific American</span><span>2026.06.07</span><span>可信度：高</span></div>
           </div>
-          <div class="panel pb">
-            <div class="plabel">影响判断<span class="bar"></span>2/3</div>
-            <div class="box"><div class="h blue">具体影响</div><ul class="ilist">${impacts}</ul></div>
-            <div class="box hl"><div class="h green">建议动作</div><div class="body">${n.action}</div></div>
+          <div class="h-scroll" aria-label="新闻 1 横向详情">
+            <section class="panel">
+              <div>
+                <div class="visual research" data-label="RESEARCH NOTE"></div>
+                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
+                <p class="big">OpenAI 通用推理模型独立找到 Erdős 1946 年「单位距离猜想」的反例，把上界提升到约 <b>n^1.014</b>。</p>
+                <p class="text">它用代数数论工具构造出一整族比方格更优的点阵；人类研究这题近 80 年，一直以为方格最优。普林斯顿 Will Sawin 后续精化结果。</p>
+              </div>
+              <div class="score-stamp">IMPACT 9.8</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
+                <p class="big">这是 AI <b>首次「自主」解决数学子领域核心开放问题</b>，而非当算题助手。Tim Gowers 称之为「AI 数学的里程碑」——AI 开始能在前沿科研里<b>原创</b>。</p>
+                <ul class="impact-list">
+                  <li>科研范式可能改变：AI 从检索/计算工具，升级为能提出新结构的「发现者」。</li>
+                  <li>跨学科迁移：它借用了看似无关的数论分支来解几何题。</li>
+                  <li>正面回应了「AI 只会复述已知」的长期质疑。</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>OpenAI 官方 · Scientific American</span></div>
+                  <div class="source-row"><span>可信度</span><span>高</span></div>
+                  <div class="source-row"><span>待验证</span><span>该能力能否复现到其它难题、是否依赖大量人工引导，仍待观察。</span></div>
+                  <div class="source-row"><span>建议动作</span><span>关注 OpenAI 是否把该能力产品化为科研助手；以及学术界对结果的同行复核进展。</span></div>
+                </div>
+                <div class="verified">官方·多源核实</div>
+              </div>
+            </section>
           </div>
-          <div class="panel pc">
-            <div class="plabel">来源与跟进<span class="bar"></span>3/3</div>
-            <div class="kv"><div class="kk">主要来源</div><div class="vv src">${srcs}</div></div>
-            <div class="kv"><div class="kk">可信度</div><div class="vv"><span class="cred ${n.cred[0]}">${n.cred[1]}</span></div></div>
-            <div class="kv"><div class="kk">待验证</div><div class="vv pend">${n.pending}</div></div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="story-2">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag research">开源</span><span>Page 02 · Impact 9.3</span></div>
+            <h2 class="news-title">MiniMax M3 开源：逼近顶级闭源，成本仅 5%–10%</h2>
+            <div class="byline"><span>来源：devFlokers 开源月报 · llm-stats</span><span>2026.06.07</span><span>可信度：中高</span></div>
           </div>
+          <div class="h-scroll" aria-label="新闻 2 横向详情">
+            <section class="panel">
+              <div>
+                <div class="visual research" data-label="OPEN MODEL"></div>
+                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
+                <p class="big">国产 MiniMax 开放权重模型 <b>M3</b>：SWE-Bench Pro 拿到 <b>59.0%</b>，超过 GPT-5.5 与 Gemini 3.1 Pro 等闭源 API。</p>
+                <p class="text">支持 100 万 token 上下文 + 原生多模态「电脑操作」；靠 MSA 稀疏注意力，把长文本算力砍到上一代约 1/20。</p>
+              </div>
+              <div class="score-stamp">IMPACT 9.3</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
+                <p class="big">完全符合「又强又便宜」的爆点标准：先得很强，其次部署成本极低。普通团队也用得起接近顶级的能力，重塑整个成本结构。</p>
+                <ul class="impact-list">
+                  <li>推理成本骤降，中小团队可负担顶级能力。</li>
+                  <li>长上下文 + 多模态 agent 的门槛大幅降低。</li>
+                  <li>开放权重加速生态，但训练代码未开源——严格说是「开放权重」而非「完全开源」。</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>devFlokers 开源月报 · llm-stats</span></div>
+                  <div class="source-row"><span>可信度</span><span>中高</span></div>
+                  <div class="source-row"><span>待验证</span><span>真实业务下的稳定性、安全对齐、与基准成绩的差距，待第三方验证。</span></div>
+                  <div class="source-row"><span>建议动作</span><span>评估用 M3 替换部分闭源调用以降本；实测其 agent / 电脑操作的真实稳定性。</span></div>
+                </div>
+                <div class="verified">多源·待复测</div>
+              </div>
+            </section>
+          </div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="story-3">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag product">商业</span><span>Page 03 · Impact 9.0</span></div>
+            <h2 class="news-title">Anthropic 估值 9650 亿美元，反超 OpenAI 并申请 IPO</h2>
+            <div class="byline"><span>来源：NBC News · Axios</span><span>2026.06.07</span><span>可信度：高</span></div>
+          </div>
+          <div class="h-scroll" aria-label="新闻 3 横向详情">
+            <section class="panel">
+              <div>
+                <div class="visual" data-label="PRODUCT DESK"></div>
+                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
+                <p class="big">Anthropic 完成 <b>650 亿美元</b> Series H，投后估值 <b>9650 亿美元</b>，首次超过 OpenAI 私募估值。</p>
+                <p class="text">6 月 2 日已秘密提交 IPO 草案（S-1）。Apollo、Blackstone 还安排了 360 亿美元私募信贷去买谷歌 TPU——史上最大芯片融资债。</p>
+              </div>
+              <div class="score-stamp">IMPACT 9.0</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
+                <p class="big">主要靠 Claude Code（AI 编程 agent）一路冲到全球最值钱 AI 公司。说明<b>编程类 AI 正成为最被资本认可、最能赚钱的方向</b>。</p>
+                <ul class="impact-list">
+                  <li>编程 agent 的商业价值被市场给到最高定价。</li>
+                  <li>AI 进入「资本兑现期」，巨头集体冲刺 IPO。</li>
+                  <li>算力融资工具创新：用债务直接买芯片。</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>NBC News · Axios</span></div>
+                  <div class="source-row"><span>可信度</span><span>高</span></div>
+                  <div class="source-row"><span>待验证</span><span>秘密递交后，正式上市时间与最终估值仍待定。</span></div>
+                  <div class="source-row"><span>建议动作</span><span>关注 IPO 定价，以及招股书披露的真实收入与毛利率。</span></div>
+                </div>
+                <div class="verified">官方·多源核实</div>
+              </div>
+            </section>
+          </div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="story-4">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag product">商业</span><span>Page 04 · Impact 8.2</span></div>
+            <h2 class="news-title">OpenAI 也在筹备 IPO，或年内启动</h2>
+            <div class="byline"><span>来源：NBC News</span><span>2026.06.07</span><span>可信度：中高</span></div>
+          </div>
+          <div class="h-scroll" aria-label="新闻 4 横向详情">
+            <section class="panel">
+              <div>
+                <div class="visual" data-label="PRODUCT DESK"></div>
+                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
+                <p class="big">OpenAI 同样在推进上市，私募估值此前已达 <b>7000 亿美元级</b>。</p>
+                <p class="text">联手顶级投行筹备，可能成为史上最大 AI IPO 之一。</p>
+              </div>
+              <div class="score-stamp">IMPACT 8.2</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
+                <p class="big">两大巨头同年冲刺 IPO，标志生成式 AI 从「烧钱扩张」转向「向公开市场兑现」。</p>
+                <ul class="impact-list">
+                  <li>一级市场泡沫担忧与兑现需求并存。</li>
+                  <li>公开财报将首次让外界看清头部 AI 的真实经济模型。</li>
+                  <li>二级市场资金有望大规模进入 AI。</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>NBC News</span></div>
+                  <div class="source-row"><span>可信度</span><span>中高</span></div>
+                  <div class="source-row"><span>待验证</span><span>具体时间、估值与是否年内完成，尚未官方确认。</span></div>
+                  <div class="source-row"><span>建议动作</span><span>对比 Anthropic 与 OpenAI 招股书里的毛利与增速，判断谁的模式更健康。</span></div>
+                </div>
+                <div class="verified">多源·待复测</div>
+              </div>
+            </section>
+          </div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="story-5">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag product">产品</span><span>Page 05 · Impact 8.0</span></div>
+            <h2 class="news-title">微软 Build 2026 一口气发 7 个自研 MAI 模型</h2>
+            <div class="byline"><span>来源：Microsoft AI · CNBC</span><span>2026.06.07</span><span>可信度：高</span></div>
+          </div>
+          <div class="h-scroll" aria-label="新闻 5 横向详情">
+            <section class="panel">
+              <div>
+                <div class="visual" data-label="MODEL LAUNCH"></div>
+                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
+                <p class="big">微软发布 <b>MAI 家族 7 款自研模型</b>，均<b>非蒸馏</b>自第三方模型。</p>
+                <p class="text">推理模型 MAI-Thinking-1（350 亿活跃参数，盲测优于 Sonnet 4.6）、5B 的 MAI-Code-1-Flash（SWE-Bench Pro 51%，进 GitHub Copilot）、MAI-Image-2.5（已进 PowerPoint）、MAI-Voice-2、MAI-Transcribe-1.5 等。</p>
+              </div>
+              <div class="score-stamp">IMPACT 8.0</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
+                <p class="big">微软正系统性<b>降低对 OpenAI 的依赖</b>，自建全栈模型能力。巨头从「投资 OpenAI」转向「自研竞争」。</p>
+                <ul class="impact-list">
+                  <li>OpenAI 与微软的关系变得微妙。</li>
+                  <li>小而快的专用模型（如 5B 编程模型）成为趋势。</li>
+                  <li>Office / Copilot 正全面换上自研模型。</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>Microsoft AI · CNBC</span></div>
+                  <div class="source-row"><span>可信度</span><span>高</span></div>
+                  <div class="source-row"><span>待验证</span><span>自研模型在真实负载下与 OpenAI 模型的差距，待第三方评测。</span></div>
+                  <div class="source-row"><span>建议动作</span><span>关注 Copilot 换用 MAI 后的实际体验与成本变化。</span></div>
+                </div>
+                <div class="verified">官方·多源核实</div>
+              </div>
+            </section>
+          </div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="story-6">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag research">开源</span><span>Page 06 · Impact 7.8</span></div>
+            <h2 class="news-title">英伟达开源 Nemotron 3 Ultra：550B MoE，美国最强开放模型</h2>
+            <div class="byline"><span>来源：NVIDIA Newsroom · Artificial Analysis</span><span>2026.06.07</span><span>可信度：高</span></div>
+          </div>
+          <div class="h-scroll" aria-label="新闻 6 横向详情">
+            <section class="panel">
+              <div>
+                <div class="visual research" data-label="OPEN MODEL"></div>
+                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
+                <p class="big">6 月 4 日英伟达发布 <b>Nemotron 3 Ultra</b>，5500 亿参数混合专家（MoE）开放模型，主打 agent 推理。</p>
+                <p class="text">配套 Nano / Super 三档，采用混合潜在 MoE 架构，被称作「美国最佳开放权重模型」。</p>
+              </div>
+              <div class="score-stamp">IMPACT 7.8</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
+                <p class="big">芯片巨头亲自下场做开放模型，既卖铲子又给生态打样，正面抗衡中国开源军团。</p>
+                <ul class="impact-list">
+                  <li>开放模型阵营的美国一侧得到补强。</li>
+                  <li>推动多 agent 系统走向标准化。</li>
+                  <li>与自家硬件深度绑定，形成软硬闭环。</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>NVIDIA Newsroom · Artificial Analysis</span></div>
+                  <div class="source-row"><span>可信度</span><span>高</span></div>
+                  <div class="source-row"><span>待验证</span><span>许可证细节与第三方 agent 实测表现，待跟进。</span></div>
+                  <div class="source-row"><span>建议动作</span><span>对比 Nemotron 3 Ultra 与 Qwen / DeepSeek 在 agent 任务上的性价比。</span></div>
+                </div>
+                <div class="verified">官方·多源核实</div>
+              </div>
+            </section>
+          </div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="story-7">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag product">产品</span><span>Page 07 · Impact 7.5</span></div>
+            <h2 class="news-title">英伟达 RTX Spark 超级芯片：AI 跑进你自己的电脑</h2>
+            <div class="byline"><span>来源：buildfastwithai 综述</span><span>2026.06.07</span><span>可信度：中高</span></div>
+          </div>
+          <div class="h-scroll" aria-label="新闻 7 横向详情">
+            <section class="panel">
+              <div>
+                <div class="visual" data-label="PRODUCT DESK"></div>
+                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
+                <p class="big">Computex 2026 上，黄仁勋宣布与微软联手「重新定义 PC」，推出面向消费端的 <b>RTX Spark 超级芯片</b>。</p>
+                <p class="text">让 agent 在本地运行，摆脱云端延迟和成本；微软让 Windows 能本地直接跑开放模型。</p>
+              </div>
+              <div class="score-stamp">IMPACT 7.5</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
+                <p class="big">AI 工作负载的下一个瓶颈被押注在「端侧」。个人 AI、隐私 AI 时代正式起步。</p>
+                <ul class="impact-list">
+                  <li>本地 agent 兴起，隐私和速度都更好。</li>
+                  <li>可能催化新一轮 PC 换机潮。</li>
+                  <li>云端推理需求的结构将发生变化。</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>buildfastwithai 综述</span></div>
+                  <div class="source-row"><span>可信度</span><span>中高</span></div>
+                  <div class="source-row"><span>待验证</span><span>消费级落地时间、价格与实际本地性能，待产品验证。</span></div>
+                  <div class="source-row"><span>建议动作</span><span>关注端侧到底能跑多大模型，以及电池/发热的真实表现。</span></div>
+                </div>
+                <div class="verified">多源·待复测</div>
+              </div>
+            </section>
+          </div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="story-8">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag research">研究</span><span>Page 08 · Impact 7.0</span></div>
+            <h2 class="news-title">三大旗舰同期刷新 + GPT-5.6 基准疑似泄露</h2>
+            <div class="byline"><span>来源：OpenAI 帮助中心 · CNBC</span><span>2026.06.07</span><span>可信度：中</span></div>
+          </div>
+          <div class="h-scroll" aria-label="新闻 8 横向详情">
+            <section class="panel">
+              <div>
+                <div class="visual research" data-label="RESEARCH NOTE"></div>
+                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
+                <p class="big">三大旗舰同期刷新：ChatGPT 默认切到 <b>GPT-5.5 Instant</b>，谷歌主打低价 <b>Gemini 3.5 Flash</b>，<b>Claude Opus 4.8</b> 领跑编程。</p>
+                <p class="text">同时本周流出疑似 GPT-5.6 内部基准，指向多步 agent 推理与 token 效率提升，6 月窗口发布。</p>
+              </div>
+              <div class="score-stamp">IMPACT 7.0</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
+                <p class="big">头部模型迭代进入「季度级」节奏，竞争白热化，价格与效率成为新战场。</p>
+                <ul class="impact-list">
+                  <li>默认模型免费升级，普通用户直接受益。</li>
+                  <li>低价 Flash 类模型主攻企业批量需求。</li>
+                  <li>迭代过快，带来选型疲劳。</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>OpenAI 帮助中心 · CNBC</span></div>
+                  <div class="source-row"><span>可信度</span><span>中</span></div>
+                  <div class="source-row"><span>待验证</span><span>GPT-5.6 的发布时间与真实指标，尚未官方确认。</span></div>
+                  <div class="source-row"><span>建议动作</span><span>重大业务先用小流量灰度新模型，再考虑全量切换。</span></div>
+                </div>
+                <div class="verified">传闻·待证实</div>
+              </div>
+            </section>
+          </div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="story-9">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag research">开源</span><span>Page 09 · Impact 6.8</span></div>
+            <h2 class="news-title">中国开源模型集体登顶</h2>
+            <div class="byline"><span>来源：devFlokers · BentoML</span><span>2026.06.07</span><span>可信度：中高</span></div>
+          </div>
+          <div class="h-scroll" aria-label="新闻 9 横向详情">
+            <section class="panel">
+              <div>
+                <div class="visual research" data-label="OPEN MODEL"></div>
+                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
+                <p class="big">阿里 Qwen、DeepSeek、Moonshot 的 <b>Kimi K2.6</b>、智谱 GLM 等多款开放权重模型，在编程 / agent 基准上追平甚至超过闭源。</p>
+                <p class="text">Kimi K2.6 主打长上下文与多步编程规划。</p>
+              </div>
+              <div class="score-stamp">IMPACT 6.8</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
+                <p class="big">「只有闭源才最强」的格局正被改写，开源（尤其中国队）成本优势明显。</p>
+                <ul class="impact-list">
+                  <li>全球开发者获得高性价比、可自部署的选项。</li>
+                  <li>闭源厂商的定价持续承压。</li>
+                  <li>地缘 / 合规因素，带来部署选择的分化。</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>devFlokers · BentoML</span></div>
+                  <div class="source-row"><span>可信度</span><span>中高</span></div>
+                  <div class="source-row"><span>待验证</span><span>各模型的商用许可条款与安全性，需逐一核对。</span></div>
+                  <div class="source-row"><span>建议动作</span><span>数据敏感场景，可优先评估可自部署的开放权重模型。</span></div>
+                </div>
+                <div class="verified">多源·待复测</div>
+              </div>
+            </section>
+          </div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="story-10">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag">落地</span><span>Page 10 · Impact 6.5</span></div>
+            <h2 class="news-title">机器人与无人车加速落地：马德里 Robotaxi、Atlas、MolmoAct 2</h2>
+            <div class="byline"><span>来源：buildfastwithai</span><span>2026.06.07</span><span>可信度：中高</span></div>
+          </div>
+          <div class="h-scroll" aria-label="新闻 10 横向详情">
+            <section class="panel">
+              <div>
+                <div class="visual" data-label="FIELD DESK"></div>
+                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
+                <p class="big">Uber 联合 WeRide、AVOMO 在马德里推出<b>欧洲首个商业化 Robotaxi</b>。</p>
+                <p class="text">波士顿动力 Atlas 展示新的敏捷动作；Ai2 开源机器人控制模型 MolmoAct 2，下载量已超 40 万次。</p>
+              </div>
+              <div class="score-stamp">IMPACT 6.5</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
+                <p class="big">大模型正从「聊天框」走进真实物理世界，具身智能的商业化版图扩大到欧洲。</p>
+                <ul class="impact-list">
+                  <li>自动驾驶商业化从中美扩散到欧洲。</li>
+                  <li>开放具身模型降低机器人开发门槛。</li>
+                  <li>人形机器人能力持续逼近实用。</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>buildfastwithai</span></div>
+                  <div class="source-row"><span>可信度</span><span>中高</span></div>
+                  <div class="source-row"><span>待验证</span><span>商业化规模、盈利能力与安全记录，待长期数据。</span></div>
+                  <div class="source-row"><span>建议动作</span><span>关注 Robotaxi 在欧洲的监管与安全数据披露。</span></div>
+                </div>
+                <div class="verified">多源·待复测</div>
+              </div>
+            </section>
+          </div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="tomorrow">
+        <div class="slide-inner watch">
+          <div class="edition">
+            <span>Tomorrow</span>
+            <span>Watchlist</span>
+          </div>
+          <h2 class="news-title">明日观察</h2>
+          <div class="wrap">
+            <div class="mini-card"><strong>GPT-5.6</strong><span>是否正式发布，以及它的真实指标能否兑现泄露的预期。</span></div>
+            <div class="mini-card"><strong>IPO 招股书</strong><span>Anthropic / OpenAI 的 IPO 招股书一旦公开，将首次揭示头部 AI 的收入与毛利。</span></div>
+            <div class="mini-card"><strong>开放权重复测</strong><span>MiniMax M3、Nemotron 3 等开放权重模型，第三方复测结果与生态采用速度。</span></div>
+          </div>
+          <div class="ticker"><b>Next brief</b><span>06-08 继续追踪</span></div>
+          <div class="hint"><span>模板字段：日期 / 新闻 / 摘要 / 影响 / 来源</span><span class="gesture"><i></i><i></i><i></i></span></div>
         </div>
-        <div class="pdots"><span>←</span><span class="d act"></span><span class="d"></span><span class="d"></span><span>左右滑动</span></div>
-      </div>`;
-    host.appendChild(sec);
+      </section>
+    </div>
+  </main>
 
-    const panels = sec.querySelector('.panels');
-    const dots = sec.querySelectorAll('.pdots .d');
-    panels.addEventListener('scroll',()=>{
-      const i = Math.round(panels.scrollLeft / panels.clientWidth);
-      dots.forEach((d,di)=>d.classList.toggle('act', di===i));
-    },{passive:true});
-  });
-}
+  <script>
+    (() => {
+      const drawer = document.querySelector(".date-drawer");
+      const handle = document.querySelector(".date-handle");
+      let startX = 0;
+      let startY = 0;
 
-function renderWatch(){
-  document.getElementById('watchHost').innerHTML =
-    WATCH.map((w,i)=>`<div class="witem"><div class="wn">${i+1}</div><div class="wt">${w}</div></div>`).join('');
-}
+      const open = () => drawer.classList.add("open");
+      const close = () => drawer.classList.remove("open");
 
-function buildProgress(){
-  const pages = document.querySelectorAll('.page');
-  const prog = document.getElementById('progress');
-  pages.forEach((p,i)=>{
-    const d = document.createElement('div');
-    d.className = 'pd' + (i===0?' act':'') + (p.dataset.hot==='1'?' hot':'');
-    prog.appendChild(d);
-  });
-  const dots = prog.querySelectorAll('.pd');
-  const scroller = document.getElementById('scroller');
-  scroller.addEventListener('scroll',()=>{
-    const i = Math.round(scroller.scrollTop / scroller.clientHeight);
-    dots.forEach((d,di)=>d.classList.toggle('act', di===i));
-  },{passive:true});
-}
+      handle.addEventListener("click", () => {
+        drawer.classList.toggle("open");
+      });
 
-function setupDrawer(){
-  const drawer = document.getElementById('drawer');
-  const scrim = document.getElementById('scrim');
-  const handle = document.getElementById('dHandle');
-  const open = ()=>{drawer.classList.add('open');scrim.classList.add('show');};
-  const close = ()=>{drawer.classList.remove('open');scrim.classList.remove('show');};
-  handle.addEventListener('click', ()=> drawer.classList.contains('open')?close():open());
-  handle.addEventListener('mouseenter', open);
-  scrim.addEventListener('click', close);
-  let sx=null;
-  window.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
-  window.addEventListener('touchend',e=>{
-    if(sx===null) return;
-    const dx = e.changedTouches[0].clientX - sx;
-    if(sx<28 && dx>40) open();
-    if(drawer.classList.contains('open') && dx<-40) close();
-    sx=null;
-  },{passive:true});
-}
+      document.addEventListener("click", (event) => {
+        if (!drawer.contains(event.target)) close();
+      });
 
-renderNews();
-renderWatch();
-buildProgress();
-setupDrawer();
-</script>
+      document.addEventListener("touchstart", (event) => {
+        const touch = event.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+      }, { passive: true });
+
+      document.addEventListener("touchmove", (event) => {
+        const touch = event.touches[0];
+        const dx = touch.clientX - startX;
+        const dy = Math.abs(touch.clientY - startY);
+        if (startX < 28 && dx > 42 && dy < 50) open();
+        if (drawer.classList.contains("open") && dx < -36 && dy < 50) close();
+      }, { passive: true });
+    })();
+  </script>
 </body>
 </html>
