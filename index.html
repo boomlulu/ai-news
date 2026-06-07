@@ -1,13 +1,3 @@
-<!--
-每日 AI 新闻「新闻刊物风格」HTML 填充模板
-
-使用规则：
-1. 不要改 CSS、JS、class 名称、布局结构和交互方式。
-2. 只替换 {{...}} 占位符。
-3. 保留移动端单屏阅读：上下翻页，新闻内左右横滑。
-4. 保留左侧日期抽屉和右侧页码进度。
-5. 如果增加新闻页，复制一个 story section，并同步增加右侧 progress 链接。
--->
 <!doctype html>
 <html lang="zh-CN">
 <head>
@@ -801,10 +791,10 @@
     <aside class="date-drawer" aria-label="日期切换抽屉">
       <button class="date-handle" type="button" aria-label="展开日期列表">日期</button>
       <nav class="date-menu" aria-label="按日期切换新闻">
-        <a href="archive/index.html" aria-label="查看 历史归档 新闻">更早</a>
-        <a href="archive/2026-06-07.html" aria-label="查看 2026年6月7日 新闻">06·07</a>
-        <a class="active" href="index.html" aria-current="page" aria-label="当前 2026年6月8日（active） 新闻">06·08</a>
-        <a href="#" aria-label="查看 预告 新闻">预告</a>
+        <a href="archive/index.html" aria-label="查看 历史归档">归档</a>
+        <a href="archive/2026-06-07.html" aria-label="查看 2026-06-07 新闻">06-07</a>
+        <a class="active" href="index.html" aria-current="page" aria-label="当前 2026-06-08 新闻">06-08</a>
+        <a href="#" aria-label="下一期预告">预告</a>
       </nav>
     </aside>
 
@@ -813,6 +803,7 @@
       <a href="#story-1" aria-label="新闻 1">01</a>
       <a href="#story-2" aria-label="新闻 2">02</a>
       <a href="#story-3" aria-label="新闻 3">03</a>
+      <a href="#story-4" aria-label="新闻 4">04</a>
       <a href="#tomorrow" aria-label="明日观察">明</a>
     </nav>
 
@@ -827,18 +818,18 @@
             <small>Daily Artificial Intelligence Newspaper</small>
             <h1>AI 日报</h1>
           </div>
-          <p class="front-lead">WWDC 开幕日：据报道苹果把 Siri 交给谷歌 Gemini；Anthropic、OpenAI 同步刷新旗舰与记忆。</p>
+          <p class="front-lead">苹果今夜或重写 Siri 改投谷歌 Gemini；华盛顿酝酿「三年冻结」各州 AI 立法。</p>
           <div class="headline-stack" aria-label="今日头条">
-            <a href="#story-1"><b>01</b><span>据报道苹果 Siri 改用谷歌 Gemini</span></a>
-            <a href="#story-2"><b>02</b><span>Claude Opus 4.8 发布，默认百万上下文</span></a>
-            <a href="#story-3"><b>03</b><span>ChatGPT 记忆系统 V3 升级，容量翻倍</span></a>
+            <a href="#story-1"><b>01</b><span>据报道：苹果今夜 WWDC 重写 Siri，改投谷歌 Gemini</span></a>
+            <a href="#story-2"><b>02</b><span>两党草案拟「三年冻结」各州 AI 立法，引爆反对</span></a>
+            <a href="#story-3"><b>03</b><span>英伟达开源 Nemotron 3 Ultra：美国最强开放权重，仍逊中国</span></a>
           </div>
           <div class="daily-stats" aria-label="今日统计">
-            <div class="stat"><strong>3</strong><span>重点条目</span></div>
-            <div class="stat"><strong>6</strong><span>信息来源</span></div>
-            <div class="stat"><strong>约3分钟</strong><span>阅读时间</span></div>
+            <div class="stat"><strong>4</strong><span>重点条目</span></div>
+            <div class="stat"><strong>13</strong><span>信息来源</span></div>
+            <div class="stat"><strong>约4分钟</strong><span>阅读时间</span></div>
           </div>
-          <div class="ticker"><b>快讯</b><span>苹果据报改用 Gemini 重写 Siri · Claude Opus 4.8 默认百万上下文 · ChatGPT 记忆 V3 容量翻倍</span></div>
+          <div class="ticker"><b>快讯</b><span>苹果今夜或确认 Siri 改用谷歌 1.2 万亿参数 Gemini · 两党 AI 法草案拟冻结各州立法三年 · 英伟达开源 550B Nemotron 3 Ultra · GitHub Copilot 改按 token 计费引开发者反弹</span></div>
           <div class="hint"><span>上下翻页 · 左右横滑</span><span class="gesture"><i></i><i></i><i></i></span></div>
         </div>
       </section>
@@ -846,28 +837,28 @@
       <section class="slide" id="story-1">
         <article class="slide-inner">
           <div class="news-head">
-            <div class="eyebrow"><span class="tag product">产品</span><span>Page 01 · Impact 9.2</span></div>
-            <h2 class="news-title">据报道：苹果 WWDC 重写 Siri，改用谷歌 Gemini 大模型</h2>
-            <div class="byline"><span>来源：MacRumors · 彭博社（据报道）</span><span>2026-06-08</span><span>可信度：中高</span></div>
+            <div class="eyebrow"><span class="tag product">产品</span><span>Page 01 · Impact 9.3</span></div>
+            <h2 class="news-title">据报道：苹果今夜 WWDC 重写 Siri，改投谷歌 Gemini</h2>
+            <div class="byline"><span>来源：彭博社 · MacRumors · 9to5Mac</span><span>2026-06-08（北京时间 6/9 凌晨 keynote）</span><span>可信度：中高</span></div>
           </div>
           <div class="h-scroll" aria-label="新闻 1 横向详情">
             <section class="panel">
               <div>
                 <div class="visual" data-label="PRODUCT DESK"></div>
                 <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
-                <p class="big">据多家媒体报道，苹果将在今天（6/8）开幕的 WWDC 上发布<b>重写版 Siri</b>，云端能力改由<b>谷歌定制版 Gemini</b>（约 <b>1.2 万亿参数</b>）驱动，年付谷歌约 <b>10 亿美元</b>。</p>
-                <p class="text">据报道还将推出 Extensions 机制，让用户自选 ChatGPT / Gemini / Claude 驱动 Apple Intelligence；Siri 变独立 App，带系统级"问一问"手势与聊天界面。一切以 keynote 正式公布为准。</p>
+                <p class="big">据多家媒体报道，苹果将在北京时间今夜开幕的 WWDC 2026 上发布重写版 Siri，云端能力改由谷歌定制版 Gemini 驱动。</p>
+                <p class="text">该定制 Gemini 约 <b>1.2 万亿参数</b>，苹果年付谷歌约 <b>10 亿美元</b>，模型跑在苹果「私有云计算」内、查询不被用于训练；同时推出独立 Siri App 与 Extensions，让用户在 ChatGPT / Gemini / Claude 间切换，Gemini 为默认。</p>
               </div>
-              <div class="score-stamp">IMPACT 9.2</div>
+              <div class="score-stamp">IMPACT 9.3</div>
             </section>
             <section class="panel">
               <div>
                 <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
-                <p class="big">若属实，意味着苹果<b>承认自研 AI 暂时落后</b>，把手机最核心的入口交给对手谷歌——AI 竞争格局的标志性转折。</p>
+                <p class="big">看点：全球最大消费电子公司把核心 AI 大脑外包给最大竞争对手之一，等于公开承认自研大模型掉队——这是 AI 竞争格局的标志性转向，也是库克任内的关键一役。</p>
                 <ul class="impact-list">
-                  <li>谷歌 Gemini 借苹果拿到数亿台设备的超级入口。</li>
-                  <li>用户可在系统级自由切换 ChatGPT/Gemini/Claude，模型变"可插拔"。</li>
-                  <li>苹果自研大模型路线受质疑，端云协同策略生变。</li>
+                  <li>十亿级 iPhone 用户的语音助手底座或首次由谷歌模型驱动，谷歌借此拿下移动端最大入口。</li>
+                  <li>Extensions 若开放第三方模型，Anthropic Claude、OpenAI 将争夺苹果设备上的默认与可选位。</li>
+                  <li>苹果「自研 AI」叙事受冲击，资本市场与开发者将重新评估其 AI 路线与议价能力。</li>
                 </ul>
               </div>
             </section>
@@ -875,10 +866,10 @@
               <div>
                 <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
                 <div class="source-box">
-                  <div class="source-row"><span>主要来源</span><span>MacRumors · 彭博社（据报道）</span></div>
+                  <div class="source-row"><span>主要来源</span><span>彭博社 · MacRumors · 9to5Mac</span></div>
                   <div class="source-row"><span>可信度</span><span>中高</span></div>
-                  <div class="source-row"><span>待验证</span><span>合作条款、参数与发布范围以今天 WWDC keynote（北京时间 6/9 凌晨）官方公布为准；当前为发布前报道。</span></div>
-                  <div class="source-row"><span>建议动作</span><span>看今晚 keynote 是否正式确认；关注 Extensions 是否真支持 Claude。</span></div>
+                  <div class="source-row"><span>待验证</span><span>参数、年费及 Claude 是否入选 Extensions，以今夜 keynote 官方公布为准</span></div>
+                  <div class="source-row"><span>建议动作</span><span>关注 6/9 凌晨 keynote；开发者预研 App Intents 与 Extensions 接入</span></div>
                 </div>
                 <div class="verified unverified">据报道·待证实</div>
               </div>
@@ -891,28 +882,28 @@
       <section class="slide" id="story-2">
         <article class="slide-inner">
           <div class="news-head">
-            <div class="eyebrow"><span class="tag research">研究</span><span>Page 02 · Impact 8.3</span></div>
-            <h2 class="news-title">Anthropic 发布 Claude Opus 4.8，默认 100 万 token 上下文</h2>
-            <div class="byline"><span>来源：Anthropic 官方 · Releasebot</span><span>2026-06-08</span><span>可信度：高</span></div>
+            <div class="eyebrow"><span class="tag policy">政策</span><span>Page 02 · Impact 9.0</span></div>
+            <h2 class="news-title">两党草案拟「三年冻结」各州 AI 立法，引爆反对</h2>
+            <div class="byline"><span>来源：Roll Call · FedScoop · Nextgov · 众议院官网</span><span>2026-06-04</span><span>可信度：高</span></div>
           </div>
           <div class="h-scroll" aria-label="新闻 2 横向详情">
             <section class="panel">
               <div>
-                <div class="visual research" data-label="MODEL LAUNCH"></div>
+                <div class="visual policy" data-label="POLICY FILE"></div>
                 <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
-                <p class="big">Anthropic 发布最新旗舰 <b>Claude Opus 4.8</b>，编程、agent、推理较 Opus 4.7 全面增强，复杂编程任务<b>默认 100 万 token 上下文</b>。</p>
-                <p class="text">受管 Agent 可在你自己的沙箱内运行、接私有 MCP 服务器；旧版 Opus 4.1 定于 8/5 在 API 退役。</p>
+                <p class="big">众议员 Obernolte（共和党）与 Trahan（民主党）6 月 4 日联合公布 269 页《伟大的美国 AI 法案》讨论稿，核心是对各州「监管 AI 模型开发」的法律设三年优先豁免。</p>
+                <p class="text">草案以<b>强制透明度与第三方审计</b>换取冻结，且仅冻结<b>三年</b>（非此前主张的十年），并明确不覆盖针对 AI「使用 / 部署」的州法；但发布数小时内即遭工会、消费者组织乃至众议院民主党委员会近乎一致反对。</p>
               </div>
-              <div class="score-stamp">IMPACT 8.3</div>
+              <div class="score-stamp">IMPACT 9.0</div>
             </section>
             <section class="panel">
               <div>
                 <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
-                <p class="big">编程/agent 是当前最被验证的 AI 商业方向，旗舰每次提速都直接抬高开发者生产力上限。</p>
+                <p class="big">看点：「联邦统一 vs 各州自治」之争首次落到国会实质性立法文本——叠加特朗普去年 12 月签署的预占式行政令与 DOJ 诉讼小组，AI 监管主导权之争进入摊牌阶段。</p>
                 <ul class="impact-list">
-                  <li>超长默认上下文降低大型代码库 agent 的工程门槛。</li>
-                  <li>受管 Agent + 私有 MCP 让企业更敢把 agent 接进内网。</li>
-                  <li>旗舰迭代加快，挤压闭源竞品的差异化空间。</li>
+                  <li>若通过，科罗拉多《AI 消费者保护法》（6/30 生效）等州法的「开发」条款或被冻结，企业合规版图将重画。</li>
+                  <li>AI 公司或获三年监管确定性预期，但「换审计换冻结」能否在两党两院同时过关存疑。</li>
+                  <li>劳工、儿童与消费者保护团体已组织反对，立法博弈与诉讼或贯穿全年。</li>
                 </ul>
               </div>
             </section>
@@ -920,12 +911,12 @@
               <div>
                 <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
                 <div class="source-box">
-                  <div class="source-row"><span>主要来源</span><span>Anthropic 官方 · Releasebot</span></div>
+                  <div class="source-row"><span>主要来源</span><span>Roll Call · FedScoop · Nextgov · 众议院官网</span></div>
                   <div class="source-row"><span>可信度</span><span>高</span></div>
-                  <div class="source-row"><span>待验证</span><span>真实任务上相对 GPT-5.5 / Gemini 的优势，待第三方独立评测。</span></div>
-                  <div class="source-row"><span>建议动作</span><span>编程/agent 团队可小流量实测 Opus 4.8 的长上下文稳定性与成本。</span></div>
+                  <div class="source-row"><span>待验证</span><span>目前仅为讨论稿，未正式提交；最终条款、听证时间与两院支持度待定</span></div>
+                  <div class="source-row"><span>建议动作</span><span>法务跟踪听证与科罗拉多 6/30 节点，预案州法「被冻结 / 存续」两种情形</span></div>
                 </div>
-                <div class="verified">官方·多源核实</div>
+                <div class="verified ">官方·多源核实</div>
               </div>
             </section>
           </div>
@@ -936,28 +927,28 @@
       <section class="slide" id="story-3">
         <article class="slide-inner">
           <div class="news-head">
-            <div class="eyebrow"><span class="tag product">产品</span><span>Page 03 · Impact 7.8</span></div>
-            <h2 class="news-title">ChatGPT 上线 "Dreaming" V3 记忆系统，容量翻倍</h2>
-            <div class="byline"><span>来源：OpenAI 官方 · Releasebot</span><span>2026-06-04</span><span>可信度：高</span></div>
+            <div class="eyebrow"><span class="tag research">开源</span><span>Page 03 · Impact 8.1</span></div>
+            <h2 class="news-title">英伟达开源 Nemotron 3 Ultra：美国最强开放权重，仍逊中国</h2>
+            <div class="byline"><span>来源：Artificial Analysis · 英伟达 · HuggingFace</span><span>2026-06-04（Computex 6/1 公布）</span><span>可信度：高</span></div>
           </div>
           <div class="h-scroll" aria-label="新闻 3 横向详情">
             <section class="panel">
               <div>
-                <div class="visual" data-label="PRODUCT DESK"></div>
+                <div class="visual research" data-label="OPEN MODEL"></div>
                 <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
-                <p class="big">OpenAI 自 2024 年以来最大的记忆升级——<b>Dreaming V3</b> 架构 6/4 起向美国 Plus / Pro 用户推送。</p>
-                <p class="text">主打解决记忆"过时/出错/难扩展"，做到自动更新、个性化更准、Plus/Pro <b>记忆容量翻倍</b>。</p>
+                <p class="big">英伟达 6 月 4 日放出 Nemotron 3 Ultra 权重：约 <b>5500 亿参数</b>的开放权重 MoE 推理模型，智能指数 48，为美国开放权重模型最高分。</p>
+                <p class="text">模型连同<b>训练数据与配方</b>一并发布，许可允许商用，支持 100 万 token 上下文；预发布端点实测 <b>300+ tokens/秒</b>。但全球第一仍是中国 Kimi K2.6（54 分），6 分差距被评测方称「有意义」。</p>
               </div>
-              <div class="score-stamp">IMPACT 7.8</div>
+              <div class="score-stamp">IMPACT 8.1</div>
             </section>
             <section class="panel">
               <div>
                 <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
-                <p class="big">记忆是把 ChatGPT 从"问答工具"变成"长期助理"的关键一步，直接影响数亿人日常使用的黏性与体验。</p>
+                <p class="big">看点：英伟达从「卖铲子」延伸到「给最强开源模型」，重塑美国开源叙事；但「美国最强开放权重仍落后中国头部」这一结论，直指开源主导权之争的真实位置。</p>
                 <ul class="impact-list">
-                  <li>上下文更新更及时，长期个性化体验提升。</li>
-                  <li>黏性增强，进一步巩固 ChatGPT 的消费级入口地位。</li>
-                  <li>长期记忆带来的隐私与数据边界更受关注。</li>
+                  <li>美国企业获得可商用、可私有部署的高速开放权重选项，降低对闭源 API 的依赖。</li>
+                  <li>英伟达同时掌握算力与开源模型，进一步绑定其 NIM / CUDA 生态。</li>
+                  <li>中美开源模型差距被量化呈现，将牵动 Qwen、DeepSeek、Kimi 等后续迭代节奏。</li>
                 </ul>
               </div>
             </section>
@@ -965,12 +956,57 @@
               <div>
                 <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
                 <div class="source-box">
-                  <div class="source-row"><span>主要来源</span><span>OpenAI 官方 · Releasebot</span></div>
+                  <div class="source-row"><span>主要来源</span><span>Artificial Analysis · 英伟达 · HuggingFace</span></div>
                   <div class="source-row"><span>可信度</span><span>高</span></div>
-                  <div class="source-row"><span>待验证</span><span>全量推送时间表、非美国地区与免费用户的覆盖待官方说明。</span></div>
-                  <div class="source-row"><span>建议动作</span><span>重度用户留意记忆开关与隐私设置；企业关注数据留存边界。</span></div>
+                  <div class="source-row"><span>待验证</span><span>48 分等基准为第三方测评，真实业务表现需各团队自测复核</span></div>
+                  <div class="source-row"><span>建议动作</span><span>成本敏感 / 私有化团队可在 HuggingFace / NIM 上做基准与成本对比</span></div>
                 </div>
-                <div class="verified">官方·多源核实</div>
+                <div class="verified ">官方·多源核实</div>
+              </div>
+            </section>
+          </div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="story-4">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag product">商业</span><span>Page 04 · Impact 7.8</span></div>
+            <h2 class="news-title">GitHub Copilot 改按 token 计费，开发者预警账单暴涨</h2>
+            <div class="byline"><span>来源：TechCrunch · Visual Studio Magazine · Dataconomy</span><span>2026-06-01 生效</span><span>可信度：中高</span></div>
+          </div>
+          <div class="h-scroll" aria-label="新闻 4 横向详情">
+            <section class="panel">
+              <div>
+                <div class="visual" data-label="PRODUCT DESK"></div>
+                <div class="panel-title"><span>Lead</span><span class="index">1 / 3</span></div>
+                <p class="big">GitHub Copilot 自 6 月 1 日起由「按请求的固定订阅」改为「按 token 用量」计费，部分开发者警告成本或暴涨 <b>10–50 倍</b>。</p>
+                <p class="text">有用户称原本月付约 <b>29 美元</b>、新方案估算逼近 <b>750 美元</b>；一名 39 美元 Pro+ 用户称两小时用掉约 8% 月度额度。微软将其与 AI 算力成本上升挂钩，部分开发者已转向 OpenAI Codex、Claude、DeepSeek V4 Pro 或本地开源模型。</p>
+              </div>
+              <div class="score-stamp">IMPACT 7.8</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Analysis</span><span class="index">2 / 3</span></div>
+                <p class="big">看点：AI 编程工具「订阅制 → 用量计费」转向的首个标志性事件——AI 真实推理成本正被转嫁给终端开发者，可能重塑整个编码助手市场的价格与忠诚度。</p>
+                <ul class="impact-list">
+                  <li>重度 agentic 用户成本结构剧变，需重新评估预算与工具选型。</li>
+                  <li>竞品（Codex、Claude Code、Cursor、本地开源模型）迎来抢量窗口。</li>
+                  <li>用量计费若成范式，将倒逼厂商优化推理成本，也加剧用户对「账单不可预测」的焦虑。</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>Sources</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>TechCrunch · Visual Studio Magazine · Dataconomy</span></div>
+                  <div class="source-row"><span>可信度</span><span>中高</span></div>
+                  <div class="source-row"><span>待验证</span><span>暴涨倍数多为个体用户在 Reddit/X 的估算，人均涨幅与官方额度细则待核实</span></div>
+                  <div class="source-row"><span>建议动作</span><span>重度用户即刻核对新额度与上限，设预算告警或评估替代工具</span></div>
+                </div>
+                <div class="verified ">多源·待复测</div>
               </div>
             </section>
           </div>
@@ -986,11 +1022,11 @@
           </div>
           <h2 class="news-title">明日观察</h2>
           <div class="wrap">
-            <div class="mini-card"><strong>WWDC 落地</strong><span>keynote 是否正式确认 Siri-Gemini 条款，以及 Claude 是否进入 Extensions。</span></div>
-            <div class="mini-card"><strong>六月模型潮</strong><span>谷歌 Gemini 3.5 Pro、Anthropic Claude Mythos 1、xAI Grok 5 是否本月落地。</span></div>
-            <div class="mini-card"><strong>AI 上市竞赛</strong><span>Anthropic（$965B 估值）秘密 IPO 后 OpenAI 是否跟进；GPT-5.5-Cyber 对欧盟开放进展。</span></div>
+            <div class="mini-card"><strong>WWDC 落地确认</strong><span>keynote 是否正式坐实 Siri-Gemini 条款（参数、年费），以及 Claude 是否进入 Extensions。</span></div>
+            <div class="mini-card"><strong>Gemini 3.5 Pro</strong><span>皮查伊承诺「六月内交付」，谷歌新旗舰是否如期落地、对标 GPT-5.5 / Opus 4.8。</span></div>
+            <div class="mini-card"><strong>AI 立法摊牌</strong><span>《伟大的美国 AI 法案》听证进展、科罗拉多法 6/30 生效、特朗普行政令相关诉讼走向。</span></div>
           </div>
-          <div class="ticker"><b>Next brief</b><span>06-09 继续追踪 WWDC 落地与六月模型潮。</span></div>
+          <div class="ticker"><b>Next brief</b><span>今夜 WWDC keynote 后，明日重点复盘苹果-谷歌条款是否坐实，及六月模型潮后续。</span></div>
           <div class="hint"><span>模板字段：日期 / 新闻 / 摘要 / 影响 / 来源</span><span class="gesture"><i></i><i></i><i></i></span></div>
         </div>
       </section>
