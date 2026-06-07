@@ -10,8 +10,8 @@
       "cosyvoice": {
         "mode": "zero_shot",
         "instruct": "中文普通话，年轻女性，声音甜美，亲和力强，语速中等偏慢，情绪温暖但不夸张，像早间新闻简报主播，吐字清晰，适合朗读 AI 新闻。",
-        "prompt_wav": "tts/assets/ref_sweet_female_zh.wav",
-        "prompt_text": "大家好，欢迎收听每日人工智能新闻，我会用温暖清晰的声音，为你播报今天的重点。",
+        "prompt_wav": "tts/assets/ref_official_female_zh.wav",
+        "prompt_text": "希望你以后能够做的比我还好呦。",
         "spk_id": "中文女"
       },
       "macsay": {
@@ -26,8 +26,8 @@
     "repo_dir": "tts/vendor/CosyVoice",
     "model_dir": "tts/models/CosyVoice2-0.5B",
     "venv_python": "tts/.venv/bin/python",
-    "prompt_wav": "tts/assets/ref_sweet_female_zh.wav",
-    "prompt_text": "大家好，欢迎收听每日人工智能新闻，我会用温暖清晰的声音，为你播报今天的重点。",
+    "prompt_wav": "tts/assets/ref_official_female_zh.wav",
+    "prompt_text": "希望你以后能够做的比我还好呦。",
     "per_line": true,
     "seg_max_chars": 32
   }
