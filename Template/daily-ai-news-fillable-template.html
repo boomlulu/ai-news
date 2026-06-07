@@ -1,0 +1,747 @@
+<!--
+每日 AI 新闻 HTML 填充模板
+
+使用方式：
+1. 不要改动 CSS、整体 HTML 结构和 JS。
+2. 只替换 {{...}} 占位符。
+3. 如果新闻超过 3 条，复制一个 <section class="slide" id="story-N">...</section> 新闻页，并同步增加右侧 .progress 链接。
+4. 每条新闻内部固定 3 个横滑面板：核心摘要 / 影响判断 / 来源与跟进。
+5. 日期抽屉里的链接可以替换为真实 HTML 文件路径，例如 daily-ai-news-2026-06-07.html。
+-->
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>{{PAGE_TITLE}}</title>
+  <style>
+    :root {
+      --bg: #f7f4ee;
+      --ink: #121713;
+      --muted: #687269;
+      --line: rgba(18, 23, 19, .12);
+      --card: rgba(255, 255, 255, .88);
+      --green: #0e6b4f;
+      --teal: #08747c;
+      --gold: #a66500;
+      --red: #bd463d;
+      --shadow: 0 20px 48px rgba(22, 31, 25, .14);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 22% 10%, rgba(8, 116, 124, .16), transparent 28%),
+        linear-gradient(160deg, #f2f6ec 0%, #fbf7ef 42%, #f6efe7 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.45;
+    }
+
+    button { font: inherit; }
+
+    .app {
+      position: relative;
+      height: 100dvh;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .topbar {
+      position: fixed;
+      z-index: 20;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: calc(12px + var(--safe-top)) 16px 10px;
+      color: rgba(18, 23, 19, .88);
+      background: linear-gradient(180deg, rgba(247, 244, 238, .94), rgba(247, 244, 238, 0));
+      pointer-events: none;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .mark {
+      display: grid;
+      width: 31px;
+      height: 31px;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 8px;
+      color: white;
+      background: conic-gradient(from 140deg, var(--green), var(--teal), #2f7e4e, var(--green));
+      font-size: 12px;
+      box-shadow: 0 8px 18px rgba(14, 107, 79, .22);
+    }
+
+    .date {
+      max-width: 45vw;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rail {
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+      overscroll-behavior-y: contain;
+    }
+
+    .date-drawer {
+      position: fixed;
+      z-index: 30;
+      left: 10px;
+      top: 50%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transform: translateY(-50%);
+    }
+
+    .date-handle {
+      display: grid;
+      width: 28px;
+      height: 96px;
+      place-items: center;
+      border: 1px solid rgba(18, 23, 19, .11);
+      border-radius: 0 8px 8px 0;
+      color: rgba(18, 23, 19, .62);
+      background: rgba(255, 255, 255, .74);
+      box-shadow: 0 10px 22px rgba(22, 31, 25, .08);
+      font-size: 11px;
+      font-weight: 850;
+      writing-mode: vertical-rl;
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+    }
+
+    .date-menu {
+      display: grid;
+      gap: 8px;
+      width: 50px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-12px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .date-drawer:hover .date-menu,
+    .date-drawer:focus-within .date-menu,
+    .date-drawer.open .date-menu {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    .date-menu a {
+      display: grid;
+      min-height: 54px;
+      place-items: center;
+      padding: 7px 5px;
+      border: 1px solid rgba(18, 23, 19, .1);
+      border-radius: 8px;
+      color: rgba(18, 23, 19, .58);
+      background: rgba(255, 255, 255, .68);
+      box-shadow: 0 10px 22px rgba(22, 31, 25, .08);
+      font-size: 11px;
+      font-weight: 850;
+      line-height: 1.05;
+      text-align: center;
+      text-decoration: none;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      backdrop-filter: blur(12px);
+    }
+
+    .date-menu a.active {
+      border-color: rgba(14, 107, 79, .36);
+      color: white;
+      background: linear-gradient(160deg, var(--green), var(--teal));
+      box-shadow: 0 14px 28px rgba(14, 107, 79, .24);
+    }
+
+    .rail::-webkit-scrollbar,
+    .h-scroll::-webkit-scrollbar { display: none; }
+
+    .slide {
+      position: relative;
+      display: flex;
+      min-height: 100dvh;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      padding: calc(68px + var(--safe-top)) 16px calc(24px + var(--safe-bottom)) 40px;
+    }
+
+    .slide-inner {
+      display: flex;
+      width: min(100%, 480px);
+      min-height: calc(100dvh - 92px - var(--safe-top) - var(--safe-bottom));
+      margin: 0 auto;
+      flex-direction: column;
+    }
+
+    .intro { justify-content: center; gap: 22px; }
+
+    .kicker {
+      width: fit-content;
+      padding: 6px 10px;
+      border: 1px solid rgba(14, 107, 79, .22);
+      border-radius: 999px;
+      color: var(--green);
+      background: rgba(255, 255, 255, .62);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin: 0; letter-spacing: 0; }
+
+    h1 {
+      max-width: 12ch;
+      font-size: clamp(43px, 13vw, 68px);
+      line-height: .98;
+    }
+
+    .lead {
+      max-width: 30rem;
+      color: #3c483f;
+      font-size: 18px;
+    }
+
+    .daily-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .stat {
+      min-height: 86px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .hint {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .gesture { display: inline-flex; gap: 6px; }
+
+    .gesture i {
+      display: block;
+      width: 20px;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(18, 23, 19, .28);
+    }
+
+    .news-head {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .tag {
+      padding: 4px 8px;
+      border-radius: 999px;
+      color: white;
+      background: var(--green);
+    }
+
+    .tag.product { background: var(--teal); }
+    .tag.research { background: var(--gold); }
+    .tag.policy { background: var(--red); }
+
+    .news-title {
+      font-size: clamp(29px, 8.8vw, 42px);
+      line-height: 1.06;
+    }
+
+    .h-scroll {
+      display: grid;
+      grid-auto-columns: 100%;
+      grid-auto-flow: column;
+      gap: 12px;
+      min-height: 0;
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+    }
+
+    .panel {
+      display: flex;
+      min-height: 0;
+      flex-direction: column;
+      justify-content: space-between;
+      scroll-snap-align: center;
+      padding: 19px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .index {
+      color: rgba(18, 23, 19, .34);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .big {
+      color: var(--ink);
+      font-size: clamp(21px, 6vw, 28px);
+      font-weight: 850;
+      line-height: 1.18;
+    }
+
+    .text {
+      margin-top: 13px;
+      color: #3f4b43;
+      font-size: 16px;
+    }
+
+    .impact-list {
+      display: grid;
+      gap: 11px;
+      margin-top: 18px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .impact-list li {
+      padding: 12px;
+      border-left: 3px solid var(--green);
+      border-radius: 0 6px 6px 0;
+      background: rgba(238, 244, 235, .86);
+      color: #334039;
+      font-size: 15px;
+    }
+
+    .source-box {
+      display: grid;
+      gap: 11px;
+      margin-top: 18px;
+    }
+
+    .source-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+      color: #37443c;
+      font-size: 15px;
+    }
+
+    .source-row:last-child { border-bottom: 0; }
+    .source-row span:last-child { color: var(--muted); text-align: right; }
+
+    .dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding-top: 13px;
+    }
+
+    .dots i {
+      display: block;
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(18, 23, 19, .22);
+    }
+
+    .dots i:first-child {
+      width: 18px;
+      background: var(--green);
+    }
+
+    .score {
+      display: grid;
+      width: 86px;
+      height: 86px;
+      place-items: center;
+      margin-top: auto;
+      border-radius: 50%;
+      color: white;
+      background: linear-gradient(145deg, var(--green), var(--teal));
+      font-size: 28px;
+      font-weight: 900;
+      box-shadow: 0 16px 28px rgba(14, 107, 79, .24);
+    }
+
+    .wrap {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .mini-card {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .72);
+    }
+
+    .mini-card strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 15px;
+    }
+
+    .mini-card span {
+      color: #455149;
+      font-size: 14px;
+    }
+
+    .progress {
+      position: fixed;
+      z-index: 25;
+      right: 10px;
+      top: 50%;
+      display: grid;
+      gap: 6px;
+      transform: translateY(-50%);
+    }
+
+    .progress a {
+      width: 5px;
+      height: 24px;
+      border-radius: 999px;
+      background: rgba(18, 23, 19, .18);
+    }
+
+    .progress a:first-child { background: var(--green); }
+
+    @media (min-width: 760px) {
+      .slide { padding-left: 56px; padding-right: 24px; }
+      .slide-inner { width: min(100%, 660px); }
+      h1 { max-width: 13ch; }
+      .panel { padding: 26px; }
+    }
+
+    @media (max-height: 680px) {
+      .slide {
+        padding-top: calc(56px + var(--safe-top));
+        padding-bottom: calc(14px + var(--safe-bottom));
+      }
+      .slide-inner {
+        min-height: calc(100dvh - 70px - var(--safe-top) - var(--safe-bottom));
+      }
+      h1 { font-size: clamp(36px, 11vw, 54px); }
+      .lead, .text { font-size: 15px; }
+      .panel { padding: 15px; }
+    }
+
+    @media (max-width: 390px) {
+      .date-drawer { left: 0; }
+      .date-handle { width: 24px; height: 84px; font-size: 10px; }
+      .slide { padding-left: 30px; }
+    }
+
+    @media (hover: none) {
+      .date-drawer::before {
+        content: "";
+        position: absolute;
+        top: -120px;
+        bottom: -120px;
+        left: -10px;
+        width: 78px;
+      }
+
+      .date-drawer:active .date-menu,
+      .date-drawer.open .date-menu {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar" aria-label="简报信息">
+      <div class="brand"><span class="mark">AI</span><span>{{BRAND_NAME}}</span></div>
+      <div class="date">{{REPORT_DATE}} · {{GENERATED_TIME}}</div>
+    </header>
+
+    <aside class="date-drawer" aria-label="日期切换抽屉">
+      <button class="date-handle" type="button" aria-label="展开日期列表">日期</button>
+      <nav class="date-menu" aria-label="按日期切换新闻">
+        <a href="{{PREV_2_DATE_URL}}" aria-label="查看 {{PREV_2_DATE_LABEL}} 新闻">{{PREV_2_DATE_SHORT}}</a>
+        <a href="{{PREV_1_DATE_URL}}" aria-label="查看 {{PREV_1_DATE_LABEL}} 新闻">{{PREV_1_DATE_SHORT}}</a>
+        <a class="active" href="{{CURRENT_DATE_URL}}" aria-current="page" aria-label="当前 {{CURRENT_DATE_LABEL}} 新闻">{{CURRENT_DATE_SHORT}}</a>
+        <a href="{{NEXT_DATE_URL}}" aria-label="查看 {{NEXT_DATE_LABEL}} 新闻">{{NEXT_DATE_SHORT}}</a>
+      </nav>
+    </aside>
+
+    <nav class="progress" aria-label="页面进度">
+      <a href="#cover" aria-label="封面"></a>
+      <a href="#story-1" aria-label="新闻 1"></a>
+      <a href="#story-2" aria-label="新闻 2"></a>
+      <a href="#story-3" aria-label="新闻 3"></a>
+      <a href="#tomorrow" aria-label="明日观察"></a>
+    </nav>
+
+    <div class="rail" aria-label="每日 AI 新闻竖向阅读流">
+      <section class="slide" id="cover">
+        <div class="slide-inner intro">
+          <div class="kicker">Daily Briefing</div>
+          <h1>{{COVER_TITLE}}</h1>
+          <p class="lead">{{COVER_LEAD}}</p>
+          <div class="daily-stats" aria-label="今日统计">
+            <div class="stat"><strong>{{NEWS_COUNT}}</strong><span>重点条目</span></div>
+            <div class="stat"><strong>{{SOURCE_COUNT}}</strong><span>信息来源</span></div>
+            <div class="stat"><strong>{{READING_TIME}}</strong><span>阅读时间</span></div>
+          </div>
+          <div class="hint"><span>上下翻页 · 左右横滑</span><span class="gesture"><i></i><i></i><i></i></span></div>
+        </div>
+      </section>
+
+      <!-- 复制这个 story section 可以增加更多新闻。注意同步 id、序号和右侧 progress。 -->
+      <section class="slide" id="story-1">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag {{STORY_1_TAG_CLASS}}">{{STORY_1_CATEGORY}}</span><span>01 / {{NEWS_COUNT_PADDED}} · 影响指数 {{STORY_1_SCORE}}</span></div>
+            <h2 class="news-title">{{STORY_1_TITLE}}</h2>
+          </div>
+          <div class="h-scroll" aria-label="新闻 1 横向详情">
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>核心摘要</span><span class="index">1 / 3</span></div>
+                <p class="big">{{STORY_1_SUMMARY_MAIN}}</p>
+                <p class="text">{{STORY_1_SUMMARY_DETAIL}}</p>
+              </div>
+              <div class="score">{{STORY_1_SCORE}}</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>影响判断</span><span class="index">2 / 3</span></div>
+                <p class="big">{{STORY_1_WHY_IT_MATTERS}}</p>
+                <ul class="impact-list">
+                  <li>{{STORY_1_IMPACT_1}}</li>
+                  <li>{{STORY_1_IMPACT_2}}</li>
+                  <li>{{STORY_1_IMPACT_3}}</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>来源与跟进</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>{{STORY_1_SOURCE}}</span></div>
+                  <div class="source-row"><span>可信度</span><span>{{STORY_1_CONFIDENCE}}</span></div>
+                  <div class="source-row"><span>待验证</span><span>{{STORY_1_TO_VERIFY}}</span></div>
+                  <div class="source-row"><span>建议动作</span><span>{{STORY_1_ACTION}}</span></div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="story-2">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag {{STORY_2_TAG_CLASS}}">{{STORY_2_CATEGORY}}</span><span>02 / {{NEWS_COUNT_PADDED}} · 影响指数 {{STORY_2_SCORE}}</span></div>
+            <h2 class="news-title">{{STORY_2_TITLE}}</h2>
+          </div>
+          <div class="h-scroll" aria-label="新闻 2 横向详情">
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>核心摘要</span><span class="index">1 / 3</span></div>
+                <p class="big">{{STORY_2_SUMMARY_MAIN}}</p>
+                <p class="text">{{STORY_2_SUMMARY_DETAIL}}</p>
+              </div>
+              <div class="score">{{STORY_2_SCORE}}</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>影响判断</span><span class="index">2 / 3</span></div>
+                <p class="big">{{STORY_2_WHY_IT_MATTERS}}</p>
+                <ul class="impact-list">
+                  <li>{{STORY_2_IMPACT_1}}</li>
+                  <li>{{STORY_2_IMPACT_2}}</li>
+                  <li>{{STORY_2_IMPACT_3}}</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>来源与跟进</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>{{STORY_2_SOURCE}}</span></div>
+                  <div class="source-row"><span>可信度</span><span>{{STORY_2_CONFIDENCE}}</span></div>
+                  <div class="source-row"><span>待验证</span><span>{{STORY_2_TO_VERIFY}}</span></div>
+                  <div class="source-row"><span>建议动作</span><span>{{STORY_2_ACTION}}</span></div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="story-3">
+        <article class="slide-inner">
+          <div class="news-head">
+            <div class="eyebrow"><span class="tag {{STORY_3_TAG_CLASS}}">{{STORY_3_CATEGORY}}</span><span>03 / {{NEWS_COUNT_PADDED}} · 影响指数 {{STORY_3_SCORE}}</span></div>
+            <h2 class="news-title">{{STORY_3_TITLE}}</h2>
+          </div>
+          <div class="h-scroll" aria-label="新闻 3 横向详情">
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>核心摘要</span><span class="index">1 / 3</span></div>
+                <p class="big">{{STORY_3_SUMMARY_MAIN}}</p>
+                <p class="text">{{STORY_3_SUMMARY_DETAIL}}</p>
+              </div>
+              <div class="score">{{STORY_3_SCORE}}</div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>影响判断</span><span class="index">2 / 3</span></div>
+                <p class="big">{{STORY_3_WHY_IT_MATTERS}}</p>
+                <ul class="impact-list">
+                  <li>{{STORY_3_IMPACT_1}}</li>
+                  <li>{{STORY_3_IMPACT_2}}</li>
+                  <li>{{STORY_3_IMPACT_3}}</li>
+                </ul>
+              </div>
+            </section>
+            <section class="panel">
+              <div>
+                <div class="panel-title"><span>来源与跟进</span><span class="index">3 / 3</span></div>
+                <div class="source-box">
+                  <div class="source-row"><span>主要来源</span><span>{{STORY_3_SOURCE}}</span></div>
+                  <div class="source-row"><span>可信度</span><span>{{STORY_3_CONFIDENCE}}</span></div>
+                  <div class="source-row"><span>待验证</span><span>{{STORY_3_TO_VERIFY}}</span></div>
+                  <div class="source-row"><span>建议动作</span><span>{{STORY_3_ACTION}}</span></div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+      </section>
+
+      <section class="slide" id="tomorrow">
+        <div class="slide-inner intro">
+          <div class="kicker">Watchlist</div>
+          <h2 class="news-title">明日观察</h2>
+          <div class="wrap">
+            <div class="mini-card"><strong>{{WATCH_1_TITLE}}</strong><span>{{WATCH_1_TEXT}}</span></div>
+            <div class="mini-card"><strong>{{WATCH_2_TITLE}}</strong><span>{{WATCH_2_TEXT}}</span></div>
+            <div class="mini-card"><strong>{{WATCH_3_TITLE}}</strong><span>{{WATCH_3_TEXT}}</span></div>
+          </div>
+          <div class="hint"><span>模板字段：日期 / 新闻 / 摘要 / 影响 / 来源</span><span class="gesture"><i></i><i></i><i></i></span></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const drawer = document.querySelector(".date-drawer");
+      const handle = document.querySelector(".date-handle");
+      let startX = 0;
+      let startY = 0;
+
+      const open = () => drawer.classList.add("open");
+      const close = () => drawer.classList.remove("open");
+
+      handle.addEventListener("click", () => {
+        drawer.classList.toggle("open");
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!drawer.contains(event.target)) close();
+      });
+
+      document.addEventListener("touchstart", (event) => {
+        const touch = event.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+      }, { passive: true });
+
+      document.addEventListener("touchmove", (event) => {
+        const touch = event.touches[0];
+        const dx = touch.clientX - startX;
+        const dy = Math.abs(touch.clientY - startY);
+        if (startX < 28 && dx > 42 && dy < 50) open();
+        if (drawer.classList.contains("open") && dx < -36 && dy < 50) close();
+      }, { passive: true });
+    })();
+  </script>
+</body>
+</html>
