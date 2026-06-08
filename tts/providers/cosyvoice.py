@@ -50,6 +50,98 @@ def _split_for_tts(text, max_chars=32):
     return out
 
 
+def _merge_short(segs, max_chars, min_seg):
+    """Merge sub-min_seg fragments with a neighbor (forward first, then backward)
+    as long as the merged length stays <= max_chars. Prevents ultra-short segments
+    that make CosyVoice2 zero_shot over-generate garbage breath artifacts. Length
+    cap keeps each synth unit short enough to avoid the 0.5B over-generation runaway."""
+    if not segs:
+        return segs
+    # forward: pull following fragments into a too-short seg while it fits
+    fwd = []
+    i = 0
+    while i < len(segs):
+        seg = segs[i]
+        while len(seg) < min_seg and i + 1 < len(segs) and len(seg) + len(segs[i + 1]) <= max_chars:
+            i += 1
+            seg = seg + segs[i]
+        fwd.append(seg)
+        i += 1
+    # backward: any still-short seg merges into the previous if it fits
+    out = []
+    for seg in fwd:
+        if out and len(seg) < min_seg and len(out[-1]) + len(seg) <= max_chars:
+            out[-1] = out[-1] + seg
+        else:
+            out.append(seg)
+    return out
+
+
+def _split_with_gaps(text, max_chars, comma_gap, sentence_gap, para_gap, min_seg=12):
+    """Paragraph-aware, boundary-typed inter-segment silence. Blank lines split
+    paragraphs (news items / sections). Within a paragraph, _split_for_tts keeps
+    short segments for synth quality, but the silence AFTER each segment depends
+    on its boundary: comma-class end -> comma_gap (flow), 。！？ end -> sentence_gap,
+    last segment of a paragraph -> para_gap (a real breath). Last piece overall: 0."""
+    import re
+    out = []
+    for para in re.split(r'\n[ \t]*\n', text):
+        if not para.strip():
+            continue
+        base = _split_for_tts(para, max_chars)
+        base = _merge_short(base, max_chars, min_seg)
+        for si, seg in enumerate(base):
+            if si == len(base) - 1:
+                gap = para_gap
+            else:
+                tail = seg.rstrip()
+                last = tail[-1] if tail else ''
+                gap = sentence_gap if last in '。！？!?…' else comma_gap
+            out.append((seg, gap))
+    if out:
+        out[-1] = (out[-1][0], 0.0)
+    return out
+
+
+_SENT_END = '。！？!?；;…'
+
+
+def _split_units(text, unit, sentence_gap, para_gap):
+    """Larger synthesis units: feed whole sentences (commas kept INSIDE, model's own
+    prosody handles them) or whole paragraphs. NO comma-splitting / merge / trim needed.
+    unit='paragraph': one unit per blank-line paragraph; gap=para_gap between.
+    unit='sentence': split each paragraph at sentence terminators (。！？；…, terminator
+    kept); gap=sentence_gap within a paragraph, para_gap at paragraph end.
+    Returns list[(text, gap_after)], last overall gap 0.0."""
+    import re
+    paras = [p for p in re.split(r'\n[ \t]*\n', text) if p.strip()]
+    out = []
+    for para in paras:
+        block = re.sub(r'\s*\n\s*', '', para).strip()  # join multi-line paragraph into one block
+        if not block:
+            continue
+        if unit == 'paragraph':
+            out.append([block, para_gap])
+        else:  # sentence
+            parts = re.split(r'([%s]+)' % re.escape(_SENT_END), block)
+            sents, buf = [], ''
+            for i, p in enumerate(parts):
+                buf += p
+                if i % 2 == 1:        # terminator group -> close sentence
+                    if buf.strip():
+                        sents.append(buf.strip())
+                    buf = ''
+            if buf.strip():
+                sents.append(buf.strip())
+            if not sents:
+                sents = [block]
+            for si, s in enumerate(sents):
+                out.append([s, para_gap if si == len(sents) - 1 else sentence_gap])
+    if out:
+        out[-1][1] = 0.0
+    return [(t, g) for t, g in out]
+
+
 def _install_tn_shim_if_needed():
     """CosyVoice frontend imports WeTextProcessing (`tn.*`, needs pynini) at init.
     If absent (common on macOS), inject identity-normalizer stubs so model init
@@ -76,6 +168,33 @@ def _install_tn_shim_if_needed():
     for k, v in mods.items():
         sys.modules.setdefault(k, v)
     return True
+
+
+def _trim_speech(wav, sr, thresh_db=-28.0, win_ms=20, margin_ms=50):
+    """Trim leading/trailing non-speech (silence + detached breath artifacts) from
+    a segment waveform [1, N] using a windowed-RMS energy gate. Keeps a small margin
+    so soft consonant tails aren't clipped. If the whole clip is below threshold,
+    returns it unchanged (never nuke to empty)."""
+    import torch
+    if wav is None or wav.numel() == 0:
+        return wav
+    n = wav.shape[-1]
+    win = max(1, int(sr * win_ms / 1000))
+    nf = n // win
+    if nf < 1:
+        return wav
+    frames = wav[0, :nf * win].reshape(nf, win)
+    rms = frames.pow(2).mean(dim=1).clamp_min(1e-10).sqrt()
+    thr = 10.0 ** (thresh_db / 20.0)
+    above = (rms >= thr).nonzero().flatten()
+    if above.numel() == 0:
+        return wav
+    first = int(above[0].item())
+    last = int(above[-1].item())
+    margin = int(sr * margin_ms / 1000)
+    start = max(0, first * win - margin)
+    end = min(n, (last + 1) * win + margin)
+    return wav[:, start:end]
 
 
 class CosyVoiceProvider(TTSProvider):
@@ -216,23 +335,40 @@ class CosyVoiceProvider(TTSProvider):
             # cannot merge a single short input, so per-segment inference keeps each
             # generation short. text_frontend stays True so numbers/%/letters still
             # normalize within each segment.
-            if cv.get("per_line", True):
-                segs = _split_for_tts(req.text, cv.get("seg_max_chars", 32))
+            comma_gap = float(req.extra.get("comma_gap_sec", cv.get("comma_gap_sec", 0.0)))
+            sentence_gap = float(req.extra.get("sentence_gap_sec", cv.get("sentence_gap_sec", 0.12)))
+            para_gap = float(req.extra.get("paragraph_gap_sec", cv.get("paragraph_gap_sec", 0.5)))
+            unit = req.extra.get("synth_unit", cv.get("synth_unit", "fragment"))
+            if unit in ("sentence", "paragraph"):
+                pieces = _split_units(req.text, unit, sentence_gap, para_gap)
+            elif cv.get("per_line", True):
+                pieces = _split_with_gaps(req.text, cv.get("seg_max_chars", 32), comma_gap, sentence_gap, para_gap, cv.get("min_seg_chars", 12))
             else:
-                segs = [req.text]
-            if not segs:
-                segs = [req.text]
-            print(f"[cosyvoice] {len(segs)} segments", file=sys.stderr)
+                pieces = [(req.text, 0.0)]
+            if not pieces:
+                pieces = [(req.text, 0.0)]
+            segs = [p[0] for p in pieces]
+            gaps = [p[1] for p in pieces]
+            print(f"[cosyvoice] {len(segs)} segs unit={unit}, pacing comma={comma_gap} sent={sentence_gap} para={para_gap}", file=sys.stderr)
 
             sr = model.sample_rate
-            pad = torch.zeros(1, int(0.18 * sr))  # silence between segments for news pacing
+            trim_on = bool(req.extra.get("trim_segment_silence", cv.get("trim_segment_silence", True)))
+            trim_thresh = float(req.extra.get("trim_thresh_db", cv.get("trim_thresh_db", -40.0)))
+            trim_margin = float(req.extra.get("trim_margin_ms", cv.get("trim_margin_ms", 60.0)))
+            _sil = {}
+            def _silence(sec):
+                if sec not in _sil:
+                    _sil[sec] = torch.zeros(1, max(1, int(sec * sr)))
+                return _sil[sec]
             chunks = []
-
-            def _emit_seg_chunks(seg_chunks, is_last):
-                for c in seg_chunks:
-                    chunks.append(c)
-                if not is_last:
-                    chunks.append(pad)
+            def _emit_seg_chunks(seg_chunks, gap_after):
+                if seg_chunks:
+                    seg_audio = torch.cat(seg_chunks, dim=1) if len(seg_chunks) > 1 else seg_chunks[0]
+                    if trim_on:
+                        seg_audio = _trim_speech(seg_audio, sr, thresh_db=trim_thresh, margin_ms=trim_margin)
+                    chunks.append(seg_audio)
+                if gap_after > 0:
+                    chunks.append(_silence(gap_after))
 
             if mode == "sft":
                 spk_id = req.extra.get("spk_id", "中文女")
@@ -244,7 +380,7 @@ class CosyVoiceProvider(TTSProvider):
                         print(f"[cosyvoice] seg {i} yield speech len {sp.shape[-1]/sr:.2f}s",
                               file=sys.stderr)
                         seg_chunks.append(sp)
-                    _emit_seg_chunks(seg_chunks, i == len(segs) - 1)
+                    _emit_seg_chunks(seg_chunks, gaps[i])
             else:
                 ref = os.path.expanduser(req.extra.get("prompt_wav") or cv.get("prompt_wav", ""))
                 if not ref or not os.path.isfile(ref):
@@ -304,7 +440,7 @@ class CosyVoiceProvider(TTSProvider):
                                 if cand is prompt_16k:
                                     raise  # both forms failed
                                 # path form failed -> retry with loaded tensor (older API)
-                    _emit_seg_chunks(seg_chunks, i == len(segs) - 1)
+                    _emit_seg_chunks(seg_chunks, gaps[i])
 
             if not chunks:
                 return TTSResult(None, "error", self.name, "no audio produced")

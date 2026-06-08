@@ -38,6 +38,14 @@
     "prompt_wav": "",
     "prompt_text": "",
     "per_line": true,
-    "seg_max_chars": 32
+    "synth_unit": "fragment",
+    "seg_max_chars": 32,
+    "min_seg_chars": 12,
+    "comma_gap_sec": 0.0,
+    "sentence_gap_sec": 0.12,
+    "paragraph_gap_sec": 0.5,
+    "trim_segment_silence": true,
+    "trim_thresh_db": -40.0,
+    "trim_margin_ms": 60
   }
 }

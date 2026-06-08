@@ -111,10 +111,42 @@ if __name__ == "__main__":
     ap.add_argument("--speed", type=float)
     ap.add_argument("--style")
     ap.add_argument("--fallback")
+    ap.add_argument("--comma-gap", type=float, default=None,
+                    help="silence (s) after in-sentence comma-class segments (flow)")
+    ap.add_argument("--sentence-gap", type=float, default=None,
+                    help="silence (s) after 。！？ sentence ends (light pause)")
+    ap.add_argument("--para-gap", type=float, default=None,
+                    help="silence (s) after a paragraph / blank-line boundary (breath)")
+    ap.add_argument("--trim-thresh", type=float, default=None,
+                    help="trim energy gate dB (default config -40)")
+    ap.add_argument("--trim-margin", type=float, default=None,
+                    help="trim keep-margin ms (default config 60)")
+    ap.add_argument("--no-trim", action="store_true",
+                    help="disable per-segment silence trim")
+    ap.add_argument("--unit", choices=["fragment", "sentence", "paragraph"], default=None,
+                    help="synthesis unit: fragment (default, sub-sentence chop), "
+                         "sentence (whole sentence, commas kept inside), or paragraph")
     a = ap.parse_args()
+    # Only forward gaps the user actually set; None -> config defaults. These land
+    # in synthesize(**extra) -> req.extra and are read by the cosyvoice provider.
+    pacing = {}
+    if a.comma_gap is not None:
+        pacing["comma_gap_sec"] = a.comma_gap
+    if a.sentence_gap is not None:
+        pacing["sentence_gap_sec"] = a.sentence_gap
+    if a.para_gap is not None:
+        pacing["paragraph_gap_sec"] = a.para_gap
+    if a.trim_thresh is not None:
+        pacing["trim_thresh_db"] = a.trim_thresh
+    if a.trim_margin is not None:
+        pacing["trim_margin_ms"] = a.trim_margin
+    if a.no_trim:
+        pacing["trim_segment_silence"] = False
+    if a.unit is not None:
+        pacing["synth_unit"] = a.unit
     r = TTSService().synthesize(text=a.text, text_path=a.text_path, output_path=a.out,
                                 provider=a.provider, voice=a.voice, speed=a.speed,
-                                style=a.style, fallback=a.fallback)
+                                style=a.style, fallback=a.fallback, **pacing)
     print(json.dumps({"status": r.status, "provider": r.provider,
                       "audio_path": r.audio_path, "error": r.error, "meta": r.meta},
                      ensure_ascii=False, indent=2))
