@@ -410,7 +410,7 @@ class CosyVoiceProvider(TTSProvider):
             mtype = req.extra.get("model_type") or cv.get("model_type", "cosyvoice2")
             model = self._load_model(mdir, mtype)
             mode = req.extra.get("mode", cv.get("synth_mode", "instruct2"))
-            instruct = (req.instruct or req.extra.get("instruct")
+            instruct = (req.extra.get("instruct") or req.instruct
                         or self.config.get("default_instruct", "中文普通话，年轻女性，声音甜美，语速中等偏慢，温暖如早间新闻主播。"))
             speed = float(req.speed or 1.0)
             out = os.path.abspath(req.output_path)
@@ -540,7 +540,8 @@ class CosyVoiceProvider(TTSProvider):
 
                 def _infer_seg(seg, prompt_arg):
                     if mode == "instruct2":
-                        return model.inference_instruct2(seg, instruct, prompt_arg,
+                        instr2 = instruct if instruct.rstrip().endswith("<|endofprompt|>") else instruct.rstrip() + "<|endofprompt|>"
+                        return model.inference_instruct2(seg, instr2, prompt_arg,
                                                          stream=False, speed=speed,
                                                          text_frontend=tf)
                     elif mode == "zero_shot":
