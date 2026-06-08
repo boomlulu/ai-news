@@ -123,9 +123,21 @@ if __name__ == "__main__":
                     help="trim keep-margin ms (default config 60)")
     ap.add_argument("--no-trim", action="store_true",
                     help="disable per-segment silence trim")
-    ap.add_argument("--unit", choices=["fragment", "sentence", "paragraph"], default=None,
+    ap.add_argument("--unit", choices=["fragment", "sentence", "paragraph", "smart"], default=None,
                     help="synthesis unit: fragment (default, sub-sentence chop), "
-                         "sentence (whole sentence, commas kept inside), or paragraph")
+                         "sentence (whole sentence, commas kept inside), paragraph, or "
+                         "smart (item/paragraph-level long units + silero-VAD endpoint "
+                         "normalize + fixed inter-item pause)")
+    ap.add_argument("--item-pause", type=float, default=None,
+                    help="[smart] silence (ms) after an item/paragraph-boundary unit")
+    ap.add_argument("--within-pause", type=float, default=None,
+                    help="[smart] silence (ms) after a within-item split (default 0)")
+    ap.add_argument("--tail-keep", type=float, default=None,
+                    help="[smart] ms of audio kept past last speech end (VAD tail)")
+    ap.add_argument("--min-unit", type=int, default=None,
+                    help="[smart] min chars per unit (shorter ones merge into a neighbor)")
+    ap.add_argument("--target-max", type=int, default=None,
+                    help="[smart] target max chars per unit (split only at sentence ends)")
     a = ap.parse_args()
     # Only forward gaps the user actually set; None -> config defaults. These land
     # in synthesize(**extra) -> req.extra and are read by the cosyvoice provider.
@@ -144,6 +156,16 @@ if __name__ == "__main__":
         pacing["trim_segment_silence"] = False
     if a.unit is not None:
         pacing["synth_unit"] = a.unit
+    if a.item_pause is not None:
+        pacing["item_pause_ms"] = a.item_pause
+    if a.within_pause is not None:
+        pacing["within_pause_ms"] = a.within_pause
+    if a.tail_keep is not None:
+        pacing["tail_keep_ms"] = a.tail_keep
+    if a.min_unit is not None:
+        pacing["min_unit_chars"] = a.min_unit
+    if a.target_max is not None:
+        pacing["target_max_chars"] = a.target_max
     r = TTSService().synthesize(text=a.text, text_path=a.text_path, output_path=a.out,
                                 provider=a.provider, voice=a.voice, speed=a.speed,
                                 style=a.style, fallback=a.fallback, **pacing)

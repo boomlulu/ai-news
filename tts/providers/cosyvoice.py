@@ -142,6 +142,95 @@ def _split_units(text, unit, sentence_gap, para_gap):
     return [(t, g) for t, g in out]
 
 
+def _build_units(text, min_chars=22, target_max=140):
+    """Item/paragraph-level synthesis units. Blank lines = items. An item <=target_max
+    is ONE unit; longer items split ONLY at sentence terminators (。！？；…!?), packed
+    to <=target_max (never at commas). Units shorter than min_chars merge into a
+    neighbor. Returns list[[text, is_item_end]] where is_item_end marks an item/paragraph
+    boundary (gets the big inter-item pause); within-item splits get is_item_end=False."""
+    import re
+    SENT = '。！？；…!?'
+    paras = [p for p in re.split(r'\n[ \t]*\n', text) if p.strip()]
+    raw = []  # [text, is_item_end]
+    for para in paras:
+        block = re.sub(r'\s*\n\s*', '', para).strip()
+        if not block:
+            continue
+        if len(block) <= target_max:
+            subs = [block]
+        else:
+            parts = re.split(r'([%s]+)' % re.escape(SENT), block)
+            sents, buf = [], ''
+            for i, p in enumerate(parts):
+                buf += p
+                if i % 2 == 1:
+                    if buf.strip():
+                        sents.append(buf.strip()); buf = ''
+            if buf.strip():
+                sents.append(buf.strip())
+            subs, cur = [], ''
+            for s in sents:
+                if cur and len(cur) + len(s) > target_max:
+                    subs.append(cur); cur = s
+                else:
+                    cur += s
+            if cur:
+                subs.append(cur)
+        for i, su in enumerate(subs):
+            raw.append([su, i == len(subs) - 1])
+    # merge units < min_chars: forward (carry next's is_item_end), then backward
+    fwd = []
+    i = 0
+    while i < len(raw):
+        t, e = raw[i]
+        while len(t) < min_chars and i + 1 < len(raw):
+            i += 1
+            t = t + raw[i][0]
+            e = raw[i][1]
+        fwd.append([t, e]); i += 1
+    out = []
+    for t, e in fwd:
+        if out and len(t) < min_chars:
+            out[-1][0] = out[-1][0] + t
+            out[-1][1] = e
+        else:
+            out.append([t, e])
+    return out
+
+
+def _vad_normalize(wav, sr, vad_model, pre_roll_ms=60, tail_keep_ms=160,
+                   fade_in_ms=10, fade_out_ms=30, min_speech_ms=80, min_silence_ms=120):
+    """Trim a unit's outer edges to [first_speech_start - pre_roll, last_speech_end +
+    tail_keep] via silero-vad (NOT RMS), then fade in/out. Preserves sentence-final soft
+    syllables (we keep tail_keep past the real speech end) and normalizes the trailing
+    silence to a fixed amount. If VAD finds no speech, returns the clip unchanged."""
+    import torch, torchaudio
+    from silero_vad import get_speech_timestamps
+    if wav is None or wav.numel() == 0:
+        return wav, None
+    n = wav.shape[-1]
+    wav16 = torchaudio.functional.resample(wav, sr, 16000)[0]
+    ts = get_speech_timestamps(wav16, vad_model, sampling_rate=16000,
+                               min_silence_duration_ms=min_silence_ms,
+                               min_speech_duration_ms=min_speech_ms)
+    if not ts:
+        return wav, None
+    ratio = sr / 16000.0
+    first = int(ts[0]['start'] * ratio)
+    last = int(ts[-1]['end'] * ratio)
+    start = max(0, first - int(sr * pre_roll_ms / 1000))
+    end = min(n, last + int(sr * tail_keep_ms / 1000))
+    out = wav[:, start:end].clone()
+    m = out.shape[-1]
+    fi = min(int(sr * fade_in_ms / 1000), m)
+    fo = min(int(sr * fade_out_ms / 1000), m)
+    if fi > 0:
+        out[0, :fi] *= torch.linspace(0, 1, fi)
+    if fo > 0:
+        out[0, -fo:] *= torch.linspace(1, 0, fo)
+    return out, (start / sr, end / sr)
+
+
 def _install_tn_shim_if_needed():
     """CosyVoice frontend imports WeTextProcessing (`tn.*`, needs pynini) at init.
     If absent (common on macOS), inject identity-normalizer stubs so model init
@@ -202,6 +291,12 @@ class CosyVoiceProvider(TTSProvider):
 
     def _cv(self):
         return self.config.get("cosyvoice", {})
+
+    def _vad(self):
+        if getattr(self, "_vad_model", None) is None:
+            from silero_vad import load_silero_vad
+            self._vad_model = load_silero_vad()
+        return self._vad_model
 
     def _model_dir(self):
         return os.path.expanduser(self._cv().get("model_dir", ""))
@@ -339,16 +434,37 @@ class CosyVoiceProvider(TTSProvider):
             sentence_gap = float(req.extra.get("sentence_gap_sec", cv.get("sentence_gap_sec", 0.12)))
             para_gap = float(req.extra.get("paragraph_gap_sec", cv.get("paragraph_gap_sec", 0.5)))
             unit = req.extra.get("synth_unit", cv.get("synth_unit", "fragment"))
-            if unit in ("sentence", "paragraph"):
+            # smart-mode knobs (config fallback + req.extra override)
+            smart_min = int(req.extra.get("min_unit_chars", cv.get("min_unit_chars", 22)))
+            smart_max = int(req.extra.get("target_max_chars", cv.get("target_max_chars", 140)))
+            item_pause = float(req.extra.get("item_pause_ms", cv.get("item_pause_ms", 420)))
+            within_pause = float(req.extra.get("within_pause_ms", cv.get("within_pause_ms", 0)))
+            tail_keep = float(req.extra.get("tail_keep_ms", cv.get("tail_keep_ms", 160)))
+            pre_roll = float(req.extra.get("pre_roll_ms", cv.get("pre_roll_ms", 60)))
+            if unit == "smart":
+                units = _build_units(req.text, smart_min, smart_max)
+                if not units:
+                    units = [[req.text, True]]
+                segs = [u[0] for u in units]
+                is_item_end = [u[1] for u in units]
+                gaps = [0.0] * len(segs)  # unused in smart path; is_item_end drives pauses
+            elif unit in ("sentence", "paragraph"):
                 pieces = _split_units(req.text, unit, sentence_gap, para_gap)
-            elif cv.get("per_line", True):
-                pieces = _split_with_gaps(req.text, cv.get("seg_max_chars", 32), comma_gap, sentence_gap, para_gap, cv.get("min_seg_chars", 12))
+                if not pieces:
+                    pieces = [(req.text, 0.0)]
+                segs = [p[0] for p in pieces]
+                gaps = [p[1] for p in pieces]
+                is_item_end = None
             else:
-                pieces = [(req.text, 0.0)]
-            if not pieces:
-                pieces = [(req.text, 0.0)]
-            segs = [p[0] for p in pieces]
-            gaps = [p[1] for p in pieces]
+                if cv.get("per_line", True):
+                    pieces = _split_with_gaps(req.text, cv.get("seg_max_chars", 32), comma_gap, sentence_gap, para_gap, cv.get("min_seg_chars", 12))
+                else:
+                    pieces = [(req.text, 0.0)]
+                if not pieces:
+                    pieces = [(req.text, 0.0)]
+                segs = [p[0] for p in pieces]
+                gaps = [p[1] for p in pieces]
+                is_item_end = None
             print(f"[cosyvoice] {len(segs)} segs unit={unit}, pacing comma={comma_gap} sent={sentence_gap} para={para_gap}", file=sys.stderr)
 
             sr = model.sample_rate
@@ -370,6 +486,32 @@ class CosyVoiceProvider(TTSProvider):
                 if gap_after > 0:
                     chunks.append(_silence(gap_after))
 
+            def _emit_smart(seg_chunks, i):
+                # smart path: VAD endpoint-normalize (NOT RMS trim), then fixed
+                # inter-unit pause driven by is_item_end. No _trim_speech here.
+                if seg_chunks:
+                    seg_audio = torch.cat(seg_chunks, dim=1) if len(seg_chunks) > 1 else seg_chunks[0]
+                    raw_dur = seg_audio.shape[-1] / sr
+                    seg_audio, vspan = _vad_normalize(seg_audio, sr, self._vad(),
+                                                      pre_roll_ms=pre_roll, tail_keep_ms=tail_keep)
+                    kept = seg_audio.shape[-1] / sr
+                    chunks.append(seg_audio)
+                else:
+                    raw_dur, kept, vspan = 0.0, 0.0, None
+                e = is_item_end[i]
+                last_unit = (i == len(segs) - 1)
+                pause = (item_pause if e else within_pause) if not last_unit else 0.0
+                if pause > 0:
+                    chunks.append(_silence(pause / 1000.0))
+                vs, ve = (vspan if vspan else (0.0, 0.0))
+                ln = len(segs[i])
+                print(f"[smart] u{i} len={ln} short?={ln < 37} raw={raw_dur:.2f}s "
+                      f"vad=[{vs:.2f},{ve:.2f}] kept={kept:.2f}s item_end={e} pause={pause}ms",
+                      file=sys.stderr)
+
+            smart = (unit == "smart")
+            _emit = (lambda sc, i: _emit_smart(sc, i)) if smart else (lambda sc, i: _emit_seg_chunks(sc, gaps[i]))
+
             if mode == "sft":
                 spk_id = req.extra.get("spk_id", "中文女")
                 for i, seg in enumerate(segs):
@@ -380,7 +522,7 @@ class CosyVoiceProvider(TTSProvider):
                         print(f"[cosyvoice] seg {i} yield speech len {sp.shape[-1]/sr:.2f}s",
                               file=sys.stderr)
                         seg_chunks.append(sp)
-                    _emit_seg_chunks(seg_chunks, gaps[i])
+                    _emit(seg_chunks, i)
             else:
                 ref = os.path.expanduser(req.extra.get("prompt_wav") or cv.get("prompt_wav", ""))
                 if not ref or not os.path.isfile(ref):
@@ -440,7 +582,7 @@ class CosyVoiceProvider(TTSProvider):
                                 if cand is prompt_16k:
                                     raise  # both forms failed
                                 # path form failed -> retry with loaded tensor (older API)
-                    _emit_seg_chunks(seg_chunks, gaps[i])
+                    _emit(seg_chunks, i)
 
             if not chunks:
                 return TTSResult(None, "error", self.name, "no audio produced")

@@ -17,6 +17,9 @@ tts/samples/*.wav
 tts/samples/voicetest/
 tts/samples/_excerpt.txt
 tts/samples/*-macsay.mp3
+# pacing/voice A-B 实验试听件（草稿），不入库；每日正式口播 mp3 仍入库
+tts/samples/_pacing_*
+tts/samples/daily-ai-news-*-broadcast-myvoice*.mp3
 tts/install.log
 # 用户克隆音色参考音频：大/含版权来源/可重生成，不入库（含 30s 归档源）
 tts/assets/*.wav
