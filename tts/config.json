@@ -14,29 +14,16 @@
         "spk_id": "中文女"
       },
       "macsay": { "say_voice": "Tingting", "say_base_rate": 168 }
-    },
-    "official_female_zh": {
-      "description": "CosyVoice 官方真人女声（CosyVoice2-0.5B zero_shot 参考克隆）",
-      "speed": 0.95,
-      "style": "warm_news",
-      "cosyvoice": {
-        "mode": "zero_shot",
-        "model_dir": "tts/models/CosyVoice2-0.5B",
-        "model_type": "cosyvoice2",
-        "prompt_wav": "tts/assets/ref_official_female_zh.wav",
-        "prompt_text": "希望你以后能够做的比我还好呦。"
-      },
-      "macsay": { "say_voice": "Tingting", "say_base_rate": 168 }
     }
   },
   "cosyvoice": {
-    "model_type": "cosyvoice2",
-    "synth_mode": "zero_shot",
+    "model_type": "cosyvoice",
+    "synth_mode": "sft",
     "repo_dir": "tts/vendor/CosyVoice",
-    "model_dir": "tts/models/CosyVoice2-0.5B",
+    "model_dir": "tts/models/CosyVoice-300M-SFT",
     "venv_python": "tts/.venv/bin/python",
-    "prompt_wav": "tts/assets/ref_official_female_zh.wav",
-    "prompt_text": "希望你以后能够做的比我还好呦。",
+    "prompt_wav": "",
+    "prompt_text": "",
     "per_line": true,
     "seg_max_chars": 32
   }
