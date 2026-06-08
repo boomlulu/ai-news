@@ -134,13 +134,17 @@ class CosyVoiceProvider(TTSProvider):
                 has_wetext = False
         return has_tn or has_wetext
 
-    def _load_model(self):
-        md = self._model_dir()
+    def _load_model(self, model_dir=None, model_type=None):
+        # Per-voice override: a voice's `cosyvoice` block can pin its own
+        # model_dir/model_type (arrives via req.extra). Fall back to top-level
+        # config when not given. Cache keyed by the RESOLVED model_dir so the
+        # SFT v1 model (中文女) and the 0.5B v2 model coexist without reloads.
+        md = os.path.expanduser(model_dir or self._cv().get("model_dir", ""))
+        mtype = model_type or self._cv().get("model_type", "cosyvoice2")
         if md in _MODEL_CACHE:
             return _MODEL_CACHE[md]
         self._ensure_path()
         self._shimmed = _install_tn_shim_if_needed()
-        mtype = self._cv().get("model_type", "cosyvoice2")
         if mtype == "cosyvoice2":
             from cosyvoice.cli.cosyvoice import CosyVoice2 as M
             model = M(md, load_jit=False, load_trt=False, fp16=False)
@@ -183,8 +187,14 @@ class CosyVoiceProvider(TTSProvider):
             import torch
             import torchaudio
             from cosyvoice.utils.file_utils import load_wav
-            model = self._load_model()
             cv = self._cv()
+            # Per-voice model override: the voice's `cosyvoice` block may pin its
+            # own model_dir/model_type (e.g. sft 中文女 -> CosyVoice-300M-SFT v1
+            # while zero_shot voices stay on CosyVoice2-0.5B v2). mdir should
+            # already be absolute from the service; expanduser is just safety.
+            mdir = os.path.expanduser(req.extra.get("model_dir") or cv.get("model_dir", ""))
+            mtype = req.extra.get("model_type") or cv.get("model_type", "cosyvoice2")
+            model = self._load_model(mdir, mtype)
             mode = req.extra.get("mode", cv.get("synth_mode", "instruct2"))
             instruct = (req.instruct or req.extra.get("instruct")
                         or self.config.get("default_instruct", "中文普通话，年轻女性，声音甜美，语速中等偏慢，温暖如早间新闻主播。"))
@@ -225,10 +235,10 @@ class CosyVoiceProvider(TTSProvider):
                     chunks.append(pad)
 
             if mode == "sft":
-                spk = req.extra.get("spk_id", "中文女")
+                spk_id = req.extra.get("spk_id", "中文女")
                 for i, seg in enumerate(segs):
                     seg_chunks = []
-                    for o in model.inference_sft(seg, spk, stream=False, speed=speed,
+                    for o in model.inference_sft(seg, spk_id, stream=False, speed=speed,
                                                  text_frontend=tf):
                         sp = o["tts_speech"]
                         print(f"[cosyvoice] seg {i} yield speech len {sp.shape[-1]/sr:.2f}s",

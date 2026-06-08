@@ -37,8 +37,9 @@ class TTSService:
         eff_speed = speed if speed is not None else vp.get("speed", 1.0)
         eff_style = style if style is not None else vp.get("style")
         pv = dict(vp.get(provider, {}))
-        if "prompt_wav" in pv:
-            pv["prompt_wav"] = self._abs(pv["prompt_wav"])
+        for k in ("prompt_wav", "model_dir"):
+            if k in pv:
+                pv[k] = self._abs(pv[k])
         instruct = pv.pop("instruct", None) or self.config.get("default_instruct")
         merged = dict(pv)
         merged.update(extra or {})

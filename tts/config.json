@@ -4,20 +4,29 @@
   "default_instruct": "中文普通话，年轻女性，声音甜美，亲和力强，语速中等偏慢，情绪温暖但不夸张，像早间新闻简报主播，吐字清晰，适合朗读 AI 新闻。",
   "voices": {
     "sweet_female_zh": {
-      "description": "中文普通话 年轻女性 声音甜美 亲和力强 早间新闻主播 温暖不夸张",
+      "description": "默认音色：CosyVoice-300M-SFT 内置「中文女」，训练好的甜美播报女声",
+      "speed": 0.95,
+      "style": "warm_news",
+      "cosyvoice": {
+        "mode": "sft",
+        "model_dir": "tts/models/CosyVoice-300M-SFT",
+        "model_type": "cosyvoice",
+        "spk_id": "中文女"
+      },
+      "macsay": { "say_voice": "Tingting", "say_base_rate": 168 }
+    },
+    "official_female_zh": {
+      "description": "CosyVoice 官方真人女声（CosyVoice2-0.5B zero_shot 参考克隆）",
       "speed": 0.95,
       "style": "warm_news",
       "cosyvoice": {
         "mode": "zero_shot",
-        "instruct": "中文普通话，年轻女性，声音甜美，亲和力强，语速中等偏慢，情绪温暖但不夸张，像早间新闻简报主播，吐字清晰，适合朗读 AI 新闻。",
+        "model_dir": "tts/models/CosyVoice2-0.5B",
+        "model_type": "cosyvoice2",
         "prompt_wav": "tts/assets/ref_official_female_zh.wav",
-        "prompt_text": "希望你以后能够做的比我还好呦。",
-        "spk_id": "中文女"
+        "prompt_text": "希望你以后能够做的比我还好呦。"
       },
-      "macsay": {
-        "say_voice": "Tingting",
-        "say_base_rate": 168
-      }
+      "macsay": { "say_voice": "Tingting", "say_base_rate": 168 }
     }
   },
   "cosyvoice": {
