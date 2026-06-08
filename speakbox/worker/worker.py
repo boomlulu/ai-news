@@ -59,7 +59,7 @@ def log(msg: str) -> None:
     print(msg, flush=True)
 
 
-def render_to_wav(text, voice, out_path, on_progress):
+def render_to_wav(text, voice, out_path, on_progress, instruct=None):
     """Synthesize `text` with `voice` into a 24kHz mono WAV at `out_path`.
 
     Splits into sentences, synthesizes each via synth_one (which already does
@@ -73,8 +73,10 @@ def render_to_wav(text, voice, out_path, on_progress):
         pieces = []
         for i, s in enumerate(sents):
             on_progress(int(i / len(sents) * 90))
-            data, _rms = synth_one(s, i, os.path.join(tmp, f"s{i}.wav"),
-                                   voice, retries=3, thresh=0.08)
+            data, _rms = synth_one(s, i, os.path.join(tmp, f"s{i}.wav"), voice,
+                                   retries=3, thresh=0.08,
+                                   mode=("instruct2" if instruct else None),
+                                   instruct=instruct)
             if data is None:
                 continue
             pieces.append(apply_fade(data, 0.02))
@@ -173,13 +175,15 @@ def main():
             task_id = task["id"]
             text = task["text"]
             voice = task["voice"]
+            instruct = (task.get("instruct") or "").strip()
         except (ValueError, KeyError) as e:
             log(f"[warn] bad task payload from /next ({e}): {r.text[:200]}")
             time.sleep(POLL_INTERVAL_SEC)
             continue
 
+        tone_str = f" tone='{instruct[:20]}'" if instruct else ""
         log(f"[claimed] id={task_id} voice={voice} chars={len(text)} "
-            f"text='{text[:40]}{'…' if len(text) > 40 else ''}'")
+            f"text='{text[:40]}{'…' if len(text) > 40 else ''}'{tone_str}")
 
         # --- synthesize + upload ---
         out = None
@@ -193,7 +197,7 @@ def main():
             def on_progress(p, _id=task_id):
                 post_progress(_id, {"status": "generating", "progress": p})
 
-            render_to_wav(text, voice, out, on_progress)
+            render_to_wav(text, voice, out, on_progress, instruct=instruct)
 
             log(f"[uploading] id={task_id}")
             post_progress(task_id, {"status": "uploading"})

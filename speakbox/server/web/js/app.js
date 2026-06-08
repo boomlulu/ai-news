@@ -8,12 +8,51 @@
     form: document.getElementById("task-form"),
     text: document.getElementById("text"),
     voice: document.getElementById("voice"),
+    tone: document.getElementById("tone"),
+    toneDel: document.getElementById("tone-del"),
+    customTone: document.getElementById("customTone"),
     submit: document.getElementById("submit"),
     formError: document.getElementById("form-error"),
     count: document.getElementById("count"),
     list: document.getElementById("tasks"),
     conn: document.getElementById("conn"),
   };
+
+  // ── tone presets + custom tones (localStorage) ──────────────────────────────
+  var TONE_PRESETS = [
+    { label: "默认（原声·不加情绪）", instruct: "" },
+    { label: "恋人撒娇（奶声奶气·尾音拖长）", instruct: "像跟恋人撒娇那样，奶声奶气、娇滴滴地说，尾音拖长" },
+    { label: "嗲嗲撒娇（慢而软）", instruct: "用嗲嗲的、撒娇黏人的语气，慢一点、软一点说" },
+    { label: "温柔甜腻", instruct: "温柔甜腻，黏人撒娇，语速放慢，语气上扬" },
+    { label: "开心活泼", instruct: "用开心、活泼、上扬的语气，语速稍快地说" },
+    { label: "严肃播音", instruct: "用严肃、正式、沉稳的新闻播报语气说" },
+  ];
+
+  var CUSTOM_KEY = "speakbox_custom_tones";
+  var TONE_CUSTOM_VALUE = "__custom__"; // value of the "✏️ 自定义…" option
+
+  function loadCustomTones() {
+    try {
+      var raw = localStorage.getItem(CUSTOM_KEY);
+      if (!raw) return [];
+      var arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) return [];
+      return arr.filter(function (s) { return typeof s === "string" && s.trim(); });
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function saveCustomTones(arr) {
+    try {
+      localStorage.setItem(CUSTOM_KEY, JSON.stringify(arr));
+    } catch (err) {}
+  }
+
+  function truncate(s, n) {
+    s = String(s);
+    return s.length > n ? s.slice(0, n) + "…" : s;
+  }
 
   var STATUS_LABEL = {
     pending: "排队中",
@@ -37,6 +76,99 @@
         });
       })
       .catch(function () {});
+  }
+
+  // ── tone select: presets + saved customs + "custom…" entry ──────────────────
+  function buildToneSelect() {
+    els.tone.innerHTML = "";
+
+    TONE_PRESETS.forEach(function (p) {
+      var opt = document.createElement("option");
+      opt.value = "preset:" + p.instruct; // unique enough; instruct read from dataset
+      opt.textContent = p.label;
+      opt.dataset.instruct = p.instruct;
+      els.tone.appendChild(opt);
+    });
+
+    var customs = loadCustomTones();
+    if (customs.length) {
+      var group = document.createElement("optgroup");
+      group.label = "我的自定义";
+      group.id = "tone-custom-group";
+      customs.forEach(function (instruct) {
+        group.appendChild(makeCustomOption(instruct));
+      });
+      els.tone.appendChild(group);
+    }
+
+    var customEntry = document.createElement("option");
+    customEntry.value = TONE_CUSTOM_VALUE;
+    customEntry.textContent = "✏️ 自定义…";
+    els.tone.appendChild(customEntry);
+  }
+
+  function makeCustomOption(instruct) {
+    var opt = document.createElement("option");
+    opt.value = "custom:" + instruct;
+    opt.textContent = truncate(instruct, 24);
+    opt.dataset.instruct = instruct;
+    opt.dataset.saved = "1";
+    return opt;
+  }
+
+  // Append a newly-saved custom into the optgroup (create the group if absent),
+  // inserting before the "✏️ 自定义…" entry. Returns the new option.
+  function addCustomToSelect(instruct) {
+    var group = document.getElementById("tone-custom-group");
+    if (!group) {
+      group = document.createElement("optgroup");
+      group.label = "我的自定义";
+      group.id = "tone-custom-group";
+      var entry = els.tone.querySelector('option[value="' + TONE_CUSTOM_VALUE + '"]');
+      els.tone.insertBefore(group, entry);
+    }
+    var opt = makeCustomOption(instruct);
+    group.appendChild(opt);
+    return opt;
+  }
+
+  // Reflect UI state for the current tone selection: show/hide the custom input
+  // and the delete button.
+  function syncToneUI() {
+    var sel = els.tone.options[els.tone.selectedIndex];
+    var isCustomEntry = els.tone.value === TONE_CUSTOM_VALUE;
+    var isSaved = sel && sel.dataset.saved === "1";
+
+    els.customTone.hidden = !isCustomEntry;
+    els.toneDel.hidden = !isSaved;
+  }
+
+  els.tone.addEventListener("change", syncToneUI);
+
+  els.toneDel.addEventListener("click", function () {
+    var sel = els.tone.options[els.tone.selectedIndex];
+    if (!sel || sel.dataset.saved !== "1") return;
+    var instruct = sel.dataset.instruct || "";
+
+    var customs = loadCustomTones().filter(function (s) { return s !== instruct; });
+    saveCustomTones(customs);
+
+    var group = sel.parentNode;
+    group.removeChild(sel);
+    if (group.id === "tone-custom-group" && !group.querySelector("option")) {
+      group.parentNode.removeChild(group);
+    }
+    els.tone.selectedIndex = 0; // fall back to default
+    syncToneUI();
+  });
+
+  // Resolve the instruct string for the current selection.
+  function currentInstruct() {
+    if (els.tone.value === TONE_CUSTOM_VALUE) {
+      return els.customTone.value.trim();
+    }
+    var sel = els.tone.options[els.tone.selectedIndex];
+    return (sel && sel.dataset.instruct) || "";
   }
 
   // ── tasks: initial fetch + incremental upsert ───────────────────────────────
@@ -68,6 +200,10 @@
       '<span class="badge badge-' + t.status + '">' + statusLabel + "</span>" +
       "</div>" +
       '<div class="task-meta">' + esc(t.voice) + " · " + esc(t.created_at) + "</div>";
+
+    if (t.instruct) {
+      html += '<div class="task-tone">语气：' + esc(truncate(t.instruct, 60)) + "</div>";
+    }
 
     if (t.status === "generating" || t.status === "uploading" || t.status === "pending") {
       html +=
@@ -173,11 +309,26 @@
       return;
     }
 
+    var instruct = currentInstruct();
+
+    // If the user typed a fresh custom tone, persist + add it to the select.
+    if (els.tone.value === TONE_CUSTOM_VALUE && instruct) {
+      var customs = loadCustomTones();
+      if (customs.indexOf(instruct) === -1) {
+        customs.push(instruct);
+        saveCustomTones(customs);
+        var opt = addCustomToSelect(instruct);
+        els.tone.value = opt.value; // select the now-saved tone
+        els.customTone.value = "";
+        syncToneUI();
+      }
+    }
+
     els.submit.disabled = true;
     fetch("/api/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: text, voice: voice }),
+      body: JSON.stringify({ text: text, voice: voice, instruct: instruct }),
     })
       .then(function (r) {
         return r.json().then(function (body) { return { ok: r.ok, body: body }; });
@@ -201,6 +352,8 @@
 
   // ── boot ────────────────────────────────────────────────────────────────────
   loadVoices();
+  buildToneSelect();
+  syncToneUI();
   loadTasks();
   connect();
 })();

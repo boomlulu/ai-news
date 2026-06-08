@@ -31,8 +31,9 @@ func (h *Handler) listVoices(w http.ResponseWriter, _ *http.Request) {
 }
 
 type createTaskReq struct {
-	Text  string `json:"text"`
-	Voice string `json:"voice"`
+	Text     string `json:"text"`
+	Voice    string `json:"voice"`
+	Instruct string `json:"instruct"`
 }
 
 // createTask validates the request and enqueues a pending task.
@@ -56,8 +57,13 @@ func (h *Handler) createTask(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "invalid voice")
 		return
 	}
+	instruct := strings.TrimSpace(req.Instruct)
+	if utf8.RuneCountInString(instruct) > 200 {
+		writeErr(w, http.StatusBadRequest, "instruct too long")
+		return
+	}
 
-	id := h.store.Create(text, req.Voice)
+	id := h.store.Create(text, req.Voice, instruct)
 	writeJSON(w, http.StatusCreated, map[string]int{"id": id})
 }
 

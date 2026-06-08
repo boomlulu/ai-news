@@ -88,6 +88,46 @@ select:focus {
   color: var(--muted);
 }
 
+.tone-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tone-row select { flex: 1; }
+
+.tone-del {
+  background: transparent;
+  color: var(--err);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tone-del:hover { background: rgba(224, 89, 79, 0.12); }
+
+#customTone {
+  width: 100%;
+  margin-top: 10px;
+  background: var(--card-2);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+#customTone:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+[hidden] { display: none !important; }
+
 .row {
   display: flex;
   align-items: center;
@@ -155,6 +195,16 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .task-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+.task-tone {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--accent);
+  background: rgba(108, 140, 255, 0.12);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
 
 .badge {
   font-size: 12px;

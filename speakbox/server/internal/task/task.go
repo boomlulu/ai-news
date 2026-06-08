@@ -29,6 +29,7 @@ type Task struct {
 	ID        int    `json:"id"`
 	Text      string `json:"text"`
 	Voice     string `json:"voice"`
+	Instruct  string `json:"instruct"`
 	Status    string `json:"status"`
 	Progress  int    `json:"progress"`
 	Error     string `json:"error"`
@@ -75,12 +76,13 @@ func (s *Store) publishBytes(b []byte) {
 
 // Create makes a new pending task, enqueues it, broadcasts it, and returns the
 // new id.
-func (s *Store) Create(text, voice string) int {
+func (s *Store) Create(text, voice, instruct string) int {
 	id := int(s.nextID.Add(1))
 	t := &Task{
 		ID:        id,
 		Text:      text,
 		Voice:     voice,
+		Instruct:  instruct,
 		Status:    StatusPending,
 		Progress:  0,
 		Error:     "",
@@ -132,9 +134,10 @@ func (s *Store) Get(id int) (*Task, bool) {
 
 // Claimed is the payload returned to a worker that dequeues a task.
 type Claimed struct {
-	ID    int    `json:"id"`
-	Text  string `json:"text"`
-	Voice string `json:"voice"`
+	ID       int    `json:"id"`
+	Text     string `json:"text"`
+	Voice    string `json:"voice"`
+	Instruct string `json:"instruct"`
 }
 
 // Next atomically dequeues the head pending task, flips it to generating with
@@ -151,7 +154,7 @@ func (s *Store) Next() (*Claimed, bool) {
 		}
 		t.Status = StatusGenerating
 		t.Progress = 0
-		claim := &Claimed{ID: t.ID, Text: t.Text, Voice: t.Voice}
+		claim := &Claimed{ID: t.ID, Text: t.Text, Voice: t.Voice, Instruct: t.Instruct}
 		b := marshalLocked(t)
 		s.mu.Unlock()
 		s.publishBytes(b)

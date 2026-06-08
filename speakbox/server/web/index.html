@@ -24,6 +24,14 @@
           <span class="label">音色</span>
           <select id="voice"></select>
         </label>
+        <label class="field">
+          <span class="label">语气</span>
+          <div class="tone-row">
+            <select id="tone"></select>
+            <button type="button" id="tone-del" class="tone-del" title="删除此自定义语气" hidden>✕ 删除</button>
+          </div>
+          <input id="customTone" maxlength="200" placeholder="描述语气，如：用慵懒沙哑的语气说" hidden />
+        </label>
         <div class="row">
           <button type="submit" id="submit">生成语音</button>
           <span id="form-error" class="form-error"></span>

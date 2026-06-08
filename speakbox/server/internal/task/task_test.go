@@ -43,7 +43,7 @@ func TestStoreConcurrent(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for n := 0; n < perWorker; n++ {
-				id := s.Create("hello world", "qikou")
+				id := s.Create("hello world", "qikou", "")
 
 				// Mutate the freshly-created task concurrently with other
 				// workers' Creates/Next/reads on shared *Task pointers.
