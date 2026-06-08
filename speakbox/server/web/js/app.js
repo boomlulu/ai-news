@@ -9,6 +9,7 @@
     text: document.getElementById("text"),
     voice: document.getElementById("voice"),
     tone: document.getElementById("tone"),
+    toneSave: document.getElementById("tone-save"),
     toneDel: document.getElementById("tone-del"),
     customTone: document.getElementById("customTone"),
     submit: document.getElementById("submit"),
@@ -30,6 +31,7 @@
 
   var CUSTOM_KEY = "speakbox_custom_tones";
   var TONE_CUSTOM_VALUE = "__custom__"; // value of the "✏️ 自定义…" option
+  var editingOrig = null; // original instruct of the saved custom being edited (null = new)
 
   function loadCustomTones() {
     try {
@@ -132,15 +134,36 @@
     return opt;
   }
 
-  // Reflect UI state for the current tone selection: show/hide the custom input
-  // and the delete button.
+  // Reflect UI state for the current tone selection: show/hide the custom input,
+  // the save button (new vs edit) and the delete button. Also tracks editingOrig.
   function syncToneUI() {
     var sel = els.tone.options[els.tone.selectedIndex];
     var isCustomEntry = els.tone.value === TONE_CUSTOM_VALUE;
     var isSaved = sel && sel.dataset.saved === "1";
 
-    els.customTone.hidden = !isCustomEntry;
-    els.toneDel.hidden = !isSaved;
+    if (isCustomEntry) {
+      // "✏️ 自定义…": empty editable input, "保存" creates a new tone.
+      els.customTone.hidden = false;
+      els.customTone.value = "";
+      els.toneSave.hidden = false;
+      els.toneSave.textContent = "💾 保存";
+      els.toneDel.hidden = true;
+      editingOrig = null;
+    } else if (isSaved) {
+      // A saved custom: prefill its instruct, "保存修改" updates it, del removes.
+      els.customTone.hidden = false;
+      els.customTone.value = sel.dataset.instruct || "";
+      els.toneSave.hidden = false;
+      els.toneSave.textContent = "💾 保存修改";
+      els.toneDel.hidden = false;
+      editingOrig = sel.dataset.instruct || "";
+    } else {
+      // Preset / default: no editing affordances.
+      els.customTone.hidden = true;
+      els.toneSave.hidden = true;
+      els.toneDel.hidden = true;
+      editingOrig = null;
+    }
   }
 
   els.tone.addEventListener("change", syncToneUI);
@@ -162,12 +185,46 @@
     syncToneUI();
   });
 
-  // Resolve the instruct string for the current selection.
+  // Select the saved-custom option whose instruct matches `text`; if none, fall
+  // back to the first option (default).
+  function selectToneByInstruct(text) {
+    var opts = els.tone.options;
+    for (var i = 0; i < opts.length; i++) {
+      if (opts[i].dataset.saved === "1" && opts[i].dataset.instruct === text) {
+        els.tone.selectedIndex = i;
+        return;
+      }
+    }
+    els.tone.selectedIndex = 0;
+  }
+
+  // Persist the current input text as a custom tone. When editing an existing
+  // saved tone (editingOrig set and changed), replace it; otherwise add it.
+  // Rebuilds the select and re-selects the persisted tone.
+  function persistCustom() {
+    var text = els.customTone.value.trim();
+    if (!text) return;
+    var customs = loadCustomTones();
+    if (editingOrig && editingOrig !== text) {
+      customs = customs.filter(function (s) { return s !== editingOrig; });
+    }
+    if (customs.indexOf(text) === -1) customs.push(text);
+    saveCustomTones(customs);
+    buildToneSelect();
+    selectToneByInstruct(text);
+    editingOrig = text;
+    syncToneUI();
+  }
+
+  els.toneSave.addEventListener("click", persistCustom);
+
+  // Resolve the instruct string for the current selection. For both the
+  // "✏️ 自定义…" entry and a saved custom, read the live (possibly edited) input.
   function currentInstruct() {
-    if (els.tone.value === TONE_CUSTOM_VALUE) {
+    var sel = els.tone.options[els.tone.selectedIndex];
+    if (els.tone.value === TONE_CUSTOM_VALUE || (sel && sel.dataset.saved === "1")) {
       return els.customTone.value.trim();
     }
-    var sel = els.tone.options[els.tone.selectedIndex];
     return (sel && sel.dataset.instruct) || "";
   }
 
@@ -311,17 +368,13 @@
 
     var instruct = currentInstruct();
 
-    // If the user typed a fresh custom tone, persist + add it to the select.
-    if (els.tone.value === TONE_CUSTOM_VALUE && instruct) {
-      var customs = loadCustomTones();
-      if (customs.indexOf(instruct) === -1) {
-        customs.push(instruct);
-        saveCustomTones(customs);
-        var opt = addCustomToSelect(instruct);
-        els.tone.value = opt.value; // select the now-saved tone
-        els.customTone.value = "";
-        syncToneUI();
-      }
+    // Auto-save the custom tone on submit: a freshly typed one is added, an
+    // edited saved one is replaced. persistCustom reads the live input value.
+    var sel = els.tone.options[els.tone.selectedIndex];
+    var isCustomCtx =
+      els.tone.value === TONE_CUSTOM_VALUE || (sel && sel.dataset.saved === "1");
+    if (isCustomCtx && instruct) {
+      persistCustom();
     }
 
     els.submit.disabled = true;
