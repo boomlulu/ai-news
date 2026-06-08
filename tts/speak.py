@@ -58,7 +58,7 @@ def end_rms(x: np.ndarray, ms: int = 50) -> float:
 
 
 def synth_one(sent: str, i: int, out_path: str, voice: str,
-              retries: int, thresh: float):
+              retries: int, thresh: float, mode=None, instruct=None):
     """Synthesize ONE sentence, re-synthesizing if the 句尾 looks truncated.
 
     Each synth pass advances the in-process RNG → a different deterministic
@@ -71,12 +71,17 @@ def synth_one(sent: str, i: int, out_path: str, voice: str,
     """
     best = None
     best_rms = float("inf")
+    extra = {}
+    if mode:
+        extra["mode"] = mode
+    if instruct:
+        extra["instruct"] = instruct
     for attempt in range(1 + retries):
         t0 = time.monotonic()
         try:
             res = tts_service.synthesize(
                 text=sent, output_path=out_path,
-                provider="cosyvoice", voice=voice, fallback="",
+                provider="cosyvoice", voice=voice, fallback="", **extra,
             )
         except Exception as e:  # noqa: BLE001 — never kill the producer
             log(f"[gen] seg{i} attempt{attempt+1} EXCEPTION "
