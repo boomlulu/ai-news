@@ -22,8 +22,7 @@
 
 | key | 说明 | 模式 |
 |---|---|---|
-| `my_voice_zh` | 我的克隆音色 | zero_shot |
-| `sweet_female_zh` | 甜美女声 | SFT 中文女 |
+| `my_voice_zh` | 我的克隆音色 | CosyVoice2-0.5B zero_shot |
 
 `GET /api/voices` 返回可用音色列表，网页下拉框据此渲染。
 

@@ -15,8 +15,7 @@ const maxRunes = 100
 
 // validVoices is the static allowlist; mirror it in listVoices.
 var validVoices = map[string]bool{
-	"my_voice_zh":     true,
-	"sweet_female_zh": true,
+	"my_voice_zh": true,
 }
 
 type voiceOption struct {
@@ -28,7 +27,6 @@ type voiceOption struct {
 func (h *Handler) listVoices(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, []voiceOption{
 		{ID: "my_voice_zh", Label: "我的克隆音色"},
-		{ID: "sweet_female_zh", Label: "甜美女声"},
 	})
 }
 
