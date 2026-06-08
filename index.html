@@ -164,7 +164,7 @@
     }
 
     .date-menu::before {
-      content: "往期";
+      content: "时间轴";
       padding: 6px 0;
       border-bottom: 2px solid var(--ink);
       color: var(--red);
@@ -193,6 +193,23 @@
       border-color: var(--red);
       background: var(--red);
       color: white;
+    }
+
+    .date-menu .grp {
+      margin-top: 5px;
+      padding: 2px 0 3px;
+      border-bottom: 1px dashed var(--line-strong);
+      color: var(--red);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      font-size: 9px;
+      font-weight: 950;
+      letter-spacing: 1px;
+      text-align: center;
+      line-height: 1;
+    }
+
+    .date-menu .grp:first-of-type {
+      margin-top: 0;
     }
 
     .progress {
@@ -790,11 +807,14 @@
 
     <aside class="date-drawer" aria-label="日期切换抽屉">
       <button class="date-handle" type="button" aria-label="展开日期列表">日期</button>
-      <nav class="date-menu" aria-label="按日期切换新闻">
-        <a href="archive/index.html" aria-label="查看 历史归档">归档</a>
+      <nav class="date-menu" aria-label="按时间层级切换新闻">
+        <span class="grp">三天</span>
         <a href="archive/2026-06-07.html" aria-label="查看 2026-06-07 新闻">06-07</a>
         <a class="active" href="index.html" aria-current="page" aria-label="当前 2026-06-08 新闻">06-08</a>
-        <a href="#" aria-label="下一期预告">预告</a>
+        <span class="grp">三月</span>
+        <a href="archive/大事件/index.html#month" aria-label="查看 最近三月 大事件">月度</a>
+        <span class="grp">几年</span>
+        <a href="archive/大事件/index.html#year" aria-label="查看 最近几年 大事件">年度</a>
       </nav>
     </aside>
 

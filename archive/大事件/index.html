@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d12">
+<title>AI 大事件 · 月度 / 年度</title>
+<style>
+  :root{
+    --bg:#0b0d12;--card:rgba(255,255,255,.05);--line:rgba(255,255,255,.10);
+    --txt:#e8ecf4;--sub:#9aa3b8;--accent:#5b8cff;
+    --policy:#ff453a;--research:#bf5af2;--product:#30d158;--gold:#ffd60a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(91,140,255,.10), transparent 60%),var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:600px;margin:0 auto;padding:30px 16px 56px;}
+  .kicker{font-size:13px;color:var(--accent);letter-spacing:2px;font-weight:800;}
+  h1.page{font-size:27px;margin:8px 0 4px;font-weight:800;letter-spacing:-.5px;}
+  .lede{color:var(--sub);font-size:14px;line-height:1.6;margin:0 0 18px;}
+  .nav{display:flex;gap:14px;margin-bottom:22px;}
+  .nav a{color:var(--accent);text-decoration:none;font-size:14px;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+  .tab{font-size:13px;font-weight:700;color:var(--sub);background:var(--card);
+    border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;}
+  .tab.active{color:var(--txt);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset;}
+  .filecard{background:var(--card);border:1px solid var(--line);border-radius:22px;
+    padding:20px 18px;margin-bottom:18px;backdrop-filter:blur(20px) saturate(160%);
+    -webkit-backdrop-filter:blur(20px) saturate(160%);
+    box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 14px 40px rgba(0,0,0,.35);}
+  .filecard > h2.file{font-size:20px;font-weight:800;margin:0 0 4px;letter-spacing:-.3px;}
+  .filecard .note{color:var(--sub);font-size:13px;line-height:1.6;border-left:2px solid var(--line);
+    padding-left:12px;margin:10px 0 4px;}
+  .event{border-top:1px solid var(--line);padding-top:14px;margin-top:14px;}
+  .event:first-of-type{border-top:0;margin-top:6px;}
+  .event .meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+  .event .date{font-size:12px;color:var(--sub);font-variant-numeric:tabular-nums;}
+  .event .cat{font-size:11px;font-weight:800;letter-spacing:.5px;padding:2px 9px;border-radius:999px;
+    background:rgba(91,140,255,.16);color:var(--accent);}
+  .cat.c-policy{background:rgba(255,69,58,.16);color:#ff6b61;}
+  .cat.c-research{background:rgba(191,90,242,.16);color:#cd8bff;}
+  .cat.c-product{background:rgba(48,209,88,.16);color:#5fe086;}
+  .event h3{font-size:17px;font-weight:700;margin:0 0 6px;line-height:1.35;}
+  .event p{margin:5px 0;font-size:14.5px;line-height:1.62;color:#dfe4ef;}
+  .event p.why{color:var(--sub);}
+  .event p.why b,.event p.src b{color:var(--txt);font-weight:700;}
+  .event b{color:#fff;}
+  .empty{color:var(--sub);font-size:14px;text-align:center;padding:30px 0;}
+  .err{color:var(--sub);font-size:12px;text-align:center;padding:20px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">AI 每日精选</div>
+  <h1 class="page">大事件 · 长期记忆</h1>
+  <p class="lede">日报之外的分层归档：过 3 天的进「每月大事件」，过 3 个月的归入「每年大事件」，逐层只留经得起时间的条目。</p>
+  <div class="nav">
+    <a href="../index.html">← 历史归档</a>
+    <a href="../../index.html">今日最新 →</a>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div id="content"><div class="err">加载中…</div></div>
+</div>
+
+<script>
+(function(){
+  var content = document.getElementById('content');
+  var tabsEl = document.getElementById('tabs');
+
+  function pad(n){return n<10?'0'+n:''+n;}
+
+  // 以"今天"为准，算出滚动窗口要展示的文件
+  var now = new Date();
+  var Y = now.getFullYear(), M = now.getMonth()+1;
+  var months = [];                 // 最近 3 个自然月
+  for(var i=0;i<3;i++){
+    var d = new Date(Y, M-1-i, 1);
+    months.push({key:d.getFullYear()+'-'+pad(d.getMonth()+1),
+                 label:d.getFullYear()+' 年 '+(d.getMonth()+1)+' 月',
+                 file:d.getFullYear()+'-'+pad(d.getMonth()+1)+'.md', type:'month'});
+  }
+  var years = [];                  // 当年 + 去年（若存在）
+  [Y, Y-1].forEach(function(y){
+    years.push({key:''+y, label:y+' 年度', file:y+'.md', type:'year'});
+  });
+
+  var CATMAP = {'政策':'policy','监管':'policy','安全':'policy',
+                '研究':'research','论文':'research','模型':'research','开源':'research',
+                '产品':'product','商业':'product','落地':'product','平台':'product'};
+
+  // 极简 markdown 解析：把 .md 文本转成结构
+  function parseMd(text){
+    var lines = text.replace(/\r/g,'').split('\n');
+    var title='', notes=[], events=[], cur=null, headerDone=false;
+    function flush(){ if(cur){events.push(cur);cur=null;} }
+    for(var i=0;i<lines.length;i++){
+      var ln = lines[i];
+      var t = ln.trim();
+      if(t==='') continue;
+      if(t.indexOf('# ')===0 && t.indexOf('## ')!==0){ title = t.slice(2).trim(); continue; }
+      if(t.indexOf('## ')===0){
+        flush();
+        var head = t.slice(3).trim();           // 日期 ｜ 分类 ｜ 标题
+        var parts = head.split(/\s*[｜|]\s*/);
+        cur = {date:parts[0]||'', cat:parts[1]||'', title:parts.slice(2).join(' ')||head, body:[]};
+        headerDone = true;
+        continue;
+      }
+      if(t.indexOf('>')===0){ if(!headerDone) notes.push(t.replace(/^>\s?/,'')); continue; }
+      if(cur){ cur.body.push(t.replace(/^[-*]\s+/,'')); }
+    }
+    flush();
+    return {title:title, notes:notes, events:events};
+  }
+
+  function inline(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+  }
+
+  function renderEvent(ev){
+    var cls = CATMAP[(ev.cat||'').trim()] || '';
+    var html = '<div class="event">';
+    html += '<div class="meta">';
+    if(ev.date) html += '<span class="date">'+inline(ev.date)+'</span>';
+    if(ev.cat)  html += '<span class="cat'+(cls?' c-'+cls:'')+'">'+inline(ev.cat)+'</span>';
+    html += '</div>';
+    html += '<h3>'+inline(ev.title)+'</h3>';
+    ev.body.forEach(function(line){
+      if(/^为什么重要/.test(line)){
+        html += '<p class="why"><b>为什么重要</b>'+inline(line.replace(/^为什么重要[：:]\s*/,'：'))+'</p>';
+      } else if(/^来源/.test(line)){
+        html += '<p class="src" style="font-size:12.5px;color:var(--sub)"><b>来源</b>'+inline(line.replace(/^来源[：:]\s*/,'：'))+'</p>';
+      } else {
+        html += '<p>'+inline(line)+'</p>';
+      }
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function renderFile(src){
+    var data = parseMd(src);
+    var html = '<div class="filecard">';
+    html += '<h2 class="file">'+inline(data.title||'')+'</h2>';
+    data.notes.forEach(function(n){ html += '<div class="note">'+inline(n)+'</div>'; });
+    if(data.events.length===0){
+      // 没有结构化条目时，notes 已展示「暂无」说明
+      if(data.notes.length===0) html += '<div class="empty">暂无条目</div>';
+    } else {
+      data.events.forEach(function(ev){ html += renderEvent(ev); });
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function fetchMd(item){
+    return fetch(item.file, {cache:'no-store'})
+      .then(function(r){ return r.ok ? r.text() : null; })
+      .then(function(txt){ return {item:item, txt:txt}; })
+      .catch(function(){ return {item:item, txt:null}; });
+  }
+
+  var groups = {month:months, year:years};
+  var state = {tab:'month'};
+
+  function show(tab){
+    state.tab = tab;
+    Array.prototype.forEach.call(tabsEl.children, function(b){
+      b.classList.toggle('active', b.dataset.tab===tab);
+    });
+    content.innerHTML = '<div class="err">加载中…</div>';
+    var items = groups[tab];
+    Promise.all(items.map(fetchMd)).then(function(results){
+      var html = '';
+      results.forEach(function(res){
+        if(res.txt!=null && res.txt.trim()!=='') html += renderFile(res.txt);
+      });
+      content.innerHTML = html || '<div class="empty">该范围暂无大事件归档。</div>';
+    });
+  }
+
+  // 建标签
+  [['month','月度大事件'],['year','年度大事件']].forEach(function(t){
+    var b = document.createElement('div');
+    b.className='tab'; b.dataset.tab=t[0]; b.textContent=t[1];
+    b.onclick=function(){show(t[0]);};
+    tabsEl.appendChild(b);
+  });
+
+  function tabFromHash(){ return location.hash.replace('#','')==='year' ? 'year' : 'month'; }
+  show(tabFromHash());
+  window.addEventListener('hashchange', function(){ show(tabFromHash()); });
+})();
+</script>
+</body>
+</html>
