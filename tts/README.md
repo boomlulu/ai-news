@@ -170,25 +170,27 @@ print(res.ok, res.provider, res.audio_path, res.error)
 | 隔离 venv | `tts/.venv`（python `tts/.venv/bin/python`） |
 | 参考音 | `tts/assets/ref_sweet_female_zh.wav` |
 | 报纸 HTML | `archive/YYYY-MM-DD.html` |
-| 播报稿 | `tts/samples/daily-ai-news-YYYY-MM-DD-script.txt` |
-| 音频 | `tts/samples/daily-ai-news-YYYY-MM-DD.wav`（或 `.mp3`） |
+| 字段存档稿(full) | `tts/samples/daily-ai-news-YYYY-MM-DD-script.txt` |
+| 口播稿(broadcast, TTS 读这份) | `tts/samples/daily-ai-news-YYYY-MM-DD-broadcast.txt` |
+| 音频 | `tts/samples/daily-ai-news-YYYY-MM-DD.wav`（或 `.mp3`，`--text-path` 来源为 broadcast 稿） |
 
 ## 接每天 6:05 流程（仅文档，不改 SKILL.md）
 
-日报生成出 `archive/YYYY-MM-DD.html` 之后，在现有流程末尾追加两条命令即可：
+日报生成出 `archive/YYYY-MM-DD.html` 之后，在现有流程末尾追加三段命令即可：
 
 ```bash
 DATE=$(date +%F)
-python3 -m tts.scriptgen \
-  --html archive/${DATE}.html \
-  --out  tts/samples/daily-ai-news-${DATE}-script.txt
-
-python3 -m tts.tts_service \
-  --text-path tts/samples/daily-ai-news-${DATE}-script.txt \
-  --out       tts/samples/daily-ai-news-${DATE}.mp3
+# 1) full 字段存档稿（确定性，仅存档，TTS 不读它）
+python3 -m tts.scriptgen --html archive/${DATE}.html --out tts/samples/daily-ai-news-${DATE}-script.txt
+# 2) 高密度口播稿（LLM 事实降调改写；claude 不可用时自动回退字段稿）
+python3 -m tts.broadcast_rewrite --script tts/samples/daily-ai-news-${DATE}-script.txt --out tts/samples/daily-ai-news-${DATE}-broadcast.txt
+# 3) 合成音频（TTS 只读 broadcast 版）
+python3 -m tts.tts_service --text-path tts/samples/daily-ai-news-${DATE}-broadcast.txt --out tts/samples/daily-ai-news-${DATE}.mp3
 ```
 
-未装 CosyVoice 时第二步会自动 fallback 到 macsay，仍能产出音频，不会中断定时任务。
+口播稿降调规则的唯一真源是 `tts/broadcast_prompt.md`（含「事实降调 pass」）；每日 6:05 agent 直接据此写 broadcast 稿，`broadcast_rewrite.py` 供补跑历史期 / 纯 shell 流程。
+
+未装 CosyVoice 时第三步会自动 fallback 到 macsay，仍能产出音频，不会中断定时任务。
 
 ## 字段映射表（HTML class -> 播报稿字段）
 
