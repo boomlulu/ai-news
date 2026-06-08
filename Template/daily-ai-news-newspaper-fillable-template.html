@@ -681,9 +681,10 @@
       height: 7px;
       border-radius: 999px;
       background: rgba(17, 17, 17, .24);
+      cursor: pointer;
     }
 
-    .dots i:first-child {
+    .dots i.on {
       width: 18px;
       background: var(--red);
     }
@@ -1049,6 +1050,39 @@
         if (startX < 28 && dx > 42 && dy < 50) open();
         if (drawer.classList.contains("open") && dx < -36 && dy < 50) close();
       }, { passive: true });
+
+      // —— 横滑面板页码器：圆点可点 + 高亮跟随 + 滚轮转横向（到头放行竖滑）——
+      document.querySelectorAll(".h-scroll").forEach((scroller) => {
+        const inner = scroller.closest(".slide-inner");
+        const dots = inner ? inner.querySelector(".dots") : null;
+        const items = dots ? Array.from(dots.querySelectorAll("i")) : [];
+        const panels = Array.from(scroller.children);
+        const count = panels.length;
+        const indexNow = () => Math.round(scroller.scrollLeft / scroller.clientWidth);
+        const go = (i) => {
+          const p = panels[Math.max(0, Math.min(count - 1, i))];
+          if (p) p.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+        };
+        const sync = () => {
+          const i = indexNow();
+          items.forEach((d, di) => d.classList.toggle("on", di === i));
+        };
+        items.forEach((dot, i) => dot.addEventListener("click", () => go(i)));
+        scroller.addEventListener("scroll", sync, { passive: true });
+        sync();
+        let lock = false;
+        scroller.addEventListener("wheel", (e) => {
+          if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return; // 触控板横滑交给原生
+          const i = indexNow();
+          const next = i + (e.deltaY > 0 ? 1 : -1);
+          if (next < 0 || next > count - 1) return; // 到头放行竖向翻页
+          e.preventDefault();
+          if (lock) return;
+          lock = true;
+          go(next);
+          setTimeout(() => { lock = false; }, 340);
+        }, { passive: false });
+      });
     })();
   </script>
 </body>
