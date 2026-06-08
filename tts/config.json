@@ -17,14 +17,14 @@
     },
     "my_voice_zh": {
       "description": "用户本人声音克隆（来源 bilibili 录音，demucs 人声分离 30s 参考）；CosyVoice2-0.5B zero_shot",
-      "speed": 0.95,
+      "speed": 1.0,
       "style": "warm_news",
       "cosyvoice": {
         "mode": "zero_shot",
         "model_dir": "tts/models/CosyVoice2-0.5B",
         "model_type": "cosyvoice2",
         "prompt_wav": "tts/assets/ref_my_voice_zh_prompt.wav",
-        "prompt_text": "所以传统里就很少有绿色为底色的审美设计。审美这方面，各个国家都有自己的传统，这一点还是蛮有意思的。"
+        "prompt_text": "这次罗斯凯利法的场景从设计到布局到致敬再到配色还有光追等技术的提高都太全面了"
       },
       "macsay": { "say_voice": "Tingting", "say_base_rate": 168 }
     }

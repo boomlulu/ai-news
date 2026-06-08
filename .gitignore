@@ -18,6 +18,10 @@ tts/samples/voicetest/
 tts/samples/_excerpt.txt
 tts/samples/*-macsay.mp3
 tts/install.log
-# 用户克隆音色参考音频：大/含版权来源/可重生成，不入库（含 config 引用的 prompt wav）
+# 用户克隆音色参考音频：大/含版权来源/可重生成，不入库（含 30s 归档源）
 tts/assets/*.wav
+# prompt 选型备选切片（同源 bilibili 录音）：本地备查，不入库
+tts/assets/prompt_candidates/
+# 例外：config 实际引用的正式 prompt 必须入库，保证配置自洽可复现
+!tts/assets/ref_my_voice_zh_prompt.wav
 Template/*.m4a
