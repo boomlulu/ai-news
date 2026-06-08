@@ -33,11 +33,77 @@ CHANNELS = 1
 # write to soundcard in fixed-size blocks so a long sentence can't hog the
 # stream and we get tight underrun accounting.
 WRITE_BLOCK = 2400  # 0.1s @ 24kHz
+# end-of-sentence energy above this (end-50ms RMS on RAW audio) = the model
+# truncated the 句尾 (deterministic on某些 fixed-seed synth passes). Measured:
+# clean tails ~0.029/0.002/0.0009, truncated ~0.318/0.377/0.398/0.86 → 0.08 splits.
+TAIL_RMS_THRESH = 0.08
 
 
 def log(msg: str) -> None:
     """Human metrics/logs → stderr (stdout stays clean of audio)."""
     print(msg, file=sys.stderr, flush=True)
+
+
+def end_rms(x: np.ndarray, ms: int = 50) -> float:
+    """RMS of the last `ms` milliseconds of a float32 array @ SAMPLE_RATE.
+    High value = energy still ramping at the cut → 句尾 truncated. 0.0 if empty."""
+    x = np.ascontiguousarray(x, dtype="float32").reshape(-1)
+    if x.size == 0:
+        return 0.0
+    n = min(len(x), int(ms / 1000.0 * SAMPLE_RATE))
+    if n <= 0:
+        return 0.0
+    tail = x[-n:]
+    return float(np.sqrt(np.mean(tail * tail)))
+
+
+def synth_one(sent: str, i: int, out_path: str, voice: str,
+              retries: int, thresh: float):
+    """Synthesize ONE sentence, re-synthesizing if the 句尾 looks truncated.
+
+    Each synth pass advances the in-process RNG → a different deterministic
+    output, so a truncated first pass can be replaced by a clean later one.
+    Tries up to (1 + retries) passes; stops early once end-50ms RMS ≤ thresh.
+    Keeps whichever pass had the lowest 句尾 RMS (cleanest tail). end_rms is
+    measured on RAW audio (NO fade — fade is applied downstream by the consumer).
+
+    Returns (best_ndarray | None, best_rms). None ⇒ every pass failed → caller skips.
+    """
+    best = None
+    best_rms = float("inf")
+    for attempt in range(1 + retries):
+        t0 = time.monotonic()
+        try:
+            res = tts_service.synthesize(
+                text=sent, output_path=out_path,
+                provider="cosyvoice", voice=voice, fallback="",
+            )
+        except Exception as e:  # noqa: BLE001 — never kill the producer
+            log(f"[gen] seg{i} attempt{attempt+1} EXCEPTION "
+                f"({time.monotonic()-t0:.2f}s): {e}")
+            continue
+        dt = time.monotonic() - t0
+        if not res.ok:
+            log(f"[gen] seg{i} attempt{attempt+1} FAILED status={res.status} "
+                f"({dt:.2f}s)")
+            continue
+        try:
+            data, sr = sf.read(res.audio_path, dtype="float32", always_2d=False)
+        except Exception as e:  # noqa: BLE001
+            log(f"[gen] seg{i} attempt{attempt+1} READ FAILED ({e})")
+            continue
+        if data.ndim > 1:  # safety: downmix to mono
+            data = data.mean(axis=1).astype("float32")
+        er = end_rms(data)
+        dur = len(data) / sr if sr else 0.0
+        log(f"[gen] seg{i} attempt{attempt+1} gen={dt:.2f}s "
+            f"audio={dur:.2f}s end50RMS={er:.4f}")
+        if er < best_rms:
+            best, best_rms = data, er
+        if er <= thresh:
+            break  # clean enough — keep it
+        log(f"[gen] seg{i} 句尾偏高({er:.3f}>{thresh}) → 重合成")
+    return best, best_rms
 
 
 def apply_fade(x: np.ndarray, fade_sec: float) -> np.ndarray:
@@ -122,34 +188,21 @@ class AudioQueue:
                 self._cond.wait()
 
 
-def producer(sents, audio_q: AudioQueue, voice: str, tmpdir: str, state: dict):
+def producer(sents, audio_q: AudioQueue, voice: str, tmpdir: str, state: dict,
+             retries: int, thresh: float):
     """Synthesize each sentence sequentially in this ONE process (model cached
-    after first synth) and enqueue float32 audio. Failures are logged + skipped
-    so the consumer never deadlocks (sentinel always sent at the end)."""
+    after first synth) and enqueue float32 audio. Each sentence goes through
+    synth_one, which re-synthesizes if the 句尾 looks truncated (advances RNG).
+    Failures (all passes) are logged + skipped so the consumer never deadlocks
+    (sentinel always sent at the end). Enqueued audio is RAW — fade/gap stay
+    downstream in the consumer (end_rms must see the un-faded tail)."""
     for i, sent in enumerate(sents):
         out = os.path.join(tmpdir, f"seg_{i:03d}.wav")
-        t0 = time.monotonic()
-        try:
-            res = tts_service.synthesize(
-                text=sent, output_path=out,
-                provider="cosyvoice", voice=voice, fallback="",
-            )
-        except Exception as e:  # noqa: BLE001 — never kill the producer
-            log(f"[gen] seg {i} EXCEPTION ({time.monotonic()-t0:.2f}s): {e}")
+        data, er = synth_one(sent, i, out, voice, retries, thresh)
+        if data is None:
+            log(f"[gen] seg{i} ALL ATTEMPTS FAILED — skip  '{sent[:18]}'")
             continue
-        gen_dt = time.monotonic() - t0
-        if not res.ok:
-            log(f"[gen] seg {i} FAILED status={res.status} ({gen_dt:.2f}s) — skip")
-            continue
-        try:
-            data, sr = sf.read(res.audio_path, dtype="float32", always_2d=False)
-        except Exception as e:  # noqa: BLE001
-            log(f"[gen] seg {i} READ FAILED ({e}) — skip")
-            continue
-        if data.ndim > 1:  # safety: downmix to mono
-            data = data.mean(axis=1).astype("float32")
-        dur = len(data) / sr if sr else 0.0
-        log(f"[gen] seg {i} {gen_dt:.2f}s  audio={dur:.2f}s  sr={sr}  '{sent[:18]}'")
+        log(f"[gen] seg{i} CHOSEN end50RMS={er:.4f}  '{sent[:18]}'")
         audio_q.put_audio(data)
     state["t_gen_done"] = time.monotonic()
     audio_q.mark_done()
@@ -207,24 +260,20 @@ def consume_realtime(audio_q: AudioQueue, B: float, device, state: dict,
 
 
 def consume_baseline(sents, voice: str, tmpdir: str, device, state: dict,
-                     gap: float, fade: float, save=None):
+                     gap: float, fade: float, retries: int, thresh: float,
+                     save=None):
     """对照: gen ALL first (cumulative), concat, THEN play. t_open = total gen.
-    Now also tail-faded per sentence + `gap` sec silence between sentences so
-    the A/B against MVP is fair (same play/save shaping)."""
+    Uses synth_one per sentence (same 句尾 retry as MVP → fair A/B). Also
+    tail-faded per sentence + `gap` sec silence between sentences so the A/B
+    against MVP is fair (same play/save shaping)."""
     pieces = []
     for i, sent in enumerate(sents):
         out = os.path.join(tmpdir, f"base_{i:03d}.wav")
-        t0 = time.monotonic()
-        res = tts_service.synthesize(text=sent, output_path=out,
-                                     provider="cosyvoice", voice=voice, fallback="")
-        gen_dt = time.monotonic() - t0
-        if not res.ok:
-            log(f"[base] seg {i} FAILED status={res.status} ({gen_dt:.2f}s) — skip")
+        data, er = synth_one(sent, i, out, voice, retries, thresh)
+        if data is None:
+            log(f"[base] seg{i} ALL ATTEMPTS FAILED — skip")
             continue
-        data, sr = sf.read(res.audio_path, dtype="float32", always_2d=False)
-        if data.ndim > 1:
-            data = data.mean(axis=1).astype("float32")
-        log(f"[base] seg {i} {gen_dt:.2f}s  audio={len(data)/sr:.2f}s")
+        log(f"[base] seg{i} CHOSEN end50RMS={er:.4f}")
         pieces.append(data)
     state["t_gen_done"] = time.monotonic()
     state["t_open"] = state["t_gen_done"]  # baseline opens only after all gen
@@ -271,6 +320,11 @@ def main(argv=None):
     ap.add_argument("--fade", type=float, default=0.02,
                     help="tail fade-out sec per sentence "
                          "(soften hard-cut 句尾 + anti-click)")
+    ap.add_argument("--tail-retries", type=int, default=3,
+                    help="max re-synth per sentence if 句尾 truncated "
+                         "(advances RNG; 0=off)")
+    ap.add_argument("--tail-thresh", type=float, default=0.08,
+                    help="句尾 end-50ms RMS above this = truncated → retry")
     args = ap.parse_args(argv)
 
     text = args.text if args.text is not None else sys.stdin.read()
@@ -290,7 +344,8 @@ def main(argv=None):
         f"T_est={t_est:.2f}s RTF={args.rtf} speak_rate={args.speak_rate}")
     log(f"[init] B = (1 - 1/{args.rtf})*{t_est:.2f} + {args.safety} = {B:.2f}s")
     log(f"[init] mode={'BASELINE' if args.baseline else 'MVP'} voice={args.voice} "
-        f"gap={args.gap:.2f}s fade={args.fade:.2f}s")
+        f"gap={args.gap:.2f}s fade={args.fade:.2f}s "
+        f"tail_retries={args.tail_retries} tail_thresh={args.tail_thresh:.2f}")
 
     tmpdir = tempfile.mkdtemp(prefix="speak_")
     state = {"t_start": time.monotonic(), "t_open": None,
@@ -298,12 +353,15 @@ def main(argv=None):
     try:
         if args.baseline:
             consume_baseline(sents, args.voice, tmpdir, args.device, state,
-                             gap=args.gap, fade=args.fade, save=args.save)
+                             gap=args.gap, fade=args.fade,
+                             retries=args.tail_retries, thresh=args.tail_thresh,
+                             save=args.save)
         else:
             audio_q = AudioQueue()
             prod = threading.Thread(
                 target=producer,
-                args=(sents, audio_q, args.voice, tmpdir, state),
+                args=(sents, audio_q, args.voice, tmpdir, state,
+                      args.tail_retries, args.tail_thresh),
                 daemon=True,
             )
             prod.start()
