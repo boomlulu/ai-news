@@ -25,3 +25,8 @@ tts/assets/prompt_candidates/
 # 例外：config 实际引用的正式 prompt 必须入库，保证配置自洽可复现
 !tts/assets/ref_my_voice_zh_prompt.wav
 Template/*.m4a
+
+# speakbox: secrets + build/runtime artifacts (source under speakbox/server, speakbox/worker stays tracked)
+speakbox/.env
+speakbox/server/speakbox
+speakbox/**/*.wav
