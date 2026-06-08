@@ -40,6 +40,23 @@ def log(msg: str) -> None:
     print(msg, file=sys.stderr, flush=True)
 
 
+def save_audio(path: str, pieces):
+    """Write concatenated `pieces` (list of float32 ndarrays, played order) to
+    `path` plus per-segment files <dir>/<stem>.seg{i:02d}.wav. 24kHz mono.
+    Side artifact for review — never affects playback. Logs saved paths→stderr."""
+    if not pieces:
+        log(f"[save] nothing to save → {path}")
+        return
+    full = np.concatenate(pieces).astype("float32")
+    sf.write(path, full, SAMPLE_RATE)
+    log(f"[save] {path}  ({len(full)/SAMPLE_RATE:.2f}s)")
+    root, _ = os.path.splitext(path)
+    for i, piece in enumerate(pieces):
+        seg_path = f"{root}.seg{i:02d}.wav"
+        sf.write(seg_path, np.ascontiguousarray(piece, dtype="float32"), SAMPLE_RATE)
+        log(f"[save] {seg_path}  ({len(piece)/SAMPLE_RATE:.2f}s)")
+
+
 def split_sentences(text: str):
     """Split on Chinese/ASCII sentence terminators, keeping the terminator.
     No terminator → whole text is one sentence."""
@@ -113,10 +130,12 @@ def producer(sents, audio_q: AudioQueue, voice: str, tmpdir: str, state: dict):
     log(f"[gen] ALL DONE @ +{state['t_gen_done']-state['t_start']:.2f}s")
 
 
-def consume_realtime(audio_q: AudioQueue, B: float, device, state: dict):
+def consume_realtime(audio_q: AudioQueue, B: float, device, state: dict,
+                     collect=None):
     """Prebuffer to threshold B, then open ONE persistent OutputStream and
     write queued chunks back-to-back until the sentinel. Counts underruns
-    (queue empty but sentinel not yet arrived)."""
+    (queue empty but sentinel not yet arrived). If `collect` is a list, each
+    played segment ndarray is appended (played order) for --save."""
     audio_q.wait_prebuffer(B)
     state["t_open"] = time.monotonic()
     log(f"[play] t_open @ +{state['t_open']-state['t_start']:.2f}s "
@@ -139,6 +158,8 @@ def consume_realtime(audio_q: AudioQueue, B: float, device, state: dict):
                 continue
             if item is None:  # sentinel
                 break
+            if collect is not None:
+                collect.append(item)
             # write in blocks so playback stays responsive / blocking is bounded
             buf = np.ascontiguousarray(item, dtype="float32")
             for off in range(0, len(buf), WRITE_BLOCK):
@@ -149,7 +170,8 @@ def consume_realtime(audio_q: AudioQueue, B: float, device, state: dict):
     state["underruns"] = underruns
 
 
-def consume_baseline(sents, voice: str, tmpdir: str, device, state: dict):
+def consume_baseline(sents, voice: str, tmpdir: str, device, state: dict,
+                     save=None):
     """对照: gen ALL first (cumulative), concat, THEN play. t_open = total gen."""
     pieces = []
     for i, sent in enumerate(sents):
@@ -174,6 +196,8 @@ def consume_baseline(sents, voice: str, tmpdir: str, device, state: dict):
         log("[base] nothing to play")
         return
     full = np.concatenate(pieces).astype("float32")
+    if save:
+        save_audio(save, pieces)
     import sounddevice as sd
     sd.play(full, samplerate=SAMPLE_RATE, device=device)
     sd.wait()
@@ -193,6 +217,9 @@ def main(argv=None):
                     help="gen ALL then play (对照 only)")
     ap.add_argument("--device", type=int, default=None,
                     help="sounddevice output device id (default: system default)")
+    ap.add_argument("--save", default=None,
+                    help="save played audio (24kHz mono WAV) for review; "
+                         "also dumps per-segment files")
     args = ap.parse_args(argv)
 
     text = args.text if args.text is not None else sys.stdin.read()
@@ -218,7 +245,8 @@ def main(argv=None):
              "t_gen_done": None, "underruns": 0}
     try:
         if args.baseline:
-            consume_baseline(sents, args.voice, tmpdir, args.device, state)
+            consume_baseline(sents, args.voice, tmpdir, args.device, state,
+                             save=args.save)
         else:
             audio_q = AudioQueue()
             prod = threading.Thread(
@@ -227,8 +255,11 @@ def main(argv=None):
                 daemon=True,
             )
             prod.start()
-            consume_realtime(audio_q, B, args.device, state)
+            played = [] if args.save else None
+            consume_realtime(audio_q, B, args.device, state, collect=played)
             prod.join()
+            if args.save:
+                save_audio(args.save, played)
     finally:
         shutil.rmtree(tmpdir, ignore_errors=True)
 
