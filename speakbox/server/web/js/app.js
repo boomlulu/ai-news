@@ -39,14 +39,16 @@
       .catch(function () {});
   }
 
-  // ── tasks: initial fetch + render ───────────────────────────────────────────
+  // ── tasks: initial fetch + incremental upsert ───────────────────────────────
   function loadTasks() {
     fetch("/api/tasks")
       .then(function (r) { return r.json(); })
       .then(function (list) {
-        tasks = {};
-        (list || []).forEach(function (t) { tasks[t.id] = t; });
-        render();
+        (list || []).forEach(function (t) {
+          tasks[t.id] = t;
+          upsert(t);
+        });
+        ensureEmpty();
       })
       .catch(function () {});
   }
@@ -57,29 +59,8 @@
     });
   }
 
-  function render() {
-    var ids = Object.keys(tasks).map(Number);
-    ids.sort(function (a, b) {
-      var ta = tasks[a].created_at, tb = tasks[b].created_at;
-      if (ta !== tb) return ta < tb ? 1 : -1;
-      return b - a;
-    });
-
-    if (ids.length === 0) {
-      els.list.innerHTML = '<li class="empty">暂无任务</li>';
-      return;
-    }
-
-    els.list.innerHTML = "";
-    ids.forEach(function (id) {
-      els.list.appendChild(renderTask(tasks[id]));
-    });
-  }
-
-  function renderTask(t) {
-    var li = document.createElement("li");
-    li.className = "task";
-
+  // Returns the inner HTML of a task row (no <li> wrapper).
+  function rowInner(t) {
     var statusLabel = STATUS_LABEL[t.status] || t.status;
     var html =
       '<div class="task-top">' +
@@ -94,14 +75,64 @@
         (t.progress || 0) + '%"></div></div>';
     }
     if (t.status === "done") {
-      html += '<a class="dl" href="/api/tasks/' + t.id + '/wav">下载 WAV</a>';
+      html +=
+        '<div class="actions">' +
+        '<audio class="player" controls preload="none" src="/api/tasks/' + t.id + '/wav"></audio>' +
+        '<a class="dl" href="/api/tasks/' + t.id + '/wav">下载 WAV</a>' +
+        "</div>";
     }
     if (t.status === "failed" && t.error) {
       html += '<div class="err-line">' + esc(t.error) + "</div>";
     }
+    return html;
+  }
 
-    li.innerHTML = html;
+  function makeRow(t) {
+    var li = document.createElement("li");
+    li.className = "task";
+    li.setAttribute("data-id", t.id);
+    li.setAttribute("data-created", t.created_at);
+    li.setAttribute("data-status", t.status);
+    li.innerHTML = rowInner(t);
     return li;
+  }
+
+  // Insert/update a single row without touching others. Terminal (done) rows
+  // are never rebuilt, so a playing <audio> is preserved.
+  function upsert(t) {
+    var empty = els.list.querySelector("li.empty");
+    if (empty) empty.parentNode.removeChild(empty);
+
+    var existing = els.list.querySelector('li[data-id="' + t.id + '"]');
+    if (existing) {
+      if (existing.dataset.status === "done") return; // terminal — keep audio alive
+      existing.dataset.status = t.status;
+      existing.innerHTML = rowInner(t);
+      return;
+    }
+
+    var li = makeRow(t);
+    // Insert by created_at DESC (newest first); tie-break by id DESC.
+    var rows = els.list.querySelectorAll("li.task");
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var rc = r.getAttribute("data-created");
+      var rid = Number(r.getAttribute("data-id"));
+      if (rc < t.created_at || (rc === t.created_at && rid < t.id)) {
+        els.list.insertBefore(li, r);
+        return;
+      }
+    }
+    els.list.appendChild(li);
+  }
+
+  function ensureEmpty() {
+    if (els.list.querySelector("li.task")) {
+      var empty = els.list.querySelector("li.empty");
+      if (empty) empty.parentNode.removeChild(empty);
+    } else if (!els.list.querySelector("li.empty")) {
+      els.list.innerHTML = '<li class="empty">暂无任务</li>';
+    }
   }
 
   // ── SSE live updates ────────────────────────────────────────────────────────
@@ -120,7 +151,8 @@
       try {
         var t = JSON.parse(e.data);
         tasks[t.id] = t;
-        render();
+        upsert(t);
+        ensureEmpty();
       } catch (err) {}
     });
   }
@@ -157,8 +189,7 @@
         }
         els.text.value = "";
         els.count.textContent = "0";
-        // The created task arrives via SSE; fall back to a refresh if needed.
-        loadTasks();
+        // The created task arrives via SSE upsert; no full refresh needed.
       })
       .catch(function () {
         els.formError.textContent = "网络错误";

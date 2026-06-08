@@ -197,3 +197,19 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .err-line { color: var(--err); font-size: 13px; margin-top: 8px; }
 
 .empty { color: var(--muted); padding: 12px 0; }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+audio.player {
+  height: 32px;
+  max-width: 100%;
+  flex: 1 1 220px;
+}
+
+.actions .dl { margin-top: 0; }
