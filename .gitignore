@@ -33,3 +33,7 @@ Template/*.m4a
 speakbox/.env
 speakbox/server/speakbox
 speakbox/**/*.wav
+
+# effect-archive 留档音频：私人克隆音色，本机留档不发布到公开仓库（只入库各档 README manifest）
+tts/effect-archive/**/*.wav
+tts/effect-archive/**/*.mp3
