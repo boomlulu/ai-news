@@ -1,5 +1,7 @@
 # 内部交接笔记，含本机绝对路径，不对外发布
 HANDOFF.md
+# 主编工作 prompt 正文，含本机绝对路径，同 HANDOFF.md，不对外发布
+ App 任务正文.md
 # macOS
 .DS_Store
 
@@ -16,3 +18,6 @@ tts/samples/voicetest/
 tts/samples/_excerpt.txt
 tts/samples/*-macsay.mp3
 tts/install.log
+# 用户克隆音色参考音频：大/含版权来源/可重生成，不入库（含 config 引用的 prompt wav）
+tts/assets/*.wav
+Template/*.m4a
