@@ -40,16 +40,42 @@ def log(msg: str) -> None:
     print(msg, file=sys.stderr, flush=True)
 
 
-def save_audio(path: str, pieces):
-    """Write concatenated `pieces` (list of float32 ndarrays, played order) to
-    `path` plus per-segment files <dir>/<stem>.seg{i:02d}.wav. 24kHz mono.
+def apply_fade(x: np.ndarray, fade_sec: float) -> np.ndarray:
+    """Tail fade-out: ramp the last `fade_sec` seconds to 0 (softens the hard
+    句尾 cut + kills end-of-segment clicks). No-op if fade_sec<=0 or the segment
+    is shorter than the fade window. Returns float32 (a copy if faded)."""
+    x = np.ascontiguousarray(x, dtype="float32")
+    n = int(fade_sec * SAMPLE_RATE)
+    if n <= 0 or len(x) <= n:
+        return x
+    out = x.copy()
+    out[-n:] *= np.linspace(1.0, 0.0, n, dtype="float32")
+    return out
+
+
+def silence(gap_sec: float) -> np.ndarray:
+    """`gap_sec` seconds of float32 silence @ 24kHz (换气 between sentences)."""
+    return np.zeros(int(gap_sec * SAMPLE_RATE), dtype="float32")
+
+
+def save_audio(path: str, pieces, gap_sec: float):
+    """Write `pieces` (list of FADED float32 ndarrays, played order) to `path`,
+    interleaving `gap_sec` of silence BETWEEN pieces (none before first / after
+    last), plus per-segment files <dir>/<stem>.seg{i:02d}.wav (each FADED, NO
+    gap). 24kHz mono. Saved == played (same faded pieces + same gaps).
     Side artifact for review — never affects playback. Logs saved paths→stderr."""
     if not pieces:
         log(f"[save] nothing to save → {path}")
         return
-    full = np.concatenate(pieces).astype("float32")
+    parts = []
+    gap = silence(gap_sec)
+    for i, piece in enumerate(pieces):
+        if i:
+            parts.append(gap)
+        parts.append(np.ascontiguousarray(piece, dtype="float32"))
+    full = np.concatenate(parts).astype("float32")
     sf.write(path, full, SAMPLE_RATE)
-    log(f"[save] {path}  ({len(full)/SAMPLE_RATE:.2f}s)")
+    log(f"[save] {path}  ({len(full)/SAMPLE_RATE:.2f}s, gap={gap_sec:.2f}s)")
     root, _ = os.path.splitext(path)
     for i, piece in enumerate(pieces):
         seg_path = f"{root}.seg{i:02d}.wav"
@@ -131,11 +157,13 @@ def producer(sents, audio_q: AudioQueue, voice: str, tmpdir: str, state: dict):
 
 
 def consume_realtime(audio_q: AudioQueue, B: float, device, state: dict,
-                     collect=None):
+                     gap: float, fade: float, collect=None):
     """Prebuffer to threshold B, then open ONE persistent OutputStream and
-    write queued chunks back-to-back until the sentinel. Counts underruns
-    (queue empty but sentinel not yet arrived). If `collect` is a list, each
-    played segment ndarray is appended (played order) for --save."""
+    write queued chunks until the sentinel. Each sentence is tail-faded (`fade`
+    sec) and `gap` sec of silence is written BETWEEN sentences (none before the
+    first / after the last → N-1 gaps for N sentences). Counts underruns (queue
+    empty but sentinel not yet arrived). If `collect` is a list, each played
+    FADED segment ndarray is appended (played order) for --save."""
     audio_q.wait_prebuffer(B)
     state["t_open"] = time.monotonic()
     log(f"[play] t_open @ +{state['t_open']-state['t_start']:.2f}s "
@@ -143,6 +171,8 @@ def consume_realtime(audio_q: AudioQueue, B: float, device, state: dict,
 
     import sounddevice as sd
     underruns = 0
+    first = True
+    gap_buf = silence(gap)
     stream = sd.OutputStream(samplerate=SAMPLE_RATE, channels=CHANNELS,
                              dtype="float32", device=device)
     stream.start()
@@ -158,12 +188,18 @@ def consume_realtime(audio_q: AudioQueue, B: float, device, state: dict,
                 continue
             if item is None:  # sentinel
                 break
+            faded = apply_fade(item, fade)
             if collect is not None:
-                collect.append(item)
+                collect.append(faded)
+            # 换气: write inter-sentence silence before every segment but the first
+            if not first and len(gap_buf):
+                for off in range(0, len(gap_buf), WRITE_BLOCK):
+                    stream.write(gap_buf[off:off + WRITE_BLOCK])
             # write in blocks so playback stays responsive / blocking is bounded
-            buf = np.ascontiguousarray(item, dtype="float32")
+            buf = np.ascontiguousarray(faded, dtype="float32")
             for off in range(0, len(buf), WRITE_BLOCK):
                 stream.write(buf[off:off + WRITE_BLOCK])
+            first = False
     finally:
         stream.stop()
         stream.close()
@@ -171,8 +207,10 @@ def consume_realtime(audio_q: AudioQueue, B: float, device, state: dict,
 
 
 def consume_baseline(sents, voice: str, tmpdir: str, device, state: dict,
-                     save=None):
-    """对照: gen ALL first (cumulative), concat, THEN play. t_open = total gen."""
+                     gap: float, fade: float, save=None):
+    """对照: gen ALL first (cumulative), concat, THEN play. t_open = total gen.
+    Now also tail-faded per sentence + `gap` sec silence between sentences so
+    the A/B against MVP is fair (same play/save shaping)."""
     pieces = []
     for i, sent in enumerate(sents):
         out = os.path.join(tmpdir, f"base_{i:03d}.wav")
@@ -195,9 +233,16 @@ def consume_baseline(sents, voice: str, tmpdir: str, device, state: dict,
     if not pieces:
         log("[base] nothing to play")
         return
-    full = np.concatenate(pieces).astype("float32")
+    faded_pieces = [apply_fade(p, fade) for p in pieces]
+    parts = []
+    gap_buf = silence(gap)
+    for i, p in enumerate(faded_pieces):
+        if i and len(gap_buf):
+            parts.append(gap_buf)
+        parts.append(p)
+    full = np.concatenate(parts).astype("float32")
     if save:
-        save_audio(save, pieces)
+        save_audio(save, faded_pieces, gap)
     import sounddevice as sd
     sd.play(full, samplerate=SAMPLE_RATE, device=device)
     sd.wait()
@@ -220,6 +265,12 @@ def main(argv=None):
     ap.add_argument("--save", default=None,
                     help="save played audio (24kHz mono WAV) for review; "
                          "also dumps per-segment files")
+    ap.add_argument("--gap", type=float, default=0.30,
+                    help="silence sec inserted BETWEEN sentences "
+                         "(换气; gives clipped 句尾 room)")
+    ap.add_argument("--fade", type=float, default=0.02,
+                    help="tail fade-out sec per sentence "
+                         "(soften hard-cut 句尾 + anti-click)")
     args = ap.parse_args(argv)
 
     text = args.text if args.text is not None else sys.stdin.read()
@@ -238,7 +289,8 @@ def main(argv=None):
     log(f"[init] sentences={len(sents)} chars={total_chars} "
         f"T_est={t_est:.2f}s RTF={args.rtf} speak_rate={args.speak_rate}")
     log(f"[init] B = (1 - 1/{args.rtf})*{t_est:.2f} + {args.safety} = {B:.2f}s")
-    log(f"[init] mode={'BASELINE' if args.baseline else 'MVP'} voice={args.voice}")
+    log(f"[init] mode={'BASELINE' if args.baseline else 'MVP'} voice={args.voice} "
+        f"gap={args.gap:.2f}s fade={args.fade:.2f}s")
 
     tmpdir = tempfile.mkdtemp(prefix="speak_")
     state = {"t_start": time.monotonic(), "t_open": None,
@@ -246,7 +298,7 @@ def main(argv=None):
     try:
         if args.baseline:
             consume_baseline(sents, args.voice, tmpdir, args.device, state,
-                             save=args.save)
+                             gap=args.gap, fade=args.fade, save=args.save)
         else:
             audio_q = AudioQueue()
             prod = threading.Thread(
@@ -256,10 +308,11 @@ def main(argv=None):
             )
             prod.start()
             played = [] if args.save else None
-            consume_realtime(audio_q, B, args.device, state, collect=played)
+            consume_realtime(audio_q, B, args.device, state,
+                             gap=args.gap, fade=args.fade, collect=played)
             prod.join()
             if args.save:
-                save_audio(args.save, played)
+                save_audio(args.save, played, args.gap)
     finally:
         shutil.rmtree(tmpdir, ignore_errors=True)
 
