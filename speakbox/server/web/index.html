@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>speakbox · 文字转语音</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="hdr">
+      <h1>speakbox</h1>
+      <p class="sub">输入文字，选择音色，生成可下载的语音。</p>
+    </header>
+
+    <section class="card">
+      <form id="task-form" autocomplete="off">
+        <label class="field">
+          <span class="label">文本（最多 100 字）</span>
+          <textarea id="text" rows="3" maxlength="100" placeholder="请输入要合成的中文文本…"></textarea>
+          <span class="counter"><span id="count">0</span>/100</span>
+        </label>
+        <label class="field">
+          <span class="label">音色</span>
+          <select id="voice"></select>
+        </label>
+        <div class="row">
+          <button type="submit" id="submit">生成语音</button>
+          <span id="form-error" class="form-error"></span>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="list-hdr">
+        <h2>任务列表</h2>
+        <span id="conn" class="conn conn-off">未连接</span>
+      </div>
+      <ul id="tasks" class="tasks"></ul>
+    </section>
+  </main>
+  <script src="/js/app.js"></script>
+</body>
+</html>
