@@ -82,8 +82,8 @@ def write_scoring(outdir, rows, round_name):
     lines.append("听 `*.mp3`，每条只填两列。")
     lines.append("有Bug：吞字/读错/电音/杂音/削音/停顿怪 → 填 `Y`，无则留空；可用：能用 → 填 `√`，不能用留空。")
     lines.append("")
-    lines.append("| 序号 | 情绪 | 变体 | 文件 | instruct | 有Bug | 可用 |")
-    lines.append("|---|---|---|---|---|---|---|")
+    lines.append("| 序号 | 情绪 | 变体 | 文件 | instruct | 有Bug | 可用 | 优化建议 |")
+    lines.append("|---|---|---|---|---|---|---|---|")
     last_emo = None
     for r in rows:
         # 同情绪只在第一行展示情绪名，分组更清晰（后续行留空）
@@ -92,7 +92,7 @@ def write_scoring(outdir, rows, round_name):
         status = "" if r["ok"] else " (合成失败)"
         lines.append(
             f"| {r['emo_id']} | {emo_cell} | {r['v']} | `{r['fname']}`{status} | "
-            f"{r['instruct']} |  |  |"
+            f"{r['instruct']} |  |  |  |"
         )
     lines.append("")
     path = os.path.join(outdir, "SCORING.md")
