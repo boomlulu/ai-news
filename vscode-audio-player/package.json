@@ -1,0 +1,31 @@
+{
+  "name": "ainews-audio-player",
+  "displayName": "AINews Audio Player",
+  "description": "资源管理器右键播放/停止音频 (afplay)",
+  "version": "0.0.1",
+  "publisher": "ainews-local",
+  "engines": { "vscode": "^1.75.0" },
+  "categories": ["Other"],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "ainewsAudio.play", "title": "▶ 播放音频" },
+      { "command": "ainewsAudio.stop", "title": "⏹ 停止播放" }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "ainewsAudio.play",
+          "when": "resourceExtname == .wav || resourceExtname == .mp3 || resourceExtname == .flac || resourceExtname == .ogg || resourceExtname == .m4a || resourceExtname == .aac",
+          "group": "audio@1"
+        },
+        {
+          "command": "ainewsAudio.stop",
+          "when": "resourceExtname == .wav || resourceExtname == .mp3 || resourceExtname == .flac || resourceExtname == .ogg || resourceExtname == .m4a || resourceExtname == .aac",
+          "group": "audio@2"
+        }
+      ]
+    }
+  }
+}
