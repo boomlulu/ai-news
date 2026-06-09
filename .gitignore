@@ -5,13 +5,9 @@ HANDOFF.md
 # macOS
 .DS_Store
 
-# TTS layer (heavy/generated artifacts)
-tts/.venv/
-tts/vendor/
-tts/models/
-tts/assets/_ref.aiff
-tts/**/__pycache__/
 __pycache__/
+
+# TTS 引擎已迁 AISpeak；此处仅保留 tts/samples/ 每日口播产物的草稿/试听忽略规则
 # large/scratch TTS audio (keep small mp3 samples + script only)
 tts/samples/*.wav
 tts/samples/voicetest/
@@ -20,20 +16,4 @@ tts/samples/*-macsay.mp3
 # pacing/voice A-B 实验试听件（草稿），不入库；每日正式口播 mp3 仍入库
 tts/samples/_pacing_*
 tts/samples/daily-ai-news-*-broadcast-myvoice*.mp3
-tts/install.log
-# 用户克隆音色参考音频：大/含版权来源/可重生成，不入库（含 30s 归档源）
-tts/assets/*.wav
-# prompt 选型备选切片（同源 bilibili 录音）：本地备查，不入库
-tts/assets/prompt_candidates/
-# 例外：config 实际引用的正式 prompt 必须入库，保证配置自洽可复现
-!tts/assets/ref_my_voice_zh_prompt.wav
 Template/*.m4a
-
-# speakbox: secrets + build/runtime artifacts (source under speakbox/server, speakbox/worker stays tracked)
-speakbox/.env
-speakbox/server/speakbox
-speakbox/**/*.wav
-
-# effect-archive 留档音频：私人克隆音色，本机留档不发布到公开仓库（只入库各档 README manifest）
-tts/effect-archive/**/*.wav
-tts/effect-archive/**/*.mp3
