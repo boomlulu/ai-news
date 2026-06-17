@@ -822,8 +822,8 @@
         <span class="grp">三天</span>
         <a href="2026-06-14.html" aria-label="查看 2026年6月14日 新闻">6/14</a>
         <a href="2026-06-15.html" aria-label="查看 2026年6月15日 新闻">6/15</a>
-        <a class="active" href="2026-06-16.html" aria-current="page" aria-label="当前 2026年6月16日 新闻">今天</a>
-        <span class="grp">三月</span>
+        <a class="active" href="2026-06-16.html" aria-current="page" aria-label="当前 2026年6月16日 新闻">6/16</a>
+        <!--navfix:start--><span class="grp">较新</span><a href="2026-06-17.html" aria-label="查看次日 2026-06-17 新闻">次日</a><a href="../index.html" aria-label="回到最新一期">最新</a><!--navfix:end--><span class="grp">三月</span>
         <a href="大事件/index.html#month" aria-label="查看 最近三月 大事件">月度</a>
         <span class="grp">几年</span>
         <a href="大事件/index.html#year" aria-label="查看 最近几年 大事件">年度</a>
@@ -1085,5 +1085,32 @@
       });
     })();
   </script>
+<!--aiaudio:start-->
+<style>
+#aiAudioFab{position:fixed;z-index:40;right:12px;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:9px 15px;border:1px solid var(--ink,#111);border-radius:999px;background:var(--ink,#111);color:var(--paper,#fbf8ef);font-family:ui-sans-serif,system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;font-weight:900;letter-spacing:.03em;cursor:pointer;box-shadow:0 10px 24px rgba(38,31,20,.22);-webkit-tap-highlight-color:transparent}
+#aiAudioFab[disabled]{opacity:.55;cursor:default;background:rgba(251,248,239,.92);color:var(--muted,#69645b);border-style:dashed;box-shadow:0 6px 16px rgba(38,31,20,.12)}
+#aiAudioFab.playing{background:var(--red,#b52823);border-color:var(--red,#b52823);color:#fff}
+@media (max-width:390px){#aiAudioFab{font-size:12px;padding:8px 13px}}
+</style>
+<button type="button" id="aiAudioFab" disabled aria-label="收听本期 AI 播报">⏳ 检查中…</button>
+<audio id="aiAudioEl" preload="none" src="../tts/samples/daily-ai-news-2026-06-16-broadcast.mp3"></audio>
+<script>
+(function(){
+  var b=document.getElementById('aiAudioFab'),a=document.getElementById('aiAudioEl');
+  if(!b||!a)return;
+  var IDLE='\uD83D\uDD0A 收听播报',PLAY='\u23F8 暂停',MISS='\uD83D\uDD07 播报未生成';
+  // 用 HEAD 探测站点上是否有该 mp3（比移动端不稳定的 audio 预加载更可靠）
+  fetch(a.getAttribute('src'),{method:'HEAD'}).then(function(r){
+    if(r.ok){b.disabled=false;b.textContent=IDLE;}
+    else{b.disabled=true;b.textContent=MISS;}
+  }).catch(function(){b.disabled=false;b.textContent=IDLE;}); // 网络异常仍允许点按尝试
+  a.addEventListener('play',function(){b.classList.add('playing');b.textContent=PLAY;});
+  a.addEventListener('pause',function(){b.classList.remove('playing');if(!b.disabled)b.textContent=IDLE;});
+  a.addEventListener('ended',function(){b.classList.remove('playing');b.textContent=IDLE;});
+  a.addEventListener('error',function(){b.disabled=true;b.classList.remove('playing');b.textContent=MISS;});
+  b.addEventListener('click',function(){if(b.disabled)return;if(a.paused){a.play().catch(function(){b.disabled=true;b.textContent=MISS;});}else{a.pause();}});
+})();
+</script>
+<!--aiaudio:end-->
 </body>
 </html>

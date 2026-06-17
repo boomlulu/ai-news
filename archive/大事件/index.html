@@ -629,8 +629,8 @@ AI 大事件「新闻刊物风格」归档模板
       <button class="date-handle" type="button" aria-label="展开时间轴">时间</button>
       <nav class="date-menu" aria-label="按时间层级切换新闻">
         <span class="grp">日报</span>
-        <a href="../2026-06-07.html" aria-label="查看 2026-06-07 日报">06-07</a>
-        <a href="../2026-06-08.html" aria-label="查看 2026-06-08 日报">06-08</a>
+        <a href="../2026-06-16.html" aria-label="查看 2026-06-16 日报">06-16</a>
+        <a href="../2026-06-17.html" aria-label="查看 2026-06-17 日报">06-17</a>
         <span class="grp">归档</span>
         <a class="active" href="#month" aria-label="查看月度大事件">月度</a>
         <a href="#year" aria-label="查看年度大事件">年度</a>
@@ -654,13 +654,13 @@ AI 大事件「新闻刊物风格」归档模板
             <small>Monthly and Yearly Record</small>
             <h1>AI 大事件</h1>
           </div>
-          <p class="front-lead">日报之外的长期记忆：只有经得起一周、一个月、一个季度回看的事件，才进入月度与年度档案。</p>
+          <p class="front-lead">日报之外的长期记忆：最近两个月按月汇总当月大事件，更早的归并进年度最终档案。</p>
           <div class="memory-rule">
-            <p><b>Monthly</b> 过 3 天窗口后复评，留下当月真正值得回看的重大进展。</p>
-            <p><b>Yearly</b> 超出最近 3 个月后再筛选，只保留改变格局的里程碑。</p>
+            <p><b>Monthly</b> 最近两个月，按月汇总日报头条，作为当月大事件。</p>
+            <p><b>Yearly</b> 超过最近两个月的月份，归并入年度最终档案，长期保留。</p>
           </div>
           <div class="archive-links">
-            <a class="archive-link" href="#month"><strong>月度</strong><span>最近三月大事件</span></a>
+            <a class="archive-link" href="#month"><strong>月度</strong><span>最近两月大事件</span></a>
             <a class="archive-link" href="#year"><strong>年度</strong><span>最近几年里程碑</span></a>
           </div>
           <div class="ticker"><b>筛选规则</b><span>宁可空缺，不为归档凑数。</span></div>
@@ -670,9 +670,9 @@ AI 大事件「新闻刊物风格」归档模板
       <section class="slide" id="month">
         <div class="slide-inner archive">
           <div class="archive-head">
-            <div class="eyebrow"><span class="tag month">Monthly</span><span>Rolling 3 months</span></div>
+            <div class="eyebrow"><span class="tag month">Monthly</span><span>Rolling 2 months</span></div>
             <h2 class="archive-title">月度大事件</h2>
-            <p class="archive-desc">从日报里复评出来的月度事件，强调“回看仍然重要”的产业、研究、产品和监管变化。</p>
+            <p class="archive-desc">最近两个月的日报头条，按月汇总为当月大事件；更早的归入年度档案。</p>
           </div>
           <div class="event-scroll" id="month-content"><div class="err">加载中...</div></div>
         </div>
@@ -731,7 +731,7 @@ AI 大事件「新闻刊物风格」归档模板
       var Y = now.getFullYear();
       var M = now.getMonth() + 1;
       var months = [];
-      for(var i = 0; i < 3; i++){
+      for(var i = 0; i < 2; i++){
         var d = new Date(Y, M - 1 - i, 1);
         months.push({
           key: d.getFullYear() + "-" + pad(d.getMonth() + 1),
