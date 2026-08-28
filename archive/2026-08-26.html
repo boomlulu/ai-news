@@ -1,1 +1,28 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>每日 AI 新闻｜2026-08-26</title><link rel="stylesheet" href="../style.css"></head><body><main><p><a href="../index.html">最新</a> · <a href="index.html">历史归档</a></p><h1>AI 日报 · 2026年8月26日</h1><p>增量窗口：2026-08-25T03:00:00Z → 2026-08-26T11:00:00+08:00</p><h2>今日新增</h2><p>Hugging Face 官方 RSS 收录 IBM Granite 4.2 构建说明，以及 Quantization-Aware Healing 的 4-bit 压缩模型文章。</p><h2>持续追踪</h2><p>6 条既有事件链暂无新官方里程碑。<a href="../data/raw/2026-08-26/search-note.json">原始检索快照</a>。</p><h2>检索局限</h2><p>两项性能/影响判断仍待独立复现；OpenAI RSS 受挑战保护。</p></main></body></html>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>每日 AI 新闻｜2026-08-26</title><link rel="stylesheet" href="../style.css"></head><body><main><p><a href="../index.html">最新</a> · <a href="index.html">历史归档</a></p><h1>AI 日报 · 2026年8月26日</h1><p>增量窗口：2026-08-25T03:00:00Z → 2026-08-26T11:00:00+08:00</p><h2>今日新增</h2><p>Hugging Face 官方 RSS 收录 IBM Granite 4.2 构建说明，以及 Quantization-Aware Healing 的 4-bit 压缩模型文章。</p><h2>持续追踪</h2><p>6 条既有事件链暂无新官方里程碑。<a href="../data/raw/2026-08-26/search-note.json">原始检索快照</a>。</p><h2>检索局限</h2><p>两项性能/影响判断仍待独立复现；OpenAI RSS 受挑战保护。</p></main><!--aiaudio:start-->
+<style>
+#aiAudioFab{position:fixed;z-index:40;right:12px;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:9px 15px;border:1px solid var(--ink,#111);border-radius:999px;background:var(--ink,#111);color:var(--paper,#fbf8ef);font-family:ui-sans-serif,system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;font-weight:900;letter-spacing:.03em;cursor:pointer;box-shadow:0 10px 24px rgba(38,31,20,.22);-webkit-tap-highlight-color:transparent}
+#aiAudioFab[disabled]{opacity:.55;cursor:default;background:rgba(251,248,239,.92);color:var(--muted,#69645b);border-style:dashed;box-shadow:0 6px 16px rgba(38,31,20,.12)}
+#aiAudioFab.playing{background:var(--red,#b52823);border-color:var(--red,#b52823);color:#fff}
+@media (max-width:390px){#aiAudioFab{font-size:12px;padding:8px 13px}}
+</style>
+<button type="button" id="aiAudioFab" disabled aria-label="收听本期 AI 播报">⏳ 检查中…</button>
+<audio id="aiAudioEl" preload="none" src="../tts/samples/daily-ai-news-2026-08-26-broadcast.mp3"></audio>
+<script>
+(function(){
+  var b=document.getElementById('aiAudioFab'),a=document.getElementById('aiAudioEl');
+  if(!b||!a)return;
+  var IDLE='\uD83D\uDD0A 收听播报',PLAY='\u23F8 暂停',MISS='\uD83D\uDD07 播报未生成';
+  // 用 HEAD 探测站点上是否有该 mp3（比移动端不稳定的 audio 预加载更可靠）
+  fetch(a.getAttribute('src'),{method:'HEAD'}).then(function(r){
+    if(r.ok){b.disabled=false;b.textContent=IDLE;}
+    else{b.disabled=true;b.textContent=MISS;}
+  }).catch(function(){b.disabled=false;b.textContent=IDLE;}); // 网络异常仍允许点按尝试
+  a.addEventListener('play',function(){b.classList.add('playing');b.textContent=PLAY;});
+  a.addEventListener('pause',function(){b.classList.remove('playing');if(!b.disabled)b.textContent=IDLE;});
+  a.addEventListener('ended',function(){b.classList.remove('playing');b.textContent=IDLE;});
+  a.addEventListener('error',function(){b.disabled=true;b.classList.remove('playing');b.textContent=MISS;});
+  b.addEventListener('click',function(){if(b.disabled)return;if(a.paused){a.play().catch(function(){b.disabled=true;b.textContent=MISS;});}else{a.pause();}});
+})();
+</script>
+<!--aiaudio:end-->
+</body></html>
