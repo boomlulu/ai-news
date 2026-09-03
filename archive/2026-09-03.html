@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI 每日精选 · 2026-09-03</title><link rel="stylesheet" href="../style.css"></head><body><main><h1>AI 日报 · 2026年9月3日</h1><p>严格窗口内收录 8 条可核验增量：3 个产品/平台发布、4 篇预印本、1 个客户案例；持续追踪 6 条事件链。</p><p><a href="../index.html">返回今日</a> · <a href="index.html">历史归档</a> · <a href="../timeline/index.html">事件时间线</a></p><h2>今日新增</h2><ol><li><a href="https://blog.google/innovation-and-ai/technology/safety-security/fairwind-program/">Google Fairwind 限量网络防御计划</a>：面向政府与受信伙伴；尚无独立效果证据。</li><li><a href="https://aws.amazon.com/blogs/machine-learning/accessing-openai-gpt-5-6-models-on-amazon-bedrock-from-australia-with-global-cross-region-inference/">AWS 澳大利亚入口接入 GPT-5.6</a>：悉尼、墨尔本可调用全球推理 profiles；处理可能跨区。</li><li><a href="https://huggingface.co/blog/ibm-research/real-time-intelligence">IBM 时序模型进入 Confluent Early Access</a>：通过 Flink SQL 做预测与异常检测。</li><li><a href="https://arxiv.org/abs/2609.02885">Discriminative World Models</a>：用结果可区分性训练 Web Agent 世界模型。</li><li><a href="https://arxiv.org/abs/2609.02846">UE5M3 FP4</a>：8B 模型近 1900 亿 token 软件模拟 FP4 预训练。</li><li><a href="https://arxiv.org/abs/2609.02783">EarlyEval</a>：作者报告减少 13%-26% Agent 步数及最多 44.1% 输入 token。</li><li><a href="https://arxiv.org/abs/2609.02774">CodePoisonRAG</a>：展示检索增强代码生成的上游投毒风险。</li><li><a href="https://openai.com/index/atv-big-air-tour">OpenAI ATV 客户案例</a>：效率数字仅来自官方 RSS，未经独立验证。</li></ol><h2>持续追踪</h2><p>既有 6 条事件链无同事件新里程碑，实体与时间线不变。</p><h2>证据边界</h2><p>论文均为作者报告的预印本；没有发现独立市场反馈。完整来源与限制见 Markdown 归档及原始 JSON。</p></main><!--aiaudio:start-->
+<style>
+#aiAudioFab{position:fixed;z-index:40;right:12px;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:9px 15px;border:1px solid var(--ink,#111);border-radius:999px;background:var(--ink,#111);color:var(--paper,#fbf8ef);font-family:ui-sans-serif,system-ui,-apple-system,"PingFang SC",sans-serif;font-size:13px;font-weight:900;letter-spacing:.03em;cursor:pointer;box-shadow:0 10px 24px rgba(38,31,20,.22);-webkit-tap-highlight-color:transparent}
+#aiAudioFab[disabled]{opacity:.55;cursor:default;background:rgba(251,248,239,.92);color:var(--muted,#69645b);border-style:dashed;box-shadow:0 6px 16px rgba(38,31,20,.12)}
+#aiAudioFab.playing{background:var(--red,#b52823);border-color:var(--red,#b52823);color:#fff}
+@media (max-width:390px){#aiAudioFab{font-size:12px;padding:8px 13px}}
+</style>
+<button type="button" id="aiAudioFab" disabled aria-label="收听本期 AI 播报">⏳ 检查中…</button>
+<audio id="aiAudioEl" preload="none" src="../tts/samples/daily-ai-news-2026-09-03-broadcast.mp3"></audio>
+<script>
+(function(){
+  var b=document.getElementById('aiAudioFab'),a=document.getElementById('aiAudioEl');
+  if(!b||!a)return;
+  var IDLE='\uD83D\uDD0A 收听播报',PLAY='\u23F8 暂停',MISS='\uD83D\uDD07 播报未生成';
+  // 用 HEAD 探测站点上是否有该 mp3（比移动端不稳定的 audio 预加载更可靠）
+  fetch(a.getAttribute('src'),{method:'HEAD'}).then(function(r){
+    if(r.ok){b.disabled=false;b.textContent=IDLE;}
+    else{b.disabled=true;b.textContent=MISS;}
+  }).catch(function(){b.disabled=false;b.textContent=IDLE;}); // 网络异常仍允许点按尝试
+  a.addEventListener('play',function(){b.classList.add('playing');b.textContent=PLAY;});
+  a.addEventListener('pause',function(){b.classList.remove('playing');if(!b.disabled)b.textContent=IDLE;});
+  a.addEventListener('ended',function(){b.classList.remove('playing');b.textContent=IDLE;});
+  a.addEventListener('error',function(){b.disabled=true;b.classList.remove('playing');b.textContent=MISS;});
+  b.addEventListener('click',function(){if(b.disabled)return;if(a.paused){a.play().catch(function(){b.disabled=true;b.textContent=MISS;});}else{a.pause();}});
+})();
+</script>
+<!--aiaudio:end-->
+</body></html>
